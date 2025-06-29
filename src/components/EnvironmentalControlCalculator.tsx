@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { PBandClimateControl, PBandConfiguration } from '@/lib/p-band-climate-control';
 
 interface EnvironmentalInputs {
   // Room dimensions
@@ -42,10 +43,17 @@ interface EnvironmentalInputs {
   targetCO2: number; // ppm
   
   // Crop parameters
-  cropType: 'leafy' | 'fruiting' | 'herbs' | 'ornamental';
+  cropType: 'leafy' | 'fruiting' | 'herbs' | 'ornamental' | 'tomato';
   plantDensity: number; // plants/m² or plants/ft²
   leafAreaIndex: number;
   transpirationRate: number; // L/m²/day or gal/ft²/day
+  
+  // P-Band Climate Control (tomato-specific)
+  pBandSize: 'small' | 'medium' | 'large';
+  windSpeed: number; // m/s
+  radiationLevel: number; // W/m²
+  timeOfDay: 'night' | 'morning' | 'day' | 'evening';
+  seasonalMode: 'winter' | 'spring' | 'summer' | 'fall';
   
   // External conditions
   outsideTemperature: number; // °C or °F
@@ -97,6 +105,20 @@ interface HVACResults {
     temperatureAdjustment: number; // °C adjustment needed
   };
   
+  // P-Band Climate Control Analysis (tomato-specific)
+  pBandAnalysis?: {
+    ventilationPercentage: number; // 0-100%
+    fanSpeed: number; // 0-100%
+    heatingRequired: boolean;
+    coolingMode: 'recirculation' | 'ventilation' | 'pad-cooling';
+    guillotineDoorPosition: number; // 0-100%
+    expectedTemperature: number; // °C
+    controlStrategy: string;
+    warnings: string[];
+    momentumRisk: 'none' | 'low' | 'medium' | 'high';
+    optimalLightTemp: number; // °C based on light level
+  };
+  
   // Equipment recommendations
   equipmentRecommendations: {
     hvacType: string;
@@ -145,6 +167,11 @@ export function EnvironmentalControlCalculator() {
     plantDensity: 30,
     leafAreaIndex: 3.0,
     transpirationRate: 3.5,
+    pBandSize: 'medium',
+    windSpeed: 3.0,
+    radiationLevel: 400,
+    timeOfDay: 'day',
+    seasonalMode: 'summer',
     outsideTemperature: 25,
     outsideHumidity: 60,
     ambientCO2: 400,
@@ -538,6 +565,44 @@ export function EnvironmentalControlCalculator() {
     
     // Calculate enhanced analysis
     const vpdAnalysis = calculateVPDAnalysis(targetTemp, inputs.targetHumidity, inputs.cropType);
+    
+    // Calculate P-Band analysis for tomato crops
+    let pBandAnalysis = undefined;
+    if (inputs.cropType === 'tomato') {
+      const pBandConfig: PBandConfiguration = {
+        pBandSize: inputs.pBandSize,
+        temperatureTarget: targetTemp,
+        outsideTemperature: outsideTemp,
+        windSpeed: inputs.windSpeed,
+        radiationLevel: inputs.radiationLevel,
+        timeOfDay: inputs.timeOfDay,
+        seasonalMode: inputs.seasonalMode
+      };
+      
+      const pBandResult = PBandClimateControl.calculatePBandControl(pBandConfig);
+      const optimalLightTemp = PBandClimateControl.calculateOptimalTemperatureForLight(inputs.radiationLevel);
+      
+      // Analyze momentum risk
+      const tempDiff = targetTemp - outsideTemp;
+      let momentumRisk: 'none' | 'low' | 'medium' | 'high' = 'none';
+      if (tempDiff > 6) momentumRisk = 'high';
+      else if (tempDiff > 4) momentumRisk = 'medium';
+      else if (tempDiff > 3) momentumRisk = 'low';
+      
+      pBandAnalysis = {
+        ventilationPercentage: pBandResult.ventilationPercentage,
+        fanSpeed: pBandResult.fanSpeed,
+        heatingRequired: pBandResult.heatingRequired,
+        coolingMode: pBandResult.coolingMode,
+        guillotineDoorPosition: pBandResult.guillotineDoorPosition,
+        expectedTemperature: pBandResult.expectedTemperature,
+        controlStrategy: pBandResult.controlStrategy,
+        warnings: pBandResult.warnings,
+        momentumRisk,
+        optimalLightTemp
+      };
+    }
+    
     const equipmentRecommendations = generateEquipmentRecommendations(totalHeatLoad, floorArea, inputs.energyEfficiencyTarget);
     const sustainability = calculateSustainability(totalEnergyDaily, floorArea, transpirationRate * floorArea);
     const peakLoads = calculatePeakLoads(totalHeatLoad, totalEnergyDaily);
@@ -582,6 +647,7 @@ export function EnvironmentalControlCalculator() {
         velocity: ductVelocity
       },
       vpdAnalysis: vpdAnalysis,
+      pBandAnalysis: pBandAnalysis,
       equipmentRecommendations: equipmentRecommendations,
       sustainability: sustainability,
       peakLoads: peakLoads,
@@ -1083,10 +1149,93 @@ export function EnvironmentalControlCalculator() {
                 <option value="fruiting">Fruiting Crops</option>
                 <option value="herbs">Herbs</option>
                 <option value="ornamental">Ornamental</option>
+                <option value="tomato">🍅 Tomato (P-Band Control)</option>
               </select>
             </div>
           </div>
         </div>
+
+        {/* P-Band Climate Control Settings (Tomato-Specific) */}
+        {inputs.cropType === 'tomato' && (
+          <div className="bg-gradient-to-r from-green-900/30 to-green-800/30 backdrop-blur-xl rounded-xl border border-green-700 p-6">
+            <h3 className="text-lg font-semibold text-green-400 mb-4 flex items-center gap-2">
+              🍅 P-Band Climate Control (Advanced Dutch Research)
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm text-green-300">P-Band Size</label>
+                <select
+                  value={inputs.pBandSize}
+                  onChange={(e) => setInputs({...inputs, pBandSize: e.target.value as any})}
+                  className="w-full mt-1 px-3 py-2 bg-green-900/50 border border-green-600 rounded-lg text-white"
+                >
+                  <option value="small">Small (Quick Response)</option>
+                  <option value="medium">Medium (Balanced)</option>
+                  <option value="large">Large (Patient Strategy)</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="text-sm text-green-300">Wind Speed (m/s)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="10"
+                  value={inputs.windSpeed}
+                  onChange={(e) => setInputs({...inputs, windSpeed: Number(e.target.value)})}
+                  className="w-full mt-1 px-3 py-2 bg-green-900/50 border border-green-600 rounded-lg text-white"
+                />
+              </div>
+              
+              <div>
+                <label className="text-sm text-green-300">Radiation Level (W/m²)</label>
+                <input
+                  type="number"
+                  step="50"
+                  min="0"
+                  max="1200"
+                  value={inputs.radiationLevel}
+                  onChange={(e) => setInputs({...inputs, radiationLevel: Number(e.target.value)})}
+                  className="w-full mt-1 px-3 py-2 bg-green-900/50 border border-green-600 rounded-lg text-white"
+                />
+              </div>
+              
+              <div>
+                <label className="text-sm text-green-300">Time of Day</label>
+                <select
+                  value={inputs.timeOfDay}
+                  onChange={(e) => setInputs({...inputs, timeOfDay: e.target.value as any})}
+                  className="w-full mt-1 px-3 py-2 bg-green-900/50 border border-green-600 rounded-lg text-white"
+                >
+                  <option value="night">Night</option>
+                  <option value="morning">Morning</option>
+                  <option value="day">Day</option>
+                  <option value="evening">Evening</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="text-sm text-green-300">Seasonal Mode</label>
+                <select
+                  value={inputs.seasonalMode}
+                  onChange={(e) => setInputs({...inputs, seasonalMode: e.target.value as any})}
+                  className="w-full mt-1 px-3 py-2 bg-green-900/50 border border-green-600 rounded-lg text-white"
+                >
+                  <option value="winter">Winter</option>
+                  <option value="spring">Spring</option>
+                  <option value="summer">Summer</option>
+                  <option value="fall">Fall</option>
+                </select>
+              </div>
+            </div>
+            
+            <p className="text-sm text-green-300 mt-4 opacity-80">
+              P-Band control provides precise tomato-specific climate management with momentum prevention and light-based temperature optimization.
+            </p>
+          </div>
+        )}
 
         {/* Advanced Settings */}
         <div className="bg-gray-900/50 backdrop-blur-xl rounded-xl border border-gray-800 overflow-hidden">
@@ -1369,6 +1518,87 @@ export function EnvironmentalControlCalculator() {
             </div>
           </div>
         </div>
+
+        {/* P-Band Climate Control Results (Tomato-Specific) */}
+        {results.pBandAnalysis && (
+          <div className="bg-gradient-to-br from-green-900/30 to-green-800/30 backdrop-blur-xl rounded-xl p-6 border border-green-500/30">
+            <h3 className="text-lg font-semibold text-green-400 mb-4 flex items-center gap-2">
+              🍅 P-Band Climate Control Results
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div className="text-center p-4 bg-green-900/30 rounded-lg border border-green-600/30">
+                <p className="text-green-300 text-sm mb-1">Ventilation</p>
+                <p className="text-2xl font-bold text-white">{results.pBandAnalysis.ventilationPercentage}%</p>
+              </div>
+              
+              <div className="text-center p-4 bg-green-900/30 rounded-lg border border-green-600/30">
+                <p className="text-green-300 text-sm mb-1">Fan Speed</p>
+                <p className="text-2xl font-bold text-white">{results.pBandAnalysis.fanSpeed}%</p>
+              </div>
+              
+              <div className="text-center p-4 bg-green-900/30 rounded-lg border border-green-600/30">
+                <p className="text-green-300 text-sm mb-1">Expected Temp</p>
+                <p className="text-2xl font-bold text-white">{formatNumber(results.pBandAnalysis.expectedTemperature, 1)}°C</p>
+              </div>
+              
+              <div className="text-center p-4 bg-green-900/30 rounded-lg border border-green-600/30">
+                <p className="text-green-300 text-sm mb-1">Optimal Light Temp</p>
+                <p className="text-2xl font-bold text-white">{formatNumber(results.pBandAnalysis.optimalLightTemp, 1)}°C</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <h4 className="font-medium text-green-300">Control Settings</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Cooling Mode</span>
+                    <span className="text-white capitalize">{results.pBandAnalysis.coolingMode}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Door Position</span>
+                    <span className="text-white">{results.pBandAnalysis.guillotineDoorPosition}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Heating Required</span>
+                    <span className="text-white">{results.pBandAnalysis.heatingRequired ? 'Yes' : 'No'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">Momentum Risk</span>
+                    <span className={`font-medium ${
+                      results.pBandAnalysis.momentumRisk === 'high' ? 'text-red-400' :
+                      results.pBandAnalysis.momentumRisk === 'medium' ? 'text-yellow-400' :
+                      results.pBandAnalysis.momentumRisk === 'low' ? 'text-orange-400' :
+                      'text-green-400'
+                    }`}>
+                      {results.pBandAnalysis.momentumRisk.toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <h4 className="font-medium text-green-300">Strategy & Alerts</h4>
+                <p className="text-sm text-gray-300">{results.pBandAnalysis.controlStrategy}</p>
+                
+                {results.pBandAnalysis.warnings.length > 0 && (
+                  <div className="space-y-2">
+                    <h5 className="text-sm font-medium text-yellow-400">⚠️ Warnings</h5>
+                    <ul className="space-y-1">
+                      {results.pBandAnalysis.warnings.map((warning, idx) => (
+                        <li key={idx} className="text-sm text-yellow-300 flex items-start gap-2">
+                          <span className="text-yellow-400 mt-0.5">•</span>
+                          {warning}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Equipment Recommendations */}
         <div className="bg-gray-900/50 backdrop-blur-xl rounded-xl p-6 border border-gray-800">

@@ -13,6 +13,7 @@ export type CalculatorType =
   | 'psychrometric'
   | 'transpiration'
   | 'environmental-control'
+  | 'plant-physiological-monitor'
   // Financial calculators
   | 'advanced-roi'
   | 'tco'
@@ -80,6 +81,9 @@ const CalculatorComponents = {
   'environmental-control': React.lazy(() => import('../EnvironmentalControlCalculator').then(module => ({ 
     default: module.default || module.EnvironmentalControlCalculator 
   }))),
+  'plant-physiological-monitor': React.lazy(() => import('../PlantPhysiologicalMonitor').then(module => ({ 
+    default: module.default 
+  }))),
   
   // Financial calculators
   'advanced-roi': React.lazy(() => import('../AdvancedROICalculator').then(module => ({ 
@@ -146,6 +150,7 @@ const CALCULATOR_CATEGORIES: Record<CalculatorType, CalculatorCategory> = {
   'psychrometric': 'environmental',
   'transpiration': 'environmental',
   'environmental-control': 'environmental',
+  'plant-physiological-monitor': 'environmental',
   
   // Financial
   'advanced-roi': 'financial',

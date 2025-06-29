@@ -40,7 +40,9 @@ import {
   Camera,
   Building,
   Sparkles,
-  Scale
+  Scale,
+  Atom,
+  Dna
 } from 'lucide-react';
 
 const featureCategories = [
@@ -498,6 +500,18 @@ const featureCategories = [
         description: 'Interactive 3D visualization of biomass vs environmental factors',
         href: '/research-analysis/biomass-3d',
         highlights: ['Three.js rendering', 'Multi-axis analysis', 'Data export', 'Environmental correlation']
+      },
+      {
+        name: 'Quantum Biotechnology',
+        description: 'Quantum-enhanced gene expression prediction and metabolomics optimization',
+        href: '/quantum-biotechnology',
+        highlights: ['QAOA quantum algorithms', 'Gene expression modeling', 'Metabolite optimization', 'Patent-pending technology']
+      },
+      {
+        name: 'Professional Reporting',
+        description: 'Comprehensive reports with energy analytics, ROI calculations, and compliance documentation',
+        href: '/professional-reporting',
+        highlights: ['ROI & NPV analysis', 'Energy compliance verification', 'Environmental impact assessment', 'PDF/Excel export']
       }
     ]
   },

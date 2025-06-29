@@ -73,7 +73,7 @@ model Consultation {
   expertId          String
   expert            Expert   @relation(fields: [expertId], references: [id])
   clientId          String
-  client            User     @relation(fields: [clientId], references: [id])
+  client            User     @relation("ClientConsultations", fields: [clientId], references: [id])
   
   // Scheduling
   scheduledStart    DateTime

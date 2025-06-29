@@ -251,7 +251,7 @@ export default function BenchmarksPage() {
             <ReportTypeCard
               title="Yield Benchmarks"
               description="Compare your yield per square foot against industry leaders"
-              icon={<Leaf className="h-6 w-6" />}
+              icon={<span className="h-6 w-6">🌱</span>}
               reportType="yield"
               tier="basic"
               isLocked={!subscription}
@@ -260,7 +260,7 @@ export default function BenchmarksPage() {
             <ReportTypeCard
               title="Energy Efficiency"
               description="Analyze energy consumption and identify savings opportunities"
-              icon={<Zap className="h-6 w-6" />}
+              icon={<span className="h-6 w-6">⚡</span>}
               reportType="energy"
               tier="basic"
               isLocked={!subscription}
@@ -269,7 +269,7 @@ export default function BenchmarksPage() {
             <ReportTypeCard
               title="Financial Performance"
               description="Revenue per square foot and profitability analysis"
-              icon={<DollarSign className="h-6 w-6" />}
+              icon={<span className="h-6 w-6">💰</span>}
               reportType="financial"
               tier="pro"
               isLocked={!subscription || subscription.tier === 'basic'}

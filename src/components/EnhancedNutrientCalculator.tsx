@@ -49,6 +49,7 @@ import {
   exportRecipe,
   RecipeValidation
 } from '@/lib/nutrient-recipe-models'
+import { TomatoNutrientCalculator, TomatoNutrientReport } from '@/lib/tomato-nutrient-calculator'
 
 interface RecipeBuilderProps {
   onSave: (recipe: CustomNutrientRecipe) => void
@@ -433,8 +434,16 @@ export function EnhancedNutrientCalculator() {
   const [customRecipes, setCustomRecipes] = useState<CustomNutrientRecipe[]>([])
   const [showRecipeBuilder, setShowRecipeBuilder] = useState(false)
   const [editingRecipe, setEditingRecipe] = useState<CustomNutrientRecipe | null>(null)
-  const [activeTab, setActiveTab] = useState<'calculator' | 'recipes' | 'stages' | 'formulations'>('calculator')
+  const [activeTab, setActiveTab] = useState<'calculator' | 'recipes' | 'stages' | 'formulations' | 'tomato'>('calculator')
   const [showImportExport, setShowImportExport] = useState(false)
+  
+  // Tomato-specific state
+  const [tomatoMeasurements, setTomatoMeasurements] = useState<Record<string, number>>({
+    NH4: 0, K: 7.2, Na: 0.5, Mg: 4.5, NO3: 17.5, Cl: 3.5, S: 4.5, HCO3: 0, P: 1.9,
+    Fe: 42, Mn: 15, Zn: 18, B: 95, Cu: 1.2
+  })
+  const [sampleType, setSampleType] = useState<'drip' | 'drain'>('drip')
+  const [tomatoResults, setTomatoResults] = useState<TomatoNutrientReport | null>(null)
 
   // Load custom recipes from localStorage
   useEffect(() => {
@@ -443,6 +452,12 @@ export function EnhancedNutrientCalculator() {
       setCustomRecipes(JSON.parse(savedRecipes))
     }
   }, [])
+
+  // Calculate tomato nutrient analysis
+  useEffect(() => {
+    const results = TomatoNutrientCalculator.analyzeNutrients(tomatoMeasurements, sampleType)
+    setTomatoResults(results)
+  }, [tomatoMeasurements, sampleType])
 
   // Save custom recipes to localStorage
   const saveCustomRecipes = (recipes: CustomNutrientRecipe[]) => {
@@ -661,6 +676,16 @@ export function EnhancedNutrientCalculator() {
         >
           Formulations
         </button>
+        <button
+          onClick={() => setActiveTab('tomato')}
+          className={`flex-1 px-4 py-2 rounded-md transition-colors ${
+            activeTab === 'tomato'
+              ? 'bg-green-600 text-white'
+              : 'text-gray-400 hover:text-gray-200'
+          }`}
+        >
+          🍅 Tomato Analysis
+        </button>
       </div>
 
       {/* Recipe Builder Modal */}
@@ -815,6 +840,232 @@ export function EnhancedNutrientCalculator() {
           <p className="text-gray-400">
             Build and save custom fertilizer formulations...
           </p>
+        </div>
+      )}
+
+      {activeTab === 'tomato' && (
+        <div className="space-y-6">
+          {/* Tomato Nutrient Analysis Header */}
+          <div className="bg-gradient-to-r from-green-900/50 to-green-800/50 rounded-lg p-6 border border-green-600/30">
+            <h2 className="text-xl font-semibold text-green-400 mb-2 flex items-center gap-2">
+              🍅 Tomato Nutrient Analysis
+            </h2>
+            <p className="text-green-300 text-sm">
+              Professional tomato-specific nutrient analysis based on Advanced Dutch Research standards
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Input Panel */}
+            <div className="bg-gray-800 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <Beaker className="w-5 h-5 text-green-400" />
+                Nutrient Measurements
+              </h3>
+              
+              {/* Sample Type Selector */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-300 mb-2">Sample Type</label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setSampleType('drip')}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      sampleType === 'drip' 
+                        ? 'bg-green-600 text-white' 
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    Drip Irrigation
+                  </button>
+                  <button
+                    onClick={() => setSampleType('drain')}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      sampleType === 'drain' 
+                        ? 'bg-green-600 text-white' 
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    Drain Water
+                  </button>
+                </div>
+              </div>
+
+              {/* Nutrient Inputs Grid */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium text-green-400">Major Elements (mMol)</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { key: 'NH4', label: 'NH₄', unit: 'mMol' },
+                    { key: 'K', label: 'K', unit: 'mMol' },
+                    { key: 'Na', label: 'Na', unit: 'mMol' },
+                    { key: 'Mg', label: 'Mg', unit: 'mMol' },
+                    { key: 'NO3', label: 'NO₃', unit: 'mMol' },
+                    { key: 'Cl', label: 'Cl', unit: 'mMol' },
+                    { key: 'S', label: 'S', unit: 'mMol' },
+                    { key: 'P', label: 'P', unit: 'mMol' }
+                  ].map(({ key, label, unit }) => (
+                    <div key={key}>
+                      <label className="block text-xs text-gray-400 mb-1">{label} ({unit})</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={tomatoMeasurements[key]}
+                        onChange={(e) => setTomatoMeasurements(prev => ({
+                          ...prev,
+                          [key]: parseFloat(e.target.value) || 0
+                        }))}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <h4 className="text-sm font-medium text-green-400 mt-6">Microelements (μMol)</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { key: 'Fe', label: 'Fe', unit: 'μMol' },
+                    { key: 'Mn', label: 'Mn', unit: 'μMol' },
+                    { key: 'Zn', label: 'Zn', unit: 'μMol' },
+                    { key: 'B', label: 'B', unit: 'μMol' },
+                    { key: 'Cu', label: 'Cu', unit: 'μMol' }
+                  ].map(({ key, label, unit }) => (
+                    <div key={key}>
+                      <label className="block text-xs text-gray-400 mb-1">{label} ({unit})</label>
+                      <input
+                        type="number"
+                        step="1"
+                        value={tomatoMeasurements[key]}
+                        onChange={(e) => setTomatoMeasurements(prev => ({
+                          ...prev,
+                          [key]: parseFloat(e.target.value) || 0
+                        }))}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Results Panel */}
+            {tomatoResults && (
+              <div className="bg-gray-800 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <Target className="w-5 h-5 text-green-400" />
+                  Analysis Results
+                </h3>
+                
+                {/* Overall Score */}
+                <div className="mb-6 p-4 bg-gray-700 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-gray-300">Overall Score</span>
+                    <span className={`text-2xl font-bold ${
+                      tomatoResults.overallScore >= 80 ? 'text-green-400' :
+                      tomatoResults.overallScore >= 60 ? 'text-yellow-400' :
+                      'text-red-400'
+                    }`}>
+                      {tomatoResults.overallScore}/100
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-600 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full transition-all ${
+                        tomatoResults.overallScore >= 80 ? 'bg-green-400' :
+                        tomatoResults.overallScore >= 60 ? 'bg-yellow-400' :
+                        'bg-red-400'
+                      }`}
+                      style={{ width: `${tomatoResults.overallScore}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Critical Issues */}
+                {tomatoResults.criticalIssues.length > 0 && (
+                  <div className="mb-4 p-3 bg-red-900/30 border border-red-600/30 rounded-lg">
+                    <h4 className="text-red-400 font-medium mb-2 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      Critical Issues
+                    </h4>
+                    <ul className="space-y-1">
+                      {tomatoResults.criticalIssues.map((issue, idx) => (
+                        <li key={idx} className="text-red-300 text-sm">• {issue}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Recommendations */}
+                {tomatoResults.recommendations.length > 0 && (
+                  <div className="mb-4 p-3 bg-blue-900/30 border border-blue-600/30 rounded-lg">
+                    <h4 className="text-blue-400 font-medium mb-2 flex items-center gap-2">
+                      <Info className="w-4 h-4" />
+                      Recommendations
+                    </h4>
+                    <ul className="space-y-1">
+                      {tomatoResults.recommendations.slice(0, 5).map((rec, idx) => (
+                        <li key={idx} className="text-blue-300 text-sm">• {rec}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Next Analysis Date */}
+                <div className="text-xs text-gray-400 mt-4">
+                  Next analysis recommended: {tomatoResults.nextAnalysisDate.toLocaleDateString()}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Detailed Element Analysis */}
+          {tomatoResults && tomatoResults.analyses.length > 0 && (
+            <div className="bg-gray-800 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <Activity className="w-5 h-5 text-green-400" />
+                Detailed Element Analysis
+              </h3>
+              
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-600">
+                      <th className="text-left py-2 text-gray-300">Element</th>
+                      <th className="text-right py-2 text-gray-300">Measured</th>
+                      <th className="text-right py-2 text-gray-300">Target Range</th>
+                      <th className="text-center py-2 text-gray-300">Status</th>
+                      <th className="text-right py-2 text-gray-300">Deviation</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tomatoResults.analyses.map((analysis, idx) => (
+                      <tr key={idx} className="border-b border-gray-700">
+                        <td className="py-2 text-white font-medium">{analysis.element}</td>
+                        <td className="py-2 text-right text-gray-300">
+                          {analysis.measured.toFixed(1)} {analysis.unit}
+                        </td>
+                        <td className="py-2 text-right text-gray-400">
+                          {analysis.target.min?.toFixed(1) || '0'} - {analysis.target.max?.toFixed(1) || '∞'}
+                        </td>
+                        <td className="py-2 text-center">
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            analysis.status === 'optimal' ? 'bg-green-600 text-white' :
+                            analysis.status === 'low' ? 'bg-blue-600 text-white' :
+                            analysis.status === 'high' ? 'bg-yellow-600 text-black' :
+                            'bg-red-600 text-white'
+                          }`}>
+                            {analysis.status.toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="py-2 text-right text-gray-300">
+                          {analysis.deviation > 0 ? '+' : ''}{analysis.deviation}%
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

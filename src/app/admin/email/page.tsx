@@ -9,7 +9,7 @@ import {
   Filter,
   Calendar,
   Clock,
-  Template,
+  FileText as Template,
   Edit,
   Trash2,
   Copy,

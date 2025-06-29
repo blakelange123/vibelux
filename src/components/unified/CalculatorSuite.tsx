@@ -62,6 +62,7 @@ const CALCULATOR_NAMES: Record<CalculatorType, string> = {
   'psychrometric': 'Psychrometric Calculator',
   'transpiration': 'Transpiration Calculator',
   'environmental-control': 'Environmental Control Calculator',
+  'plant-physiological-monitor': '🍅 Plant Physiological Monitor',
   'advanced-roi': 'Advanced ROI Calculator',
   'tco': 'Total Cost of Ownership',
   'energy-cost': 'Energy Cost Calculator',

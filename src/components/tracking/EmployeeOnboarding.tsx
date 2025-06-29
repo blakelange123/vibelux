@@ -5,10 +5,12 @@ import { useUser } from '@clerk/nextjs';
 import {
   Shield, MapPin, MessageCircle, AlertTriangle, Battery,
   CheckCircle, Clock, Smartphone, Wifi, Navigation, Radio,
-  FileText, Settings, ChevronRight, ChevronLeft, X
+  FileText, Settings, ChevronRight, ChevronLeft, X,
+  QrCode, Heart, Activity, Watch, TrendingUp, Users2
 } from 'lucide-react';
 import { RealtimeTracker } from '@/lib/realtime-tracker';
 import { PrivacyControlsService } from '@/lib/privacy-controls';
+import { ZoneBasedTracker } from '@/lib/tracking/zone-based-tracker';
 
 interface OnboardingStep {
   id: string;
@@ -29,11 +31,27 @@ export function EmployeeOnboarding({ facilityId, onComplete, onCancel }: Employe
   const [currentStep, setCurrentStep] = useState(0);
   const [privacyConsent, setPrivacyConsent] = useState(false);
   const [trackingSettings, setTrackingSettings] = useState({
-    allowRealTimeTracking: true,
+    trackingMode: 'zone-based' as 'zone-based' | 'continuous' | 'manual' | 'disabled',
+    enableQRZoneEntry: true,
+    enableBiometrics: false,
+    enableProductivityTracking: true,
+    allowRealTimeTracking: false,
     allowHistoricalAccess: true,
-    shareWithSupervisors: true,
+    shareWithSupervisors: false,
     shareWithPeers: false,
-    locationRetentionDays: 90
+    shareAggregatedData: true,
+    locationRetentionDays: 90,
+    biometricDataTypes: {
+      heartRate: false,
+      calories: false,
+      steps: false,
+      stress: false,
+      temperature: false,
+      oxygenSaturation: false
+    },
+    enableBreakSuggestions: true,
+    enableHealthAlerts: false,
+    maxDailyHours: 8
   });
   const [permissions, setPermissions] = useState({
     location: false,
@@ -178,27 +196,188 @@ export function EmployeeOnboarding({ facilityId, onComplete, onCancel }: Employe
       icon: <FileText className="w-8 h-8 text-green-500" />,
       component: (
         <div className="space-y-6">
-          <div className="bg-green-50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Your Privacy Matters</h3>
-            <p className="text-sm text-gray-600">
-              We're committed to protecting your privacy. You have full control over your data.
+          <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg border border-green-200">
+            <div className="flex items-center gap-2 mb-2">
+              <Shield className="w-5 h-5 text-green-600" />
+              <h3 className="font-semibold text-green-800">Privacy-First Approach</h3>
+            </div>
+            <p className="text-sm text-gray-700">
+              Choose your comfort level. We use QR codes instead of continuous GPS tracking for better privacy.
             </p>
           </div>
 
-          <div className="space-y-4">
+          {/* Tracking Mode Selection */}
+          <div className="space-y-3">
+            <label className="block font-medium">How would you like to be tracked?</label>
+            <div className="space-y-2">
+              <label className="flex items-start gap-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                <input
+                  type="radio"
+                  name="trackingMode"
+                  value="zone-based"
+                  checked={trackingSettings.trackingMode === 'zone-based'}
+                  onChange={(e) => setTrackingSettings(prev => ({
+                    ...prev,
+                    trackingMode: e.target.value as any
+                  }))}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <QrCode className="w-4 h-4 text-blue-500" />
+                    <span className="font-medium text-green-700">QR Zone Entry (Recommended)</span>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Scan QR codes when entering work areas. No continuous GPS tracking.
+                  </div>
+                </div>
+              </label>
+              
+              <label className="flex items-start gap-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                <input
+                  type="radio"
+                  name="trackingMode"
+                  value="manual"
+                  checked={trackingSettings.trackingMode === 'manual'}
+                  onChange={(e) => setTrackingSettings(prev => ({
+                    ...prev,
+                    trackingMode: e.target.value as any
+                  }))}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-gray-500" />
+                    <span className="font-medium">Manual Check-in Only</span>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    You control when to log your location and activities.
+                  </div>
+                </div>
+              </label>
+              
+              <label className="flex items-start gap-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                <input
+                  type="radio"
+                  name="trackingMode"
+                  value="continuous"
+                  checked={trackingSettings.trackingMode === 'continuous'}
+                  onChange={(e) => setTrackingSettings(prev => ({
+                    ...prev,
+                    trackingMode: e.target.value as any
+                  }))}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-orange-500" />
+                    <span className="font-medium">Continuous GPS Tracking</span>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Traditional real-time location tracking during work hours.
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          {/* Biometric Integration */}
+          <div className="border-t pt-4">
             <label className="flex items-start gap-3">
               <input
                 type="checkbox"
-                checked={trackingSettings.allowRealTimeTracking}
+                checked={trackingSettings.enableBiometrics}
                 onChange={(e) => setTrackingSettings(prev => ({
                   ...prev,
-                  allowRealTimeTracking: e.target.checked
+                  enableBiometrics: e.target.checked
+                }))}
+                className="mt-1"
+              />
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <Watch className="w-4 h-4 text-purple-500" />
+                  <span className="font-medium">Apple Watch Integration (Optional)</span>
+                </div>
+                <div className="text-sm text-gray-600 mb-2">
+                  Connect your Apple Watch for personal fitness insights and productivity analytics.
+                </div>
+                
+                {trackingSettings.enableBiometrics && (
+                  <div className="ml-6 mt-3 space-y-2">
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={trackingSettings.biometricDataTypes.heartRate}
+                        onChange={(e) => setTrackingSettings(prev => ({
+                          ...prev,
+                          biometricDataTypes: {
+                            ...prev.biometricDataTypes,
+                            heartRate: e.target.checked
+                          }
+                        }))}
+                        className="w-3 h-3"
+                      />
+                      <Heart className="w-3 h-3 text-red-500" />
+                      <span>Heart rate monitoring</span>
+                    </label>
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={trackingSettings.biometricDataTypes.calories}
+                        onChange={(e) => setTrackingSettings(prev => ({
+                          ...prev,
+                          biometricDataTypes: {
+                            ...prev.biometricDataTypes,
+                            calories: e.target.checked
+                          }
+                        }))}
+                        className="w-3 h-3"
+                      />
+                      <Activity className="w-3 h-3 text-orange-500" />
+                      <span>Calories burned</span>
+                    </label>
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={trackingSettings.biometricDataTypes.steps}
+                        onChange={(e) => setTrackingSettings(prev => ({
+                          ...prev,
+                          biometricDataTypes: {
+                            ...prev.biometricDataTypes,
+                            steps: e.target.checked
+                          }
+                        }))}
+                        className="w-3 h-3"
+                      />
+                      <TrendingUp className="w-3 h-3 text-blue-500" />
+                      <span>Step counting</span>
+                    </label>
+                  </div>
+                )}
+              </div>
+            </label>
+          </div>
+
+          {/* Data Sharing Controls */}
+          <div className="border-t pt-4 space-y-3">
+            <h4 className="font-medium flex items-center gap-2">
+              <Users2 className="w-4 h-4" />
+              Data Sharing Preferences
+            </h4>
+            
+            <label className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={trackingSettings.shareAggregatedData}
+                onChange={(e) => setTrackingSettings(prev => ({
+                  ...prev,
+                  shareAggregatedData: e.target.checked
                 }))}
                 className="mt-1"
               />
               <div>
-                <div className="font-medium">Real-time location tracking</div>
-                <div className="text-sm text-gray-600">Allow supervisors to see your location during work hours</div>
+                <div className="font-medium">Anonymous team analytics</div>
+                <div className="text-sm text-gray-600">Help improve team productivity (your data is anonymized)</div>
               </div>
             </label>
 
@@ -214,7 +393,7 @@ export function EmployeeOnboarding({ facilityId, onComplete, onCancel }: Employe
               />
               <div>
                 <div className="font-medium">Share with supervisors</div>
-                <div className="text-sm text-gray-600">Allow supervisors to access your location data</div>
+                <div className="text-sm text-gray-600">Allow supervisors to see your work zone activity</div>
               </div>
             </label>
 
@@ -230,30 +409,42 @@ export function EmployeeOnboarding({ facilityId, onComplete, onCancel }: Employe
               />
               <div>
                 <div className="font-medium">Share with team members</div>
-                <div className="text-sm text-gray-600">Allow other team members to see your location</div>
+                <div className="text-sm text-gray-600">Allow team members to see your current work zone</div>
               </div>
             </label>
-
-            <div>
-              <label className="block font-medium mb-2">Data retention period</label>
-              <select
-                value={trackingSettings.locationRetentionDays}
-                onChange={(e) => setTrackingSettings(prev => ({
-                  ...prev,
-                  locationRetentionDays: parseInt(e.target.value)
-                }))}
-                className="w-full p-2 border rounded-lg"
-              >
-                <option value={30}>30 days</option>
-                <option value={90}>90 days (recommended)</option>
-                <option value={180}>6 months</option>
-                <option value={365}>1 year</option>
-              </select>
-              <p className="text-xs text-gray-500 mt-1">
-                How long to keep your location history
-              </p>
-            </div>
           </div>
+
+          {/* Personal Benefits */}
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <h4 className="font-medium text-blue-800 mb-2">What you get:</h4>
+            <ul className="text-sm text-blue-700 space-y-1">
+              <li>• Personal fitness and productivity insights</li>
+              <li>• Break reminders and health alerts</li>
+              <li>• Performance trends and improvement suggestions</li>
+              <li>• Fair and accurate work time tracking</li>
+            </ul>
+          </div>
+
+          <div>
+            <label className="block font-medium mb-2">Data retention period</label>
+            <select
+              value={trackingSettings.locationRetentionDays}
+              onChange={(e) => setTrackingSettings(prev => ({
+                ...prev,
+                locationRetentionDays: parseInt(e.target.value)
+              }))}
+              className="w-full p-2 border rounded-lg"
+            >
+              <option value={30}>30 days</option>
+              <option value={90}>90 days (recommended)</option>
+              <option value={180}>6 months</option>
+              <option value={365}>1 year</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              How long to keep your work data
+            </p>
+          </div>
+        </div>
 
           <div className="border-t pt-4">
             <label className="flex items-start gap-3">

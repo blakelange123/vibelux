@@ -17,6 +17,8 @@ export default function Navigation({ onClose }: NavigationProps) {
   const navLinks = [
     { href: '/features', label: 'Features' },
     { href: '/fixtures', label: 'Fixtures', permission: 'canAccessFixtures' },
+    { href: '/quantum-biotechnology', label: 'Quantum Biotechnology', permission: 'canAccessAdvanced' },
+    { href: '/professional-reporting', label: 'Professional Reports', permission: 'canAccessReports' },
     { href: '/marketplace', label: 'B2B Marketplace' },
     { href: '/equipment/offers', label: 'Equipment Market' },
     { href: '/equipment-board', label: 'Equipment Requests' },
