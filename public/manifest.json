@@ -1,7 +1,7 @@
 {
-  "name": "Vibelux - Professional Horticultural Lighting",
+  "name": "Vibelux - Visual Operations Intelligence",
   "short_name": "Vibelux",
-  "description": "Professional lighting design platform for horticultural applications",
+  "description": "Professional visual operations intelligence platform with Advanced Dutch Research tomato cultivation calculators",
   "theme_color": "#4f46e5",
   "background_color": "#ffffff",
   "display": "standalone",
@@ -14,6 +14,12 @@
       "sizes": "16x16 32x32",
       "type": "image/x-icon",
       "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ],
   "screenshots": [
