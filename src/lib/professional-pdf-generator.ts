@@ -353,7 +353,7 @@ export class ProfessionalPDFGenerator {
     this.pageNumber++;
     this.addPageHeader('Technical Specifications');
 
-    let yPos = 40;
+    const yPos = 40;
 
     // Technical data table
     if (this.data.technicalData && this.data.technicalData.specifications) {

@@ -213,7 +213,7 @@ class MonteCarloRayTracer {
   }
 
   private traceRay(ray: Ray): number {
-    let currentRay = { ...ray };
+    const currentRay = { ...ray };
     let pathLength = 0;
     
     while (currentRay.bounces < this.config.maxBounces && currentRay.intensity > 0.001) {

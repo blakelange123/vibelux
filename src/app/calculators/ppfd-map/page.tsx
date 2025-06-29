@@ -142,8 +142,8 @@ export default function PPFDMapPage() {
   // Add new fixture
   const addFixture = (dlcFixture?: DLCFixture, preset?: any) => {
     // Calculate PPE if not provided
-    let ppf = dlcFixture?.ppf || preset?.ppf || 1700
-    let wattage = dlcFixture?.wattage || preset?.wattage || 600
+    const ppf = dlcFixture?.ppf || preset?.ppf || 1700
+    const wattage = dlcFixture?.wattage || preset?.wattage || 600
     
     const newFixture: Fixture = {
       id: Date.now(),

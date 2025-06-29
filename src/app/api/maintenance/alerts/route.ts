@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const upcoming = new Date();
     upcoming.setDate(upcoming.getDate() + 7); // Next 7 days
 
-    let alerts: any[] = [];
+    const alerts: any[] = [];
 
     // Overdue maintenance alerts
     if (!type || type === 'overdue') {

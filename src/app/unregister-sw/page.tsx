@@ -9,7 +9,7 @@ export default function UnregisterSW() {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(function(registrations) {
         setStatus(`Found ${registrations.length} service worker(s)`);
-        for(let registration of registrations) {
+        for(const registration of registrations) {
           registration.unregister().then(function(success) {
             if (success) {
               setStatus(prev => prev + '\nUnregistered successfully!');

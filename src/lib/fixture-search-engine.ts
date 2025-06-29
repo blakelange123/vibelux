@@ -226,7 +226,7 @@ class FixtureSearchEngine {
     const text = JSON.stringify(requirements).toLowerCase()
     
     // Default full spectrum
-    let spectrum = {
+    const spectrum = {
       red: [25, 35],
       blue: [15, 25],
       farRed: [5, 15],

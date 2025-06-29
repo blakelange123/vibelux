@@ -413,7 +413,7 @@ export class GrowthPredictionModel {
     if (!cropModel) return null;
     
     // Use gradient descent to find optimal parameters
-    let bestInput: GrowthPredictionInput = {
+    const bestInput: GrowthPredictionInput = {
       ppfd: cropModel.optimal_ppfd,
       spectrum_ratio: { red_blue: 3, far_red: 2 },
       duration: 16,

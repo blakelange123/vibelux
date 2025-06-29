@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const radius = parseInt(searchParams.get('radius') || '50');
     const emergencyOnly = searchParams.get('emergencyOnly') === 'true';
 
-    let whereClause: any = {
+    const whereClause: any = {
       status: 'ACTIVE',
       verified: true,
     };

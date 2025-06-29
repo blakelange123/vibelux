@@ -232,7 +232,7 @@ export function QuickStartWizard() {
 
   // Get recommended steps based on profile
   const getRecommendedSteps = (): WizardStep[] => {
-    let recommended = allSteps.filter(step => {
+    const recommended = allSteps.filter(step => {
       // Basic recommendations
       if (step.recommended) return true
       

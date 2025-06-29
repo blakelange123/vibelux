@@ -415,7 +415,7 @@ export class MaintenanceScheduler {
 
     // Calculate next due date
     const now = new Date();
-    let nextDue = new Date(now);
+    const nextDue = new Date(now);
 
     switch (schedule.frequency) {
       case 'DAILY':

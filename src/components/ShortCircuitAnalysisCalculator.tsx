@@ -174,7 +174,7 @@ export function ShortCircuitAnalysisCalculator() {
     const baseI = baseMVA * 1000 / (Math.sqrt(3) * baseKV); // kA
 
     // Source impedance
-    let sourceZ = { r: 0, x: 0 };
+    const sourceZ = { r: 0, x: 0 };
     
     if (inputs.sourceType === 'utility') {
       // Utility source impedance

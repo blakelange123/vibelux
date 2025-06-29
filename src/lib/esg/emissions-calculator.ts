@@ -200,7 +200,7 @@ export class EmissionsCalculator {
    */
   private calculateReductions(data: FacilityData): EmissionsReport['reductions'] {
     let fromSolar = 0;
-    let fromEfficiency = 0;
+    const fromEfficiency = 0;
     let fromRenewables = 0;
     
     const gridFactor = this.getGridEmissionFactor(data.zipCode);

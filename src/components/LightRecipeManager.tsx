@@ -307,7 +307,7 @@ export function LightRecipeManager() {
               name: 'New Recipe',
               description: '',
               cropType: 'Custom',
-              growthStage: 'vegetative' as 'vegetative',
+              growthStage: 'vegetative' as const,
               photoperiod: {
                 dayLength: 16,
                 nightLength: 8,

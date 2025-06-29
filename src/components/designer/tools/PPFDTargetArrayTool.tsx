@@ -128,7 +128,7 @@ export function PPFDTargetArrayTool({ isOpen, onClose }: PPFDTargetArrayToolProp
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         let x = offsetX + col * spacingX;
-        let y = offsetY + row * spacingY;
+        const y = offsetY + row * spacingY;
         
         // Apply staggered pattern if selected
         if (layoutType === 'staggered' && row % 2 === 1) {

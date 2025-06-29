@@ -519,7 +519,7 @@ export class GreenhouseAutomationEngine {
 
   // Get rule execution history
   getRuleHistory(ruleId?: string, limit: number = 100): RuleLog[] {
-    let history = ruleId 
+    const history = ruleId 
       ? this.ruleHistory.filter(log => log.ruleId === ruleId)
       : this.ruleHistory;
 

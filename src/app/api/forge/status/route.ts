@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     const manifest = await response.json()
     
     // Extract download URLs if complete
-    let downloadUrls = []
+    const downloadUrls = []
     if (manifest.status === 'success' && manifest.derivatives) {
       for (const derivative of manifest.derivatives) {
         if (derivative.children) {

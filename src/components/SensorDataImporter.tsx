@@ -51,7 +51,7 @@ export function SensorDataImporter({ onDataImported }: { onDataImported?: (data:
         const values = lines[i].split(',')
         if (values.length < 3) continue
         
-        let reading: SensorReading = {
+        const reading: SensorReading = {
           timestamp: new Date().toISOString(),
           x: 0,
           y: 0,

@@ -122,7 +122,7 @@ Provide 3 specific, actionable recommendations. Be concise.`;
     const { temperature, humidity, ppfd } = metrics;
 
     const recommendations = [];
-    let confidence = 0.95;
+    const confidence = 0.95;
 
     // Temperature checks
     if (growthStage === 'flowering') {

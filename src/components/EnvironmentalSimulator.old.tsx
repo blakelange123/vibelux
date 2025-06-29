@@ -248,17 +248,17 @@ export function EnvironmentalSimulator() {
     targetHumidity: 65,
     targetCO2: 800,
     cropType: 'lettuce_butterhead',
-    growthStage: 'seedling' as 'seedling',
+    growthStage: 'seedling' as const,
     plantDensity: 30,
     leafAreaIndex: 3.0,
     plantAge: 1,
     cycleNumber: 1,
-    planningMode: 'single' as 'single',
+    planningMode: 'single' as const,
     totalCycles: 1,
     successionPlanting: false,
     successionInterval: 14,
     seasonalAdjustments: false,
-    currentSeason: 'spring' as 'spring',
+    currentSeason: 'spring' as const,
     hvacEnabled: true,
     co2Injection: true,
     adaptiveControl: true,
@@ -308,7 +308,7 @@ export function EnvironmentalSimulator() {
     const roomArea = settings.roomWidth * settings.roomLength;
     const totalPlants = settings.plantDensity * roomArea;
     
-    let currentDate = new Date();
+    const currentDate = new Date();
     let totalYield = 0;
     let totalRevenue = 0;
     let totalCosts = 0;
@@ -762,7 +762,7 @@ export function EnvironmentalSimulator() {
     const latentHeat = transpirationRate * roomArea * 2.26; // kJ/m²/day to W
     
     // Temperature calculation
-    let targetTemp = currentSchedule.targetTemp;
+    const targetTemp = currentSchedule.targetTemp;
     let actualTemp = targetTemp;
     
     if (settings.hvacEnabled) {
@@ -918,7 +918,7 @@ export function EnvironmentalSimulator() {
           roi: 0
         },
         pestRisk: {
-          level: 'low' as 'low',
+          level: 'low' as const,
           factors: [],
           recommendations: []
         }
@@ -1810,7 +1810,7 @@ export function EnvironmentalSimulator() {
                   <label className="text-xs text-gray-400">Crop Type</label>
                   <select
                     value={settings.cropType}
-                    onChange={(e) => setSettings({...settings, cropType: e.target.value, plantAge: 1, growthStage: 'seedling' as 'seedling'})}
+                    onChange={(e) => setSettings({...settings, cropType: e.target.value, plantAge: 1, growthStage: 'seedling' as const})}
                     className="w-full mt-1 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-white text-sm"
                   >
                     <optgroup label="Leafy Greens">

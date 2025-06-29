@@ -392,7 +392,7 @@ export class ServiceMarketplace {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    let whereClause: any = {
+    const whereClause: any = {
       createdAt: { gte: thirtyDaysAgo },
     };
 

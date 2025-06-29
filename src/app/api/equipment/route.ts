@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const warrantyExpiring = searchParams.get('warrantyExpiring') === 'true';
 
-    let whereClause: any = {};
+    const whereClause: any = {};
 
     if (facilityId) {
       whereClause.facilityId = facilityId;

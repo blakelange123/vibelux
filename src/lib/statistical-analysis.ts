@@ -430,7 +430,7 @@ export class StatisticalAnalyzer {
     const mean = this.mean(data)
     
     // Calculate W statistic (approximation)
-    let numerator = 0
+    const numerator = 0
     let denominator = 0
     
     for (let i = 0; i < n; i++) {

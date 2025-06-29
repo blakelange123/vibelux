@@ -392,7 +392,7 @@ export function ElectricalDiagramGenerator({
     ctx.stroke();
 
     // Draw circuit details to the right
-    let detailX = riserX + riserWidth + 50;
+    const detailX = riserX + riserWidth + 50;
     let detailY = roomY + 20;
 
     ctx.fillStyle = '#000000';

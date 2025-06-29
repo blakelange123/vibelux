@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
       leafAreaIndex: 3.5
     }
     
-    let predictions: any = {}
+    const predictions: any = {}
     
     if (model === 'simple' || model === 'both') {
       const simplePrediction = predictYield({

@@ -58,7 +58,7 @@ export default function FixturesPage() {
         
         if (data.fixtures) {
           // Sort fixtures
-          let sorted = [...data.fixtures]
+          const sorted = [...data.fixtures]
           switch (sortBy) {
             case "ppe-high":
               sorted.sort((a, b) => b.reportedPPE - a.reportedPPE)

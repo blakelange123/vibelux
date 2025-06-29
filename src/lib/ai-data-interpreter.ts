@@ -264,7 +264,7 @@ function fallbackInterpretation(
   // Use pattern matching for common fields
   headers.forEach(header => {
     const lower = header.toLowerCase();
-    let mapping: Partial<FieldMapping> = {
+    const mapping: Partial<FieldMapping> = {
       sourceField: header,
       confidence: 60
     };

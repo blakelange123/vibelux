@@ -563,14 +563,14 @@ export class BIMIfcHandler {
     const lines = ifcContent.split('\n');
     const entities = new Map<string, any>();
     const objects: RoomObject[] = [];
-    let projectInfo = {
+    const projectInfo = {
       name: 'Imported Project',
       description: '',
       building: undefined as string | undefined,
       storey: undefined as string | undefined,
       space: undefined as string | undefined
     };
-    let units: IfcUnitAssignment = {
+    const units: IfcUnitAssignment = {
       lengthUnit: 'METRE',
       areaUnit: 'SQUARE_METRE',
       volumeUnit: 'CUBIC_METRE',

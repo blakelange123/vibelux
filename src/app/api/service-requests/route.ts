@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category');
     const priority = searchParams.get('priority');
 
-    let whereClause: any = {};
+    const whereClause: any = {};
 
     if (facilityId) {
       whereClause.facilityId = facilityId;

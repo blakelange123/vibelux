@@ -245,7 +245,7 @@ export class ApiAuthManager {
       ],
     };
 
-    let permissions = basePermissions[role] || [];
+    const permissions = basePermissions[role] || [];
 
     // Add subscription tier permissions
     if (subscriptionTier === 'PREMIUM') {

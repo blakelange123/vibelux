@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const expiring = searchParams.get('expiring') === 'true';
 
-    let whereClause: any = {};
+    const whereClause: any = {};
 
     if (equipmentId) {
       whereClause.equipmentId = equipmentId;

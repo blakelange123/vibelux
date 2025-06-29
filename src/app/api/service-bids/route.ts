@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const serviceProviderId = searchParams.get('serviceProviderId');
     const status = searchParams.get('status');
 
-    let whereClause: any = {};
+    const whereClause: any = {};
 
     if (serviceRequestId) {
       whereClause.serviceRequestId = serviceRequestId;

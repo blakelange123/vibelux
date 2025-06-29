@@ -657,7 +657,7 @@ export function ProfessionalSingleLineGenerator({
         const words = note.split(' ');
         let line = '';
         let lineCount = 0;
-        for (let word of words) {
+        for (const word of words) {
           if (line.length + word.length > 60) {
             ctx.fillText(line, 50, 835 + index * 13 + lineCount * 10);
             line = '   ' + word + ' ';

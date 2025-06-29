@@ -289,7 +289,7 @@ export class CultivationDatabaseService {
     const schedule = growthStages.map(stage => {
       let stagePPFD = optimalPPFD
       let stagePhotoperiod = cultivationData.lighting.photoperiod
-      let stageSpectrum = { ...spectrum }
+      const stageSpectrum = { ...spectrum }
       let duration = '14 days' // default
       
       switch (stage) {

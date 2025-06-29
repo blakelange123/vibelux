@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
         warnings: r.warnings || []
       }));
 
-    let consistencyCheck = { valid: true, issues: [], recommendations: [] };
+    const consistencyCheck = { valid: true, issues: [], recommendations: [] };
     if (analysisResults.length > 1) {
       // We'd need to fetch the full analysis results for this
       // For now, just return basic validation

@@ -126,7 +126,7 @@ export function SpectrumBuilder() {
     const points: SpectrumPoint[] = []
     for (let wavelength = 380; wavelength <= 780; wavelength += 10) {
       let intensity = 0
-      let color = getWavelengthColor(wavelength)
+      const color = getWavelengthColor(wavelength)
       
       switch (type) {
         case 'full':

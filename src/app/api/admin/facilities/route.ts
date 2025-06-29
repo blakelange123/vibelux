@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const facilities = await getAllFacilities();
 
     // Apply filters
-    let filteredFacilities = facilities.filter(facility => {
+    const filteredFacilities = facilities.filter(facility => {
       const matchesSearch = search === '' || 
         facility.name.toLowerCase().includes(search.toLowerCase()) ||
         facility.address.toLowerCase().includes(search.toLowerCase());

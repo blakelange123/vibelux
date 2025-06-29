@@ -619,7 +619,7 @@ export class EnhancedPhotometricReportGenerator {
       { label: 'System Efficacy:', value: `${this.data.calculations.results.powerMetrics.ppfdPerWatt.toFixed(2)} μmol/J` }
     ]
     
-    let kpiY = this.currentY + 18
+    const kpiY = this.currentY + 18
     kpis.forEach((kpi, index) => {
       const x = this.margins.left + 5 + (index % 2) * 80
       const y = kpiY + Math.floor(index / 2) * 12

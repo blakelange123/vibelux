@@ -296,7 +296,7 @@ export class EnhancedRebateCalculator {
     else if (rebate.tierStructure && rebate.tierStructure.length > 0) {
       const kwhSavedFirstYear = kwhSaved
       let tierAmount = 0
-      let tierDetails = []
+      const tierDetails = []
       
       for (const tier of rebate.tierStructure) {
         const tierKwh = Math.min(Math.max(kwhSavedFirstYear - tier.min, 0), tier.max - tier.min)

@@ -1555,7 +1555,7 @@ How can I help design your lighting system today?`
         const lowerInput = currentUserInput.toLowerCase();
         
         // Try to understand the context
-        let designContext = { ...context.currentDiscussion };
+        const designContext = { ...context.currentDiscussion };
         
         // Parse and create design
         let intent = parseDesignIntent(currentUserInput);

@@ -185,8 +185,8 @@ export default function PlantHealthMonitor() {
   // Calculate plant health based on input parameters
   const calculatePlantHealth = (data: FormData): PlantHealthReading => {
     let stressPoints = 0;
-    let healthIssues: string[] = [];
-    let recommendations: string[] = [];
+    const healthIssues: string[] = [];
+    const recommendations: string[] = [];
 
     // Analyze visual symptoms
     if (data.leafColor !== 'green') {

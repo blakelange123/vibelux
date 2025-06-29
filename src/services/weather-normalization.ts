@@ -354,7 +354,7 @@ export function applyCEAAdjustments(
     baselineSpectralData?: SpectralLightingData;
   }
 ): NormalizedResult {
-  let adjustedResult = { ...normalizedResult };
+  const adjustedResult = { ...normalizedResult };
   
   // Apply spectral lighting impact if data is available
   if (additionalFactors.spectralData && additionalFactors.baselineSpectralData) {

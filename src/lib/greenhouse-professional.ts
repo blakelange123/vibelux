@@ -230,7 +230,7 @@ export class GreenhouseDesigner {
     const deltaT = insideTarget - outsideTemp;
     
     // Basic heat loss calculation
-    let heatLoss = area * uValue * deltaT;
+    const heatLoss = area * uValue * deltaT;
     
     // Add infiltration losses
     const infiltration = area * 0.5 * deltaT; // Simplified

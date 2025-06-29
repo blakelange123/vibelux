@@ -572,7 +572,7 @@ export class EnhancedCadHandler {
       case 'LWPOLYLINE':
         entity.vertices = []
         let vertexCount = 0
-        let currentVertex = { x: 0, y: 0 }
+        const currentVertex = { x: 0, y: 0 }
         
         while (i < lines.length && parseInt(lines[i]) !== 0) {
           const code = parseInt(lines[i])

@@ -100,7 +100,7 @@ export function AdvancedPPFDMapping({
         const y = i * stepY + stepY / 2
         let totalPPFD = 0
         let totalDirectPPFD = 0
-        let spectralDistribution = new Array(31).fill(0) // 400-700nm in 10nm steps
+        const spectralDistribution = new Array(31).fill(0) // 400-700nm in 10nm steps
 
         fixtures.forEach(fixture => {
           const fixtureHeight = fixture.z || room.height * 0.9

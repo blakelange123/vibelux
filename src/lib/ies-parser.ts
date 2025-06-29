@@ -71,7 +71,7 @@ export function parseIESFile(content: string): ParsedIESFile {
   }
   
   // Parse the main photometric line - handle multiple lines if needed
-  let photometricData: number[] = []
+  const photometricData: number[] = []
   
   // Keep reading lines until we have at least 10 numbers
   while (currentIndex < lines.length && photometricData.length < 10) {
@@ -153,7 +153,7 @@ export function parseIESFile(content: string): ParsedIESFile {
   // Parse candela values
   const candela: number[][] = []
   const totalCandelaValues = numberOfVerticalAngles * numberOfHorizontalAngles
-  let allCandelaValues: number[] = []
+  const allCandelaValues: number[] = []
   
   
   // Read all remaining lines for candela data

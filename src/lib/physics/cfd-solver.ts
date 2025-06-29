@@ -193,7 +193,7 @@ export class CFDSolver {
     const cell = this.grid[i][j][k];
     const u = cell.velocity;
     
-    let conv = new Vector3();
+    const conv = new Vector3();
     
     if (direction === 'x') {
       const ue = u.x > 0 ? u.x : this.grid[i + 1][j][k].velocity.x;
@@ -213,7 +213,7 @@ export class CFDSolver {
     const cell = this.grid[i][j][k];
     const nu = cell.viscosity / cell.density; // Kinematic viscosity
     
-    let diff = new Vector3();
+    const diff = new Vector3();
     
     if (direction === 'x') {
       const d2u_dx2 = (

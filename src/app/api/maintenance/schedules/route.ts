@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const overdue = searchParams.get('overdue') === 'true';
     const upcoming = searchParams.get('upcoming') === 'true';
 
-    let whereClause: any = {
+    const whereClause: any = {
       active: true,
     };
 
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     // Calculate next due date based on frequency
     const now = new Date();
-    let nextDue = new Date(now);
+    const nextDue = new Date(now);
 
     switch (data.frequency) {
       case 'DAILY':

@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let stripeAccountId = expert.id; // Using expert ID as placeholder
+    const stripeAccountId = expert.id; // Using expert ID as placeholder
 
     // In production, you would:
     // 1. Check if expert already has a Stripe Connect account

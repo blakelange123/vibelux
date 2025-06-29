@@ -659,7 +659,7 @@ export class MonteCarloRaytracer {
   private calculateCRI(spectrum: SpectralData): number {
     // Simplified Color Rendering Index calculation
     // Would need full CIE test color samples for accurate CRI
-    let totalDeviation = 0;
+    const totalDeviation = 0;
     const testColors = 8; // Standard CRI uses 8 test colors
     
     // Simplified calculation based on spectral coverage

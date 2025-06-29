@@ -262,7 +262,7 @@ export class AlertManager {
 
   private formatEmailHTML(message: string): string {
     // Convert markdown-style formatting to HTML
-    let html = message
+    const html = message
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\n/g, '<br>')
       .replace(/^(\s*•\s*)/gm, '<ul><li>')

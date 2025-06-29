@@ -421,7 +421,7 @@ export class DemandResponseOptimizer {
     
     for (const action of actions) {
       let impact = 0
-      let weight = action.amount / profile.peakDemand
+      const weight = action.amount / profile.peakDemand
       
       // Assess impact by equipment type
       if (action.equipment.includes('lighting-primary')) {

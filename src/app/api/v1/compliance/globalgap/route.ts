@@ -199,7 +199,7 @@ export async function GET(req: NextRequest) {
     }
     
     // Filter by section if specified
-    let responseData: any = {
+    const responseData: any = {
       certificationStatus: complianceData.certificationStatus,
       overallCompliance: complianceData.overallCompliance
     }

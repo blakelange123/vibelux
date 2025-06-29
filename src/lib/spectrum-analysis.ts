@@ -541,8 +541,8 @@ export class SpectrumAnalyzer {
     }
 
     // Find common wavelength range
-    let minWavelength = Math.max(...spectra.map(s => Math.min(...s.spd.wavelengths)));
-    let maxWavelength = Math.min(...spectra.map(s => Math.max(...s.spd.wavelengths)));
+    const minWavelength = Math.max(...spectra.map(s => Math.min(...s.spd.wavelengths)));
+    const maxWavelength = Math.min(...spectra.map(s => Math.max(...s.spd.wavelengths)));
     
     // Generate wavelength array (5nm steps)
     const wavelengths: number[] = [];

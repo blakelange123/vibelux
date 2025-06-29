@@ -65,7 +65,7 @@ export class WarrantyPerformanceMonitor {
     const oneMonthFromNow = new Date();
     oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
 
-    let whereClause: any = {};
+    const whereClause: any = {};
     if (facilityId) {
       whereClause.facilityId = facilityId;
     }
@@ -169,7 +169,7 @@ export class WarrantyPerformanceMonitor {
   static async getPerformanceGuaranteeAlerts(facilityId?: string): Promise<WarrantyAlert[]> {
     const alerts: WarrantyAlert[] = [];
 
-    let whereClause: any = {
+    const whereClause: any = {
       status: 'ACTIVE',
     };
 

@@ -178,7 +178,7 @@ export function LightingScheduler() {
         const [endHour, endMin] = schedule.endTime.split(':').map(Number)
         
         const startPercent = ((startHour * 60 + startMin) / (24 * 60)) * 100
-        let endPercent = ((endHour * 60 + endMin) / (24 * 60)) * 100
+        const endPercent = ((endHour * 60 + endMin) / (24 * 60)) * 100
         
         if (endPercent < startPercent) {
           // Handle overnight schedules

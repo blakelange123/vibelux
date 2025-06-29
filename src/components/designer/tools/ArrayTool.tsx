@@ -138,7 +138,7 @@ export function ArrayTool({ isOpen, onClose, selectedObject }: ArrayToolProps) {
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < columns; col++) {
         let x = startX + col * (columnSpacing ?? 0);
-        let y = startY + row * (rowSpacing ?? 0);
+        const y = startY + row * (rowSpacing ?? 0);
         
         // Apply pattern offsets
         if (pattern === 'diamond' && row % 2 === 1) {

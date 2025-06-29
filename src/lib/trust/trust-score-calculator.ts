@@ -33,7 +33,7 @@ export async function updateTrustScore(
 
   if (!customer) throw new Error('Customer not found');
 
-  let currentScore = customer.trustScore?.score || 0.7; // Default starting score
+  const currentScore = customer.trustScore?.score || 0.7; // Default starting score
   let scoreAdjustment = 0;
 
   // Payment behavior impacts

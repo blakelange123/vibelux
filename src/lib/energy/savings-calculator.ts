@@ -60,7 +60,7 @@ export async function calculateVerifiedSavings(
 
   // 1. Calculate Energy Savings
   let energySavings = 0;
-  let verificationData: any = {};
+  const verificationData: any = {};
 
   try {
     // Get utility-verified usage

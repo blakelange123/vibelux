@@ -108,7 +108,7 @@ export function PhotosyntheticCalculator() {
     }
 
     let totalYPF = 0
-    let totalPPF = ppfd
+    const totalPPF = ppfd
     const selectedSpectrum = cropSpectra[selectedCrop].data
 
     // Calculate weighted photon flux for each wavelength range

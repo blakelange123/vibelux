@@ -120,7 +120,7 @@ export function MultiCropBalancer({
     const availableDLI = (availablePPFD * photoperiod * 3.6) / 1000
 
     // Balance based on mode
-    let zoneAdjustments: DLIBalanceResult['zoneAdjustments'] = []
+    const zoneAdjustments: DLIBalanceResult['zoneAdjustments'] = []
     
     switch (balanceMode) {
       case 'priority':

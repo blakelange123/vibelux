@@ -105,7 +105,7 @@ export function FixtureImportWizard({ isOpen, onClose }: ImportWizardProps) {
       const lines = text.split('\n');
       
       let lampLumens = 0;
-      let lampWatts = 100;
+      const lampWatts = 100;
       const angles: number[] = [];
       const candela: number[][] = [];
 

@@ -382,7 +382,7 @@ export default function LeaseVsBuyPage() {
     const paybackPeriod = calculatePaybackPeriod(cashFlow)
     
     let recommendation: 'lease' | 'buy' | 'neutral' = 'neutral'
-    let reasons: string[] = []
+    const reasons: string[] = []
     let confidence = 'medium'
     
     if (npvDifference > financialTerms.purchasePrice * 0.1) {

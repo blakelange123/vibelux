@@ -160,7 +160,7 @@ export class ProfessionalPDFExport {
       { label: 'Yield Prediction Accuracy', value: '91.8%', color: [245, 158, 11] }
     ];
 
-    let kpiY = this.currentY + 15;
+    const kpiY = this.currentY + 15;
     kpis.forEach((kpi, index) => {
       const yPos = kpiY + (index * 15);
       
