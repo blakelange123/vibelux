@@ -14,6 +14,7 @@ export type CalculatorType =
   | 'transpiration'
   | 'environmental-control'
   | 'plant-physiological-monitor'
+  | 'tomato-ipm-dashboard'
   // Financial calculators
   | 'advanced-roi'
   | 'tco'
@@ -84,6 +85,9 @@ const CalculatorComponents = {
   'plant-physiological-monitor': React.lazy(() => import('../PlantPhysiologicalMonitor').then(module => ({ 
     default: module.default 
   }))),
+  'tomato-ipm-dashboard': React.lazy(() => import('../TomatoIPMDashboard').then(module => ({ 
+    default: module.default 
+  }))),
   
   // Financial calculators
   'advanced-roi': React.lazy(() => import('../AdvancedROICalculator').then(module => ({ 
@@ -151,6 +155,7 @@ const CALCULATOR_CATEGORIES: Record<CalculatorType, CalculatorCategory> = {
   'transpiration': 'environmental',
   'environmental-control': 'environmental',
   'plant-physiological-monitor': 'environmental',
+  'tomato-ipm-dashboard': 'environmental',
   
   // Financial
   'advanced-roi': 'financial',
