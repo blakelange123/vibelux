@@ -1,0 +1,59 @@
+{
+  "name": "Vibelux - Professional Horticultural Lighting",
+  "short_name": "Vibelux",
+  "description": "Professional lighting design platform for horticultural applications",
+  "theme_color": "#4f46e5",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32",
+      "type": "image/x-icon",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Lighting Design Studio"
+    },
+    {
+      "src": "/screenshot-2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "PPFD Heat Map"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "New Design",
+      "short_name": "Design",
+      "description": "Create a new lighting design",
+      "url": "/design",
+      "icons": [{ "src": "/favicon.ico", "sizes": "16x16" }]
+    },
+    {
+      "name": "Calculators",
+      "short_name": "Calc",
+      "description": "Access lighting calculators",
+      "url": "/calculators",
+      "icons": [{ "src": "/favicon.ico", "sizes": "16x16" }]
+    },
+    {
+      "name": "Fixtures",
+      "short_name": "Fixtures",
+      "description": "Browse fixture database",
+      "url": "/fixtures",
+      "icons": [{ "src": "/favicon.ico", "sizes": "16x16" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

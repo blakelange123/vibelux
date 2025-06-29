@@ -1,0 +1,45 @@
+services:
+  # Web Service
+  - type: web
+    name: vibelux-app
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vibelux-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: vibelux-redis
+          property: connectionString
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: OPENWEATHER_API_KEY
+        sync: false
+      - key: NREL_API_KEY
+        sync: false
+      - key: INFLUXDB_URL
+        sync: false
+      - key: INFLUXDB_TOKEN
+        sync: false
+
+databases:
+  # PostgreSQL Database
+  - name: vibelux-db
+    databaseName: vibelux
+    user: vibelux
+    postgresMajorVersion: 15
+
+  # Redis Instance
+  - name: vibelux-redis
+    type: redis
+    ipAllowList: []
+    maxMemoryPolicy: allkeys-lru

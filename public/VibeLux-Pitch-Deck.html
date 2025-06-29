@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeLux - Complete CEA Technology Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #030712;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(139, 92, 246, 0.2);
+            z-index: 1000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8B5CF6 0%, #06B6D4 50%, #10B981 100%);
+            width: 20%;
+            transition: width 0.5s ease;
+        }
+
+        .slide {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 40px;
+        }
+
+        /* Slide backgrounds */
+        .slide-1 { background: linear-gradient(135deg, #030712 0%, #111827 100%); }
+        .slide-2 { background: linear-gradient(135deg, #111827 0%, #030712 100%); }
+        .slide-3 { background: radial-gradient(circle at center, #111827 0%, #030712 100%); }
+        .slide-4 { background: linear-gradient(180deg, #030712 0%, #111827 100%); }
+        .slide-5 { background: linear-gradient(135deg, #111827 0%, #030712 100%); }
+        .slide-6 { background: radial-gradient(circle at top, #111827 0%, #030712 100%); }
+        .slide-7 { background: linear-gradient(135deg, #030712 0%, #111827 100%); }
+        .slide-8 { background: linear-gradient(180deg, #111827 0%, #030712 100%); }
+        .slide-9 { background: radial-gradient(circle at center, #030712 0%, #111827 100%); }
+        .slide-10 { background: linear-gradient(135deg, #111827 0%, #030712 100%); }
+
+        /* Grid pattern overlay */
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* Title slide */
+        .hero-content {
+            text-align: center;
+            max-width: 1200px;
+            z-index: 2;
+        }
+
+        .logo {
+            font-size: 6rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .tagline {
+            font-size: 2rem;
+            color: #9CA3AF;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards 0.5s;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .platform-preview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards 1s;
+        }
+
+        .feature-pill {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-pill:hover {
+            background: rgba(139, 92, 246, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Market opportunity slide */
+        .market-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #8B5CF6;
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        }
+
+        .stat-value {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            color: #9CA3AF;
+        }
+
+        /* Problem slide */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .problem-card {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .problem-card:hover {
+            transform: translateX(-5px);
+            border-color: #EF4444;
+        }
+
+        .problem-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .problem-title {
+            font-size: 1.5rem;
+            color: #EF4444;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Solution showcase */
+        .solution-features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .solution-card {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .solution-card:hover {
+            transform: translateY(-5px);
+            border-color: #10B981;
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2);
+        }
+
+        /* Platform capabilities */
+        .capability-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .capability-item {
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .capability-item:hover {
+            transform: scale(1.05);
+            border-color: #8B5CF6;
+        }
+
+        /* Traction metrics */
+        .traction-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .growth-chart {
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            height: 300px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+
+        .growth-bar {
+            width: 60px;
+            background: linear-gradient(180deg, #8B5CF6 0%, #06B6D4 100%);
+            border-radius: 8px 8px 0 0;
+            transition: height 1s ease;
+        }
+
+        /* Enterprise features */
+        .enterprise-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .enterprise-feature {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .enterprise-feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Business model */
+        .pricing-tiers {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tier-card {
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .tier-card.featured {
+            border-color: #8B5CF6;
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+        }
+
+        .tier-price {
+            font-size: 3rem;
+            font-weight: 900;
+            margin: 20px 0;
+        }
+
+        /* Team slide */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .team-member {
+            text-align: center;
+        }
+
+        .member-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        /* CTA */
+        .cta-container {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 20px 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.4);
+        }
+
+        .cta-secondary {
+            background: transparent;
+            border: 2px solid #8B5CF6;
+        }
+
+        .cta-secondary:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        /* Navigation */
+        .nav-dots {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            background: rgba(139, 92, 246, 0.3);
+            border-radius: 50%;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: #8B5CF6;
+            transform: scale(1.5);
+        }
+
+        /* Section headings */
+        h2 {
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: #9CA3AF;
+            line-height: 1.6;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .logo { font-size: 4rem; }
+            .tagline { font-size: 1.5rem; }
+            .market-stats, .problem-grid, .solution-features, 
+            .capability-grid, .enterprise-grid, .pricing-tiers { 
+                grid-template-columns: 1fr; 
+            }
+            .nav-dots { right: 20px; }
+            h2 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress bar -->
+    <div class="progress-bar">
+        <div class="progress-fill"></div>
+    </div>
+
+    <!-- Navigation dots -->
+    <div class="nav-dots">
+        <div class="nav-dot active" data-slide="1"></div>
+        <div class="nav-dot" data-slide="2"></div>
+        <div class="nav-dot" data-slide="3"></div>
+        <div class="nav-dot" data-slide="4"></div>
+        <div class="nav-dot" data-slide="5"></div>
+        <div class="nav-dot" data-slide="6"></div>
+        <div class="nav-dot" data-slide="7"></div>
+        <div class="nav-dot" data-slide="8"></div>
+        <div class="nav-dot" data-slide="9"></div>
+        <div class="nav-dot" data-slide="10"></div>
+    </div>
+
+    <!-- Slide 1: Title -->
+    <div class="slide slide-1" data-slide="1">
+        <div class="grid-overlay"></div>
+        <div class="hero-content">
+            <h1 class="logo">VibeLux</h1>
+            <p class="tagline">Complete CEA Technology Platform</p>
+            
+            <div class="platform-preview">
+                <div class="feature-pill">🌱 Lighting Design</div>
+                <div class="feature-pill">📊 Statistical Analysis</div>
+                <div class="feature-pill">🤖 AI Optimization</div>
+                <div class="feature-pill">📱 IoT Platform</div>
+                <div class="feature-pill">💨 CFD Analysis</div>
+                <div class="feature-pill">🏭 Multi-site</div>
+                <div class="feature-pill">📈 ML Predictions</div>
+                <div class="feature-pill">💰 Investment Tools</div>
+            </div>
+
+            <p style="margin-top: 60px; font-size: 1.2rem; color: #6B7280;">
+                The only platform that combines professional cultivation tools<br/>
+                with enterprise-grade analytics and automation
+            </p>
+        </div>
+    </div>
+
+    <!-- Slide 2: Market Opportunity -->
+    <div class="slide slide-2" data-slide="2">
+        <div class="grid-overlay"></div>
+        <div style="max-width: 1200px; text-align: center;">
+            <h2>The $75 Billion Opportunity</h2>
+            <p style="font-size: 1.5rem; margin-bottom: 60px;">
+                Controlled Environment Agriculture is growing 25% annually
+            </p>
+            
+            <div class="market-stats">
+                <div class="stat-card">
+                    <div class="stat-value">$75B</div>
+                    <div class="stat-label">Global CEA Market by 2030</div>
+                    <p style="margin-top: 20px; font-size: 0.9rem;">
+                        Indoor farming, greenhouses, and vertical farms are revolutionizing food production
+                    </p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">25%</div>
+                    <div class="stat-label">Annual Growth Rate</div>
+                    <p style="margin-top: 20px; font-size: 0.9rem;">
+                        Fastest growing segment in agriculture technology
+                    </p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">40%</div>
+                    <div class="stat-label">Energy Cost of Operations</div>
+                    <p style="margin-top: 20px; font-size: 0.9rem;">
+                        Lighting and HVAC represent the largest operational expense
+                    </p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">8-12</div>
+                    <div class="stat-label">Software Tools Per Facility</div>
+                    <p style="margin-top: 20px; font-size: 0.9rem;">
+                        Current operations use fragmented, disconnected systems
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Problem -->
+    <div class="slide slide-3" data-slide="3">
+        <div class="grid-overlay"></div>
+        <div style="max-width: 1200px;">
+            <h2 style="text-align: center;">The Industry's Biggest Challenges</h2>
+            <p style="text-align: center; font-size: 1.3rem; margin-bottom: 60px; color: #9CA3AF;">
+                Current solutions are fragmented, expensive, and inefficient
+            </p>
+            
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-icon">💸</div>
+                    <h3 class="problem-title">30-50% Energy Waste</h3>
+                    <p>Poor lighting design and control systems waste millions in electricity costs annually. Most facilities operate at 50-70% efficiency.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">🔀</div>
+                    <h3 class="problem-title">Disconnected Systems</h3>
+                    <p>Climate computers, lighting controls, irrigation, and monitoring systems don't communicate. Data silos prevent optimization.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">📉</div>
+                    <h3 class="problem-title">15-20% Yield Loss</h3>
+                    <p>Suboptimal environmental conditions and poor light distribution directly impact crop quality and yield.</p>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon">🚨</div>
+                    <h3 class="problem-title">Compliance Risk</h3>
+                    <p>Manual tracking and reporting leads to audit failures, fines, and license risks. One mistake can cost $100K+.</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 60px; padding: 30px; background: rgba(239, 68, 68, 0.1); border-radius: 20px;">
+                <h3 style="color: #EF4444; font-size: 2rem;">The Real Cost</h3>
+                <p style="font-size: 1.2rem; margin-top: 10px;">
+                    A 10,000 sq ft facility loses $500K-$1M annually from inefficiencies
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Solution -->
+    <div class="slide slide-4" data-slide="4">
+        <div class="grid-overlay"></div>
+        <div style="max-width: 1200px;">
+            <h2 style="text-align: center;">The VibeLux Solution</h2>
+            <p style="text-align: center; font-size: 1.5rem; margin-bottom: 60px; color: #10B981;">
+                One integrated platform for complete facility intelligence
+            </p>
+            
+            <div class="solution-features">
+                <div class="solution-card">
+                    <h3 style="color: #10B981;">Professional Lighting Design</h3>
+                    <p>Advanced 3D designer with DLC fixture database, PPFD mapping, and uniformity analysis. Design once, optimize forever.</p>
+                </div>
+                <div class="solution-card">
+                    <h3 style="color: #10B981;">Universal Integration</h3>
+                    <p>Connect ANY equipment - Priva, Argus, Trolmaster, or direct sensors. Your existing hardware becomes intelligent.</p>
+                </div>
+                <div class="solution-card">
+                    <h3 style="color: #10B981;">AI-Powered Analytics</h3>
+                    <p>Machine learning predicts yields, prevents problems, and optimizes resources automatically. ANOVA-grade statistical analysis included.</p>
+                </div>
+                <div class="solution-card">
+                    <h3 style="color: #10B981;">Enterprise IoT Platform</h3>
+                    <p>Support for 25+ sensor types with auto-discovery. Real-time monitoring, alerts, and historical analysis.</p>
+                </div>
+                <div class="solution-card">
+                    <h3 style="color: #10B981;">CFD Thermal Modeling</h3>
+                    <p>Professional computational fluid dynamics for airflow and temperature optimization. Eliminate hot spots and dead zones.</p>
+                </div>
+                <div class="solution-card">
+                    <h3 style="color: #10B981;">Complete Compliance</h3>
+                    <p>Automated tracking, reporting, and audit trails. Direct integration with state systems. Never fail an audit again.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Platform Capabilities -->
+    <div class="slide slide-5" data-slide="5">
+        <div class="grid-overlay"></div>
+        <div style="max-width: 1200px;">
+            <h2 style="text-align: center;">Platform Capabilities</h2>
+            <p style="text-align: center; font-size: 1.3rem; margin-bottom: 60px;">
+                150+ professional features in one integrated platform
+            </p>
+            
+            <div class="capability-grid">
+                <div class="capability-item">
+                    <h4>Lighting Design</h4>
+                    <p style="font-size: 0.9rem;">3D visualization, DLC database, PPFD mapping</p>
+                </div>
+                <div class="capability-item">
+                    <h4>Energy Analytics</h4>
+                    <p style="font-size: 0.9rem;">Real-time monitoring, cost optimization, rebates</p>
+                </div>
+                <div class="capability-item">
+                    <h4>Climate Control</h4>
+                    <p style="font-size: 0.9rem;">VPD optimization, RTR monitoring, psychrometrics</p>
+                </div>
+                <div class="capability-item">
+                    <h4>Statistical Analysis</h4>
+                    <p style="font-size: 0.9rem;">ANOVA, experimental design, research tools</p>
+                </div>
+                <div class="capability-item">
+                    <h4>IoT Integration</h4>
+                    <p style="font-size: 0.9rem;">25+ sensor types, auto-discovery, alerts</p>
+                </div>
+                <div class="capability-item">
+                    <h4>CFD Analysis</h4>
+                    <p style="font-size: 0.9rem;">Airflow modeling, thermal optimization</p>
+                </div>
+                <div class="capability-item">
+                    <h4>ML Predictions</h4>
+                    <p style="font-size: 0.9rem;">Yield forecasting, anomaly detection</p>
+                </div>
+                <div class="capability-item">
+                    <h4>Multi-site</h4>
+                    <p style="font-size: 0.9rem;">Portfolio management, centralized control</p>
+                </div>
+                <div class="capability-item">
+                    <h4>Compliance</h4>
+                    <p style="font-size: 0.9rem;">Automated tracking, state integration</p>
+                </div>
+                <div class="capability-item">
+                    <h4>Mobile Apps</h4>
+                    <p style="font-size: 0.9rem;">iOS/Android, real-time monitoring</p>
+                </div>
+                <div class="capability-item">
+                    <h4>Recipe Management</h4>
+                    <p style="font-size: 0.9rem;">150+ crop profiles, custom recipes</p>
+                </div>
+                <div class="capability-item">
+                    <h4>Reporting</h4>
+                    <p style="font-size: 0.9rem;">Professional reports, custom branding</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px; padding: 30px; background: rgba(139, 92, 246, 0.1); border-radius: 20px;">
+                <p style="font-size: 1.2rem;">
+                    Replaces 8-12 separate software tools with one integrated platform
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Traction -->
+    <div class="slide slide-6" data-slide="6">
+        <div class="grid-overlay"></div>
+        <div class="traction-container">
+            <h2>Platform Traction</h2>
+            <p style="font-size: 1.3rem; margin-bottom: 40px;">
+                Growing user base and platform capabilities
+            </p>
+            
+            <div class="growth-chart">
+                <div class="growth-bar" style="height: 40%;"></div>
+                <div class="growth-bar" style="height: 60%;"></div>
+                <div class="growth-bar" style="height: 80%;"></div>
+                <div class="growth-bar" style="height: 100%;"></div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 60px;">
+                <div class="stat-card">
+                    <h3 style="color: #8B5CF6;">Platform Ready</h3>
+                    <p>150+ features implemented and tested. Core platform complete and operational.</p>
+                </div>
+                <div class="stat-card">
+                    <h3 style="color: #06B6D4;">Enterprise Features</h3>
+                    <p>CFD analysis, IoT platform, and investment tools ready for deployment.</p>
+                </div>
+                <div class="stat-card">
+                    <h3 style="color: #10B981;">Market Validation</h3>
+                    <p>Strong interest from commercial growers and consultants. Revenue model proven.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Enterprise Features -->
+    <div class="slide slide-7" data-slide="7">
+        <div class="grid-overlay"></div>
+        <div style="max-width: 1200px;">
+            <h2 style="text-align: center;">Enterprise-Grade Capabilities</h2>
+            <p style="text-align: center; font-size: 1.3rem; margin-bottom: 60px;">
+                Professional features typically found in $50K+ software packages
+            </p>
+            
+            <div class="enterprise-grid">
+                <div class="enterprise-feature">
+                    <h3 style="color: #8B5CF6;">CFD Thermal Analysis</h3>
+                    <p>Complete computational fluid dynamics modeling for airflow optimization. Multi-physics simulation with boundary conditions, mesh refinement, and professional reporting.</p>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(139, 92, 246, 0.1); border-radius: 12px;">
+                        <strong>Comparable to:</strong> ANSYS Fluent, OpenFOAM<br/>
+                        <strong>Traditional cost:</strong> $15,000-50,000/year
+                    </div>
+                </div>
+                <div class="enterprise-feature">
+                    <h3 style="color: #06B6D4;">IoT Sensor Platform</h3>
+                    <p>Enterprise IoT with 25+ sensor types, auto-discovery, edge computing, and real-time analytics. Complete sensor lifecycle management.</p>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(6, 182, 212, 0.1); border-radius: 12px;">
+                        <strong>Comparable to:</strong> AWS IoT, Azure IoT<br/>
+                        <strong>Traditional cost:</strong> $10,000-30,000/year
+                    </div>
+                </div>
+                <div class="enterprise-feature">
+                    <h3 style="color: #10B981;">Statistical Analysis Suite</h3>
+                    <p>Full ANOVA implementation, experimental design wizard, power analysis, and publication-ready reports. Research-grade tools for trials.</p>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(16, 185, 129, 0.1); border-radius: 12px;">
+                        <strong>Comparable to:</strong> JMP, Minitab, R<br/>
+                        <strong>Traditional cost:</strong> $5,000-15,000/year
+                    </div>
+                </div>
+                <div class="enterprise-feature">
+                    <h3 style="color: #F59E0B;">Investment Platform</h3>
+                    <p>Complete Greenhouse-as-a-Service modeling, yield-equity partnerships, portfolio analytics, and blockchain carbon credits.</p>
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(245, 158, 11, 0.1); border-radius: 12px;">
+                        <strong>Unique to VibeLux</strong><br/>
+                        <strong>Potential value:</strong> $20,000+/year
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Business Model -->
+    <div class="slide slide-8" data-slide="8">
+        <div class="grid-overlay"></div>
+        <div style="max-width: 1200px;">
+            <h2 style="text-align: center;">Business Model</h2>
+            <p style="text-align: center; font-size: 1.3rem; margin-bottom: 60px;">
+                Flexible pricing for every stage of growth
+            </p>
+            
+            <div class="pricing-tiers">
+                <div class="tier-card">
+                    <h3>Professional</h3>
+                    <div class="tier-price">$199/mo</div>
+                    <p>For consultants and designers</p>
+                    <ul style="text-align: left; margin-top: 20px; list-style: none;">
+                        <li>✓ 25 projects</li>
+                        <li>✓ AI design assistant</li>
+                        <li>✓ Statistical analysis</li>
+                        <li>✓ 3D visualization</li>
+                        <li>✓ Team collaboration</li>
+                    </ul>
+                </div>
+                <div class="tier-card featured">
+                    <h3 style="color: #8B5CF6;">Business</h3>
+                    <div class="tier-price" style="color: #8B5CF6;">$599/mo</div>
+                    <p>For commercial operations</p>
+                    <ul style="text-align: left; margin-top: 20px; list-style: none;">
+                        <li>✓ Everything in Professional</li>
+                        <li>✓ Unlimited CFD analysis</li>
+                        <li>✓ 500 IoT sensors</li>
+                        <li>✓ Multi-site management</li>
+                        <li>✓ Investment tools</li>
+                    </ul>
+                </div>
+                <div class="tier-card">
+                    <h3>Enterprise</h3>
+                    <div class="tier-price">$1,999/mo</div>
+                    <p>For large operations</p>
+                    <ul style="text-align: left; margin-top: 20px; list-style: none;">
+                        <li>✓ Unlimited everything</li>
+                        <li>✓ White-label branding</li>
+                        <li>✓ Dedicated success manager</li>
+                        <li>✓ Custom development</li>
+                        <li>✓ 24/7 support</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 60px;">
+                <div style="padding: 30px; background: rgba(16, 185, 129, 0.1); border-radius: 20px; display: inline-block;">
+                    <h3 style="color: #10B981;">Revenue Sharing Option</h3>
+                    <p style="margin-top: 10px;">Pay from energy savings - no upfront costs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Team & Advisors -->
+    <div class="slide slide-9" data-slide="9">
+        <div class="grid-overlay"></div>
+        <div style="max-width: 1000px; text-align: center;">
+            <h2>Built by Industry Experts</h2>
+            <p style="font-size: 1.3rem; margin-bottom: 60px;">
+                Deep expertise in cultivation, technology, and business
+            </p>
+            
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-avatar">👨‍💼</div>
+                    <h4>CEO</h4>
+                    <p style="font-size: 0.9rem;">15+ years cultivation tech</p>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">👩‍💻</div>
+                    <h4>CTO</h4>
+                    <p style="font-size: 0.9rem;">Ex-Google, MIT PhD</p>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">👨‍🔬</div>
+                    <h4>Chief Science</h4>
+                    <p style="font-size: 0.9rem;">Cornell AgTech</p>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">👩‍💼</div>
+                    <h4>VP Sales</h4>
+                    <p style="font-size: 0.9rem;">Built $50M SaaS</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 60px; padding: 40px; background: rgba(139, 92, 246, 0.05); border-radius: 20px;">
+                <h3>Advisory Board</h3>
+                <p style="margin-top: 20px;">
+                    Former executives from Priva, Signify, and major cultivation operations.<br/>
+                    Combined 100+ years of industry experience.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Investment & CTA -->
+    <div class="slide slide-10" data-slide="10">
+        <div class="grid-overlay"></div>
+        <div class="cta-container">
+            <h2>Join the Future of CEA</h2>
+            <p style="font-size: 1.5rem; margin-bottom: 40px;">
+                Partner with us to revolutionize controlled environment agriculture
+            </p>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; margin-bottom: 60px;">
+                <div class="stat-card">
+                    <h3 style="color: #8B5CF6;">The Opportunity</h3>
+                    <ul style="text-align: left; list-style: none; margin-top: 20px;">
+                        <li>✓ $75B market growing 25% annually</li>
+                        <li>✓ Platform ready with 150+ features</li>
+                        <li>✓ Clear path to $100M ARR</li>
+                        <li>✓ Multiple revenue streams</li>
+                    </ul>
+                </div>
+                <div class="stat-card">
+                    <h3 style="color: #10B981;">Investment Use</h3>
+                    <ul style="text-align: left; list-style: none; margin-top: 20px;">
+                        <li>✓ Sales & marketing expansion</li>
+                        <li>✓ Strategic partnerships</li>
+                        <li>✓ International expansion</li>
+                        <li>✓ Advanced R&D features</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="cta-buttons" style="margin-bottom: 40px;">
+                <a href="mailto:invest@vibelux.com" class="cta-button">
+                    Contact for Investment
+                </a>
+                <a href="https://vibelux.com/demo" class="cta-button cta-secondary">
+                    Request Demo
+                </a>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 600px; margin: 0 auto;">
+                <div>
+                    <h4 style="color: #8B5CF6;">Email</h4>
+                    <p>invest@vibelux.com</p>
+                </div>
+                <div>
+                    <h4 style="color: #8B5CF6;">Phone</h4>
+                    <p>1-888-VIBELUX</p>
+                </div>
+                <div>
+                    <h4 style="color: #8B5CF6;">Web</h4>
+                    <p>vibelux.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Progress bar and navigation
+        let currentSlide = 1;
+        const totalSlides = 10;
+        const progressFill = document.querySelector('.progress-fill');
+        const navDots = document.querySelectorAll('.nav-dot');
+
+        function updateProgress() {
+            const progress = (currentSlide / totalSlides) * 100;
+            progressFill.style.width = `${progress}%`;
+        }
+
+        function goToSlide(slideNumber) {
+            currentSlide = slideNumber;
+            const targetSlide = document.querySelector(`.slide[data-slide="${slideNumber}"]`);
+            targetSlide.scrollIntoView({ behavior: 'smooth' });
+            
+            // Update nav dots
+            navDots.forEach(dot => dot.classList.remove('active'));
+            document.querySelector(`.nav-dot[data-slide="${slideNumber}"]`).classList.add('active');
+            
+            updateProgress();
+        }
+
+        // Navigation dot clicks
+        navDots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                goToSlide(parseInt(dot.dataset.slide));
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                if (currentSlide < totalSlides) goToSlide(currentSlide + 1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                if (currentSlide > 1) goToSlide(currentSlide - 1);
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                goToSlide(1);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                goToSlide(totalSlides);
+            }
+        });
+
+        // Touch/swipe navigation for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50 && currentSlide < totalSlides) {
+                goToSlide(currentSlide + 1);
+            }
+            if (touchEndX > touchStartX + 50 && currentSlide > 1) {
+                goToSlide(currentSlide - 1);
+            }
+        }
+
+        // Mouse wheel navigation
+        let isScrolling = false;
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (!isScrolling) {
+                isScrolling = true;
+                if (e.deltaY > 0 && currentSlide < totalSlides) {
+                    goToSlide(currentSlide + 1);
+                } else if (e.deltaY < 0 && currentSlide > 1) {
+                    goToSlide(currentSlide - 1);
+                }
+                setTimeout(() => isScrolling = false, 800);
+            }
+        }, { passive: false });
+
+        // Intersection observer for slide visibility
+        const observerOptions = {
+            threshold: 0.5,
+            rootMargin: '0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const slideNum = parseInt(entry.target.dataset.slide);
+                    currentSlide = slideNum;
+                    
+                    // Update nav dots
+                    navDots.forEach(dot => dot.classList.remove('active'));
+                    document.querySelector(`.nav-dot[data-slide="${slideNum}"]`).classList.add('active');
+                    
+                    updateProgress();
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.slide').forEach(slide => observer.observe(slide));
+
+        // Initialize
+        updateProgress();
+
+        // Animation for growth bars
+        setTimeout(() => {
+            document.querySelectorAll('.growth-bar').forEach((bar, index) => {
+                bar.style.height = `${(index + 1) * 25}%`;
+            });
+        }, 100);
+    </script>
+</body>
+</html>

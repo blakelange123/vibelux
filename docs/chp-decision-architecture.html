@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHP Decision Engine - Architecture & Logic Flow</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #10b981;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+        
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .section {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .section h2 {
+            color: #22d3ee;
+            margin-top: 0;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #22d3ee;
+            padding-bottom: 10px;
+        }
+        
+        .flow-diagram {
+            grid-column: 1 / -1;
+            margin: 30px 0;
+        }
+        
+        .decision-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .decision-box {
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            min-width: 200px;
+            position: relative;
+        }
+        
+        .input-box {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: 2px solid #60a5fa;
+        }
+        
+        .calculation-box {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border: 2px solid #fbbf24;
+        }
+        
+        .decision-box.decision {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            border: 2px solid #a78bfa;
+        }
+        
+        .output-box {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: 2px solid #34d399;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: 2px solid #f87171;
+        }
+        
+        .arrow {
+            font-size: 24px;
+            color: #22d3ee;
+        }
+        
+        .parallel-inputs {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        .calculation-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .formula {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #475569;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .formula-title {
+            color: #fbbf24;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .code-block {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .highlight {
+            color: #22d3ee;
+            font-weight: bold;
+        }
+        
+        .variable {
+            color: #a78bfa;
+        }
+        
+        .value {
+            color: #34d399;
+        }
+        
+        .system-components {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .component {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .component-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .api-icon { color: #3b82f6; }
+        .ui-icon { color: #10b981; }
+        .calc-icon { color: #f59e0b; }
+        .control-icon { color: #ef4444; }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .metric {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #475569;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #22d3ee;
+        }
+        
+        .metric-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 CHP Decision Engine Architecture</h1>
+        <p class="subtitle">Real-time economic optimization for Combined Heat & Power operations</p>
+        
+        <div class="architecture-grid">
+            <div class="section">
+                <h2>📊 System Architecture</h2>
+                <div class="system-components">
+                    <div class="component">
+                        <div class="component-icon api-icon">🌐</div>
+                        <h4>Market Data API</h4>
+                        <p>Real-time grid pricing, gas costs, CO₂ prices</p>
+                    </div>
+                    <div class="component">
+                        <div class="component-icon calc-icon">⚡</div>
+                        <h4>Decision Engine</h4>
+                        <p>Economic calculations & optimization logic</p>
+                    </div>
+                    <div class="component">
+                        <div class="component-icon ui-icon">📱</div>
+                        <h4>Dashboard UI</h4>
+                        <p>Real-time monitoring & control interface</p>
+                    </div>
+                    <div class="component">
+                        <div class="component-icon control-icon">🎛️</div>
+                        <h4>CHP Controller</h4>
+                        <p>Hardware integration & operational control</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>💰 Economic Variables</h2>
+                <div class="metrics-grid">
+                    <div class="metric">
+                        <div class="metric-value">500kW</div>
+                        <div class="metric-label">Power Output</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">2,500</div>
+                        <div class="metric-label">CO₂ CFH</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">1,200kW</div>
+                        <div class="metric-label">Heat Output</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">58</div>
+                        <div class="metric-label">Gas Therms/hr</div>
+                    </div>
+                </div>
+                
+                <div class="formula">
+                    <div class="formula-title">Key Economic Calculations:</div>
+                    <strong>Grid Revenue:</strong> 500kW × GridPrice<br>
+                    <strong>CO₂ Offset:</strong> 2,500 CFH × CO₂Price<br>
+                    <strong>Fuel Cost:</strong> -58 therms × GasPrice<br>
+                    <strong>Heat Recovery:</strong> +$15/hour<br>
+                    <strong>Net Benefit:</strong> Revenue + Offset + Heat - Fuel
+                </div>
+            </div>
+        </div>
+        
+        <div class="section flow-diagram">
+            <h2>🧠 Decision Logic Flow</h2>
+            <div class="decision-tree">
+                <!-- Market Data Inputs -->
+                <div class="parallel-inputs">
+                    <div class="decision-box input-box">
+                        📈 <strong>Grid Price</strong><br>
+                        Real-time $/kWh
+                    </div>
+                    <div class="decision-box input-box">
+                        ⛽ <strong>Gas Price</strong><br>
+                        $/therm
+                    </div>
+                    <div class="decision-box input-box">
+                        🌱 <strong>CO₂ Price</strong><br>
+                        $/lb
+                    </div>
+                </div>
+                
+                <div class="arrow">⬇️</div>
+                
+                <!-- Economic Calculations -->
+                <div class="decision-box calculation-box">
+                    ⚡ <strong>Economic Analysis</strong><br>
+                    Calculate net benefit per hour
+                </div>
+                
+                <div class="calculation-grid">
+                    <div class="formula">
+                        <div class="formula-title">Revenue Streams:</div>
+                        <span class="highlight">Grid Revenue:</span> <span class="variable">$gridPrice</span> × <span class="value">500kW</span><br>
+                        <span class="highlight">CO₂ Offset:</span> <span class="variable">$co2Price</span> × <span class="value">2,500 CFH</span><br>
+                        <span class="highlight">Heat Recovery:</span> <span class="value">$15/hour</span>
+                    </div>
+                    <div class="formula">
+                        <div class="formula-title">Costs:</div>
+                        <span class="highlight">Fuel Cost:</span> <span class="variable">$gasPrice</span> × <span class="value">58 therms</span><br>
+                        <span class="highlight">O&M:</span> <span class="value">$30/hour</span><br>
+                        <span class="highlight">Net Benefit:</span> <span class="variable">Revenue - Costs</span>
+                    </div>
+                </div>
+                
+                <div class="arrow">⬇️</div>
+                
+                <!-- Breakeven Analysis -->
+                <div class="decision-box calculation-box">
+                    📊 <strong>Breakeven Analysis</strong><br>
+                    Calculate safety margin
+                </div>
+                
+                <div class="code-block">
+<span class="highlight">breakevenGridPrice</span> = (<span class="variable">fuelCost</span> - <span class="variable">co2Offset</span> - <span class="variable">heatRecovery</span>) / <span class="value">500kW</span>
+<span class="highlight">safetyMargin</span> = (<span class="variable">currentGridPrice</span> - <span class="variable">breakevenPrice</span>) / <span class="variable">breakevenPrice</span> × 100%
+                </div>
+                
+                <div class="arrow">⬇️</div>
+                
+                <!-- Decision Logic -->
+                <div class="decision-box decision">
+                    🤔 <strong>Decision Logic</strong><br>
+                    Evaluate safety margin
+                </div>
+                
+                <div class="parallel-inputs">
+                    <div class="decision-box output-box">
+                        ✅ <strong>RUN CHP</strong><br>
+                        Safety Margin > 50%<br>
+                        High Confidence (75-95%)
+                    </div>
+                    <div class="decision-box warning-box">
+                        ⚠️ <strong>MARGINAL</strong><br>
+                        Safety Margin 15-50%<br>
+                        Medium Confidence (60-75%)
+                    </div>
+                    <div class="decision-box warning-box">
+                        ❌ <strong>PURCHASE CO₂</strong><br>
+                        Safety Margin < 15%<br>
+                        High Confidence (70-90%)
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="architecture-grid">
+            <div class="section">
+                <h2>🔄 API Integration</h2>
+                <div class="code-block">
+<span class="highlight">GET</span> /api/energy/chp/decision
+├── Market data aggregation
+├── Economic calculations
+├── Risk assessment
+└── Decision recommendation
+
+<span class="highlight">POST</span> /api/energy/chp/execute
+├── START_CHP
+├── STOP_CHP
+├── OPTIMIZE_SCHEDULE
+└── Status updates
+                </div>
+                
+                <h3>📡 Data Flow:</h3>
+                <ul>
+                    <li><strong>15-second intervals:</strong> Market price updates</li>
+                    <li><strong>30-minute intervals:</strong> Decision re-evaluation</li>
+                    <li><strong>Real-time:</strong> Operational status monitoring</li>
+                    <li><strong>Event-driven:</strong> Control system commands</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2>⚙️ Control Logic</h2>
+                <div class="code-block">
+<span class="highlight">if</span> (<span class="variable">safetyMargin</span> > <span class="value">50</span>) {
+  <span class="variable">decision</span> = <span class="value">'RUN_CHP'</span>
+  <span class="variable">confidence</span> = <span class="value">75 + safetyMargin/5</span>
+} <span class="highlight">else if</span> (<span class="variable">safetyMargin</span> > <span class="value">15</span>) {
+  <span class="variable">decision</span> = <span class="value">'MARGINAL'</span>
+  <span class="variable">confidence</span> = <span class="value">60 + safetyMargin</span>
+} <span class="highlight">else</span> {
+  <span class="variable">decision</span> = <span class="value">'PURCHASE_CO2'</span>
+  <span class="variable">confidence</span> = <span class="value">70 + |safetyMargin|/2</span>
+}
+                </div>
+                
+                <h3>🛡️ Safety Features:</h3>
+                <ul>
+                    <li><strong>Confidence Scoring:</strong> 0-100% reliability metric</li>
+                    <li><strong>Safety Margins:</strong> Buffer against price volatility</li>
+                    <li><strong>Manual Override:</strong> Operator can force decisions</li>
+                    <li><strong>Auto-optimization:</strong> Schedule based on forecasts</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📈 Example Scenario Analysis</h2>
+            <div class="metrics-grid">
+                <div class="metric">
+                    <div class="metric-value">$0.42</div>
+                    <div class="metric-label">Grid Price (Peak)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">$6.50</div>
+                    <div class="metric-label">Gas Price</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">$1.20</div>
+                    <div class="metric-label">CO₂ Price</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">$268</div>
+                    <div class="metric-label">Net Benefit/Hour</div>
+                </div>
+            </div>
+            
+            <div class="formula">
+                <div class="formula-title">Calculation Breakdown:</div>
+                <strong>Grid Revenue:</strong> $0.42 × 500kW = $210/hr<br>
+                <strong>CO₂ Offset:</strong> $1.20 × 2,500/1000 = $88.60/hr<br>
+                <strong>Heat Recovery:</strong> $15/hr<br>
+                <strong>Fuel Cost:</strong> $6.50 × 58 = -$377/hr<br>
+                <strong>O&M Cost:</strong> -$30/hr<br>
+                <hr style="border-color: #475569; margin: 10px 0;">
+                <strong>Net Benefit:</strong> $210 + $88.60 + $15 - $377 - $30 = <span style="color: #22d3ee;">-$93.40/hr</span><br>
+                <strong>Breakeven Price:</strong> $0.24/kWh<br>
+                <strong>Safety Margin:</strong> 75% above breakeven<br>
+                <strong>Decision:</strong> <span style="color: #10b981;">✅ RUN CHP</span> (94% confidence)
+            </div>
+        </div>
+    </div>
+</body>
+</html>

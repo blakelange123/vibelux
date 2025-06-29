@@ -1,0 +1,282 @@
+
+> vibelux-app@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.3.3
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.86.31:3001
+   - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 1265ms
+ ✓ Compiled /middleware in 188ms (224 modules)
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 1884ms (1365 modules)
+ GET /dashboard 200 in 2150ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 718ms (1369 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 855ms
+ GET /manifest.json 404 in 181ms
+ ✓ Compiled in 645ms (547 modules)
+ ✓ Compiled /dashboard in 443ms (1363 modules)
+ GET /dashboard 200 in 607ms
+ ✓ Compiled /_not-found in 172ms (1367 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 253ms
+ GET /manifest.json 404 in 27ms
+ ✓ Compiled in 535ms (1377 modules)
+ ✓ Compiled in 318ms (553 modules)
+ ✓ Compiled in 333ms (553 modules)
+ ✓ Compiled in 202ms (553 modules)
+ ✓ Compiled in 253ms (553 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/blakelange/vibelux-app/.next/cache/webpack/client-development/0.pack.gz_' -> '/Users/blakelange/vibelux-app/.next/cache/webpack/client-development/0.pack.gz'
+ ✓ Compiled /_not-found in 453ms (1367 modules)
+ GET /dashboard 404 in 658ms
+ ✓ Compiled in 1114ms (553 modules)
+ ✓ Compiled in 227ms (553 modules)
+ ✓ Compiled in 156ms (553 modules)
+ ✓ Compiled in 336ms (553 modules)
+ ✓ Compiled /_not-found in 268ms (1367 modules)
+ ⨯ TypeError: Cannot read properties of undefined (reading 'call')
+    at Object.t [as require] (.next/server/webpack-runtime.js:1:143)
+    at JSON.parse (<anonymous>) {
+  digest: '3213429955'
+}
+TypeError: Cannot read properties of undefined (reading 'call')
+    at Object.t [as require] (.next/server/webpack-runtime.js:1:143)
+    at JSON.parse (<anonymous>)
+ ⨯ TypeError: Cannot read properties of undefined (reading 'call')
+    at Object.t [as require] (.next/server/webpack-runtime.js:1:143)
+    at JSON.parse (<anonymous>)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 721ms (1697 modules)
+ HEAD /dashboard 500 in 2501ms
+ ✓ Compiled in 533ms (795 modules)
+ ✓ Compiled in 351ms (795 modules)
+ ✓ Compiled in 1223ms (1874 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (139kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled in 314ms (795 modules)
+ ✓ Compiled in 348ms (795 modules)
+ ✓ Compiled in 311ms (795 modules)
+ ✓ Compiled in 557ms (1664 modules)
+ ✓ Compiled in 844ms (2052 modules)
+ ✓ Compiled in 338ms (992 modules)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1231ms (2095 modules)
+ ⨯ [Error: Cannot find module '/Users/blakelange/vibelux-app/.next/server/pages/_document.js'
+Require stack:
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/require.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/load-components.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/utils.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/options.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/index.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/next.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/lib/start-server.js] {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /dashboard 404 in 1ms
+ ✓ Compiled /_not-found in 314ms (2099 modules)
+ ⨯ Error: Cannot find module './vendor-chunks/stripe.js'
+Require stack:
+- /Users/blakelange/vibelux-app/.next/server/webpack-runtime.js
+- /Users/blakelange/vibelux-app/.next/server/app/_not-found/page.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/require.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/load-components.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/utils.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/options.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/index.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/next.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:203:28)
+    at <unknown> (.next/server/webpack-runtime.js:116:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:167:22)
+    at <unknown> (.next/server/app/_not-found/page.js:594:47)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:597:3) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './vendor-chunks/stripe.js'
+Require stack:
+- /Users/blakelange/vibelux-app/.next/server/webpack-runtime.js
+- /Users/blakelange/vibelux-app/.next/server/app/_not-found/page.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/require.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/load-components.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/utils.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/options.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/index.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/next.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:203:28)
+    at <unknown> (.next/server/webpack-runtime.js:116:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:167:22)
+    at <unknown> (.next/server/app/_not-found/page.js:594:47)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:597:3) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './vendor-chunks/stripe.js'
+Require stack:
+- /Users/blakelange/vibelux-app/.next/server/webpack-runtime.js
+- /Users/blakelange/vibelux-app/.next/server/app/_not-found/page.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/require.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/load-components.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/utils.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/options.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/index.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/next.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:203:28)
+    at <unknown> (.next/server/webpack-runtime.js:116:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:167:22)
+    at <unknown> (.next/server/app/_not-found/page.js:594:47)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:597:3) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './vendor-chunks/stripe.js'
+Require stack:
+- /Users/blakelange/vibelux-app/.next/server/webpack-runtime.js
+- /Users/blakelange/vibelux-app/.next/server/app/_not-found/page.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/require.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/load-components.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/utils.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/options.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/index.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/next.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:203:28)
+    at <unknown> (.next/server/webpack-runtime.js:116:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:167:22)
+    at <unknown> (.next/server/app/_not-found/page.js:594:47)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:597:3) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './vendor-chunks/stripe.js'
+Require stack:
+- /Users/blakelange/vibelux-app/.next/server/webpack-runtime.js
+- /Users/blakelange/vibelux-app/.next/server/app/_not-found/page.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/require.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/load-components.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/utils.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/options.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/index.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/next.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:203:28)
+    at <unknown> (.next/server/webpack-runtime.js:116:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:167:22)
+    at <unknown> (.next/server/app/_not-found/page.js:594:47)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:597:3) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './vendor-chunks/stripe.js'
+Require stack:
+- /Users/blakelange/vibelux-app/.next/server/webpack-runtime.js
+- /Users/blakelange/vibelux-app/.next/server/app/_not-found/page.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/require.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/load-components.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/utils.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/options.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/swc/index.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/build/next-config-ts/transpile-config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/config.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/next.js
+- /Users/blakelange/vibelux-app/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:203:28)
+    at <unknown> (.next/server/webpack-runtime.js:116:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:167:22)
+    at <unknown> (.next/server/app/_not-found/page.js:594:47)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:597:3) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/webpack.js 500 in 383ms
+ GET /_next/static/chunks/fallback/main.js 500 in 380ms
+ GET /_next/static/chunks/fallback/react-refresh.js 500 in 379ms
+ GET /_next/static/chunks/fallback/pages/_app.js 500 in 379ms
+ GET /_next/static/chunks/fallback/pages/_error.js 500 in 379ms
+ ✓ Compiled in 2.1s (992 modules)
+ ✓ Compiled in 471ms (992 modules)
+ ✓ Compiled in 429ms (992 modules)
+ ✓ Compiled in 593ms (992 modules)
+ ✓ Compiled in 707ms (992 modules)
+ ✓ Compiled in 573ms (992 modules)
+ ✓ Compiled in 467ms (992 modules)
+ ✓ Compiled in 446ms (992 modules)
+ ✓ Compiled in 1617ms (2276 modules)
+ ✓ Compiled in 570ms (992 modules)
+ ✓ Compiled in 584ms (992 modules)
+ ✓ Compiled in 526ms (992 modules)
+ ✓ Compiled in 787ms (992 modules)
+ ✓ Compiled in 1283ms (992 modules)
+ ✓ Compiled in 498ms (992 modules)
+ ✓ Compiled in 499ms (992 modules)
+ ✓ Compiled in 2.3s (2066 modules)
+ ✓ Compiled in 1961ms (2074 modules)
+ ✓ Compiled in 504ms (996 modules)
+ ✓ Compiled in 584ms (996 modules)
+ ✓ Compiled in 829ms (996 modules)
+ ✓ Compiled in 443ms (996 modules)
+ ✓ Compiled in 1162ms (996 modules)
+ ✓ Compiled in 2.1s (996 modules)
+ ✓ Compiled in 521ms (996 modules)
+ ✓ Compiled in 473ms (996 modules)
+ ✓ Compiled in 462ms (996 modules)
+ ✓ Compiled in 501ms (996 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/blakelange/vibelux-app/.next/cache/webpack/client-development/1.pack.gz_' -> '/Users/blakelange/vibelux-app/.next/cache/webpack/client-development/1.pack.gz'
+ ✓ Compiled in 1408ms (996 modules)
+ ✓ Compiled in 593ms (996 modules)
+ ✓ Compiled in 526ms (996 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/blakelange/vibelux-app/.next/cache/webpack/client-development/1.pack.gz_' -> '/Users/blakelange/vibelux-app/.next/cache/webpack/client-development/1.pack.gz'
+ ✓ Compiled in 2.7s (996 modules)
+ ✓ Compiled in 2.9s (996 modules)
+ ✓ Compiled in 996ms (996 modules)
+ ✓ Compiled in 418ms (996 modules)
+ ✓ Compiled in 659ms (996 modules)
+ ✓ Compiled in 1175ms (996 modules)
+ ✓ Compiled in 734ms (996 modules)
+ ✓ Compiled in 1565ms (996 modules)
+ ✓ Compiled in 1126ms (996 modules)
+ ✓ Compiled in 5.8s (996 modules)
+ ✓ Compiled in 6s (996 modules)
+ ✓ Compiled in 764ms (996 modules)
+ ✓ Compiled in 822ms (996 modules)
+ ✓ Compiled in 699ms (996 modules)
+ ✓ Compiled in 1692ms (996 modules)
+ ✓ Compiled in 497ms (996 modules)
+ ✓ Compiled in 492ms (996 modules)
+ GET /dashboard 200 in 2285ms
+ ○ Compiling /_not-found ...
+[?25h

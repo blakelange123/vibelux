@@ -1,0 +1,37 @@
+# VibeLux Robots.txt
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /sign-in
+Disallow: /sign-up
+
+# Allow specific API documentation
+Allow: /api-docs
+
+# Sitemaps
+Sitemap: https://vibelux.app/sitemap.xml
+Sitemap: https://vibelux.app/sitemap-index.xml
+
+# Crawl delay (be nice to servers)
+Crawl-delay: 1
+
+# Specific bot rules
+User-agent: GPTBot
+Disallow: /api/
+Disallow: /admin/
+
+User-agent: ChatGPT-User
+Disallow: /api/
+Disallow: /admin/
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Google-Extended
+Allow: /

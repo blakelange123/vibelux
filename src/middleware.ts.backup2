@@ -1,0 +1,216 @@
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
+import { validateEnvironment } from "@/lib/env-validator";
+
+// Validate environment on startup
+try {
+  validateEnvironment();
+} catch (error) {
+  console.error("Environment validation failed:", error);
+}
+
+const isPublicRoute = createRouteMatcher([
+  "/",
+  "/manifest.json",
+  "/api/webhooks(.*)",
+  "/api/v1(.*)", // API v1 routes use API key authentication
+  "/api/proxy(.*)", // Secure proxy endpoints
+  "/api/ai-design-chat(.*)", // AI design chat API
+  "/api/subscription(.*)", // Subscription API
+  "/sign-in(.*)",
+  "/sign-up(.*)",
+  "/dashboard", // Temporarily allow public access to dashboard
+  "/pricing",
+  "/features",
+  "/about",
+  "/privacy",
+  "/terms",
+  "/support",
+  "/fixtures(.*)",
+  "/api/fixtures(.*)",
+  "/calculators(.*)",
+  "/design(.*)",
+  "/spectrum(.*)",
+  "/schedule(.*)",
+  "/test-css",
+  "/test(.*)",
+  "/analytics(.*)",
+  "/predictions(.*)",
+  "/reports(.*)",
+  "/templates(.*)",
+  "/batch(.*)",
+  "/settings(.*)",
+  "/language(.*)",
+  "/accessibility(.*)",
+  "/integrations(.*)",
+  "/sync(.*)",
+  "/offline(.*)",
+  "/pwa(.*)",
+  "/api-docs(.*)",
+  "/dev-tools(.*)",
+  "/carbon-credits(.*)",
+  "/iot-devices(.*)",
+  "/equipment-leasing(.*)",
+  "/community-forum(.*)",
+  "/light-recipes(.*)",
+  "/photosynthetic-calculator(.*)",
+  "/spectrum-builder(.*)",
+  "/maintenance-tracker(.*)",
+  "/export-center(.*)",
+  "/greenhouse-integration(.*)",
+  "/yield-prediction(.*)",
+  "/tco-calculator(.*)",
+  "/rebate-calculator(.*)",
+  "/multi-site(.*)",
+  "/nutrient-dosing(.*)",
+  "/dlc-compliance(.*)",
+  "/weather-adaptive(.*)",
+  "/sensors(.*)",
+  "/cultivation(.*)",
+  "/cultivation-simple(.*)",
+  "/control-center(.*)",
+  "/vertical-farming(.*)",
+  "/services(.*)",
+  "/operations(.*)",
+]);
+
+// Rate limiting store (in production, use Redis)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+// Rate limiting configuration
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const RATE_LIMITS = {
+  '/api/auth': { max: 5, window: RATE_LIMIT_WINDOW },
+  '/api/ai-assistant': { max: 10, window: RATE_LIMIT_WINDOW },
+  '/api': { max: 60, window: RATE_LIMIT_WINDOW },
+  default: { max: 100, window: RATE_LIMIT_WINDOW }
+};
+
+function getRateLimit(pathname: string) {
+  for (const [path, limit] of Object.entries(RATE_LIMITS)) {
+    if (pathname.startsWith(path)) {
+      return limit;
+    }
+  }
+  return RATE_LIMITS.default;
+}
+
+function checkRateLimit(ip: string, pathname: string): boolean {
+  const now = Date.now();
+  const limit = getRateLimit(pathname);
+  const key = `${ip}:${pathname}`;
+  
+  const record = rateLimitMap.get(key);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(key, { count: 1, resetTime: now + limit.window });
+    return true;
+  }
+  
+  if (record.count >= limit.max) {
+    return false;
+  }
+  
+  record.count++;
+  return true;
+}
+
+// Clean up old rate limit entries periodically
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, record] of rateLimitMap.entries()) {
+      if (now > record.resetTime) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }, 60 * 1000); // Every minute
+}
+
+export default clerkMiddleware(async (auth, req: NextRequest) => {
+  // Add security headers to all responses
+  const response = NextResponse.next();
+  
+  // Security headers
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self)');
+  
+  // Add HSTS in production
+  if (process.env.NODE_ENV === 'production') {
+    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  
+  // Remove server identification
+  response.headers.delete('Server');
+  response.headers.delete('X-Powered-By');
+  
+  // Skip rate limiting for static assets and health checks
+  if (
+    req.nextUrl.pathname.startsWith('/_next') ||
+    req.nextUrl.pathname.startsWith('/images') ||
+    req.nextUrl.pathname === '/api/health'
+  ) {
+    return response;
+  }
+  
+  // Rate limiting for API routes
+  if (req.nextUrl.pathname.startsWith('/api')) {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 
+               req.headers.get('x-real-ip') || 
+               req.ip || 
+               'unknown';
+    
+    if (!checkRateLimit(ip, req.nextUrl.pathname)) {
+      return new NextResponse('Too Many Requests', {
+        status: 429,
+        headers: {
+          'Retry-After': '60',
+          'X-RateLimit-Limit': String(getRateLimit(req.nextUrl.pathname).max),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': String(Date.now() + RATE_LIMIT_WINDOW)
+        }
+      });
+    }
+  }
+  
+  // CORS for API routes
+  if (req.nextUrl.pathname.startsWith('/api')) {
+    const origin = req.headers.get('origin');
+    const allowedOrigins = [
+      process.env.NEXT_PUBLIC_APP_URL,
+      'http://localhost:3000',
+      'http://localhost:3001'
+    ].filter(Boolean);
+    
+    if (origin && allowedOrigins.includes(origin)) {
+      response.headers.set('Access-Control-Allow-Origin', origin);
+      response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      response.headers.set('Access-Control-Max-Age', '86400');
+    }
+  }
+  
+  // Skip Clerk auth for API v1 routes (they use API key auth)
+  if (req.nextUrl.pathname.startsWith('/api/v1/') || 
+      req.nextUrl.pathname.startsWith('/api/proxy/')) {
+    return response;
+  }
+  
+  if (!isPublicRoute(req)) {
+    await auth.protect();
+  }
+  
+  return response;
+});
+
+export const config = {
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|json)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
+};

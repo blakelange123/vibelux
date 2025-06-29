@@ -1,0 +1,347 @@
+{
+  "form_metadata": {
+    "name": "Comprehensive Lifestyle and Wellness Questionnaire",
+    "form_key": "comprehensivelifestyleandwellnessquestionnaire2",
+    "form_id": 10,
+    "total_fields": 127,
+    "created_at": "2023-06-17 14:56:21",
+    "status": "published",
+    "required_fields_count": 5,
+    "optional_fields_count": 122
+  },
+  "assessment_flow": {
+    "section_1_food_preferences": {
+      "title": "Food Preferences Assessment",
+      "description": "Please rate your preference for each food item",
+      "field_count": 76,
+      "likert_scale": {
+        "options": [
+          {"label": "Strongly Dislike", "value": "Strongly Dislike"},
+          {"label": "Dislike", "value": "Dislike"},
+          {"label": "Neutral", "value": "Neutral"},
+          {"label": "Like", "value": "Like"},
+          {"label": "Strongly Like", "value": "Strongly Like"},
+          {"label": "N/A", "value": "N/A"}
+        ]
+      },
+      "subsections": {
+        "proteins": {
+          "title": "How do you feel about the following proteins?",
+          "likert_group_id": 467,
+          "field_count": 32,
+          "foods": [
+            "Chicken", "Turkey", "Beef", "Pork", "Lamb", "Venison", "Duck", "Rabbit", "Bison",
+            "Salmon", "Tuna", "Cod", "Shrimp", "Crab", "Lobster", "Mussels", "Clams", "Oysters", "Scallops",
+            "Tofu", "Tempeh", "Seitan", "Lentils", "Chickpeas", "Black Beans", "Quinoa", 
+            "Hemp Seeds", "Chia Seeds", "Spirulina", "Nutritional Yeast", "Protein Powder", "Eggs"
+          ]
+        },
+        "vegetables": {
+          "title": "How do you feel about the following vegetables?",
+          "likert_group_id": 468,
+          "field_count": 37,
+          "foods": [
+            "Artichoke", "Arugula", "Asparagus", "Beets", "Bell Peppers", "Broccoli", "Brussels Sprouts",
+            "Cabbage", "Carrots", "Cauliflower", "Celery", "Collard Greens", "Corn", "Cucumber",
+            "Eggplant", "Fennel", "Garlic", "Green Beans", "Kale", "Leeks", "Mushrooms", "Okra",
+            "Onions", "Parsnips", "Peas", "Radishes", "Romaine Lettuce", "Spinach", "Sweet Potatoes",
+            "Swiss Chard", "Tomatoes", "Turnips", "Zucchini", "Avocado", "Bok Choy", "Artichoke Hearts"
+          ]
+        }
+      }
+    },
+    "section_2_personal_info": {
+      "title": "Personal Information",
+      "description": "Please provide your basic information",
+      "field_count": 8,
+      "fields": [
+        {
+          "name": "What is your first name?",
+          "field_key": "tbyhr",
+          "type": "text",
+          "required": true,
+          "field_order": 3
+        },
+        {
+          "name": "What is your last name?",
+          "field_key": "r5pgl",
+          "type": "text",
+          "required": true,
+          "field_order": 8
+        },
+        {
+          "name": "What is your email address?",
+          "field_key": "w9kqcb",
+          "type": "email",
+          "required": true,
+          "field_order": 13
+        },
+        {
+          "name": "What is your phone number?",
+          "field_key": "y6xm7k",
+          "type": "phone",
+          "required": true,
+          "field_order": 18,
+          "description": "Fitness via Text. We'll send workout reminders and guidance to your phone. Easy opt-out anytime."
+        },
+        {
+          "name": "What is your address?",
+          "field_key": "4n6n2b",
+          "type": "address",
+          "required": true,
+          "field_order": 20
+        },
+        {
+          "name": "Could you please identify your gender?",
+          "field_key": "yp6gm",
+          "type": "select",
+          "required": false,
+          "field_order": 101,
+          "options": [
+            {"label": "Male", "value": "Male"},
+            {"label": "Female", "value": "Female"},
+            {"label": "Other", "value": "Other"},
+            {"label": "Prefer not to say", "value": "Prefer not to say"}
+          ]
+        },
+        {
+          "name": "What is your date of birth?",
+          "field_key": "5w78dn",
+          "type": "date",
+          "required": false,
+          "field_order": 102
+        }
+      ]
+    },
+    "section_3_health_assessment": {
+      "title": "Health Assessment",
+      "description": "Please provide information about your health and fitness",
+      "field_count": 12,
+      "fields": [
+        {
+          "name": "Do you have any diagnosed health conditions? Please select all that apply.",
+          "field_key": "n4y9z",
+          "type": "checkbox",
+          "required": false,
+          "field_order": 104,
+          "options": [
+            {"label": "Diabetes", "value": "Diabetes"},
+            {"label": "High Blood Pressure", "value": "High Blood Pressure"},
+            {"label": "Heart Disease", "value": "Heart Disease"},
+            {"label": "Arthritis", "value": "Arthritis"},
+            {"label": "Asthma", "value": "Asthma"},
+            {"label": "Depression", "value": "Depression"},
+            {"label": "Anxiety", "value": "Anxiety"},
+            {"label": "Thyroid Disorder", "value": "Thyroid Disorder"},
+            {"label": "High Cholesterol", "value": "High Cholesterol"},
+            {"label": "Osteoporosis", "value": "Osteoporosis"},
+            {"label": "COPD", "value": "COPD"},
+            {"label": "Kidney Disease", "value": "Kidney Disease"},
+            {"label": "Liver Disease", "value": "Liver Disease"},
+            {"label": "Cancer", "value": "Cancer"},
+            {"label": "Autoimmune Disease", "value": "Autoimmune Disease"},
+            {"label": "Sleep Apnea", "value": "Sleep Apnea"},
+            {"label": "Fibromyalgia", "value": "Fibromyalgia"},
+            {"label": "Chronic Fatigue Syndrome", "value": "Chronic Fatigue Syndrome"},
+            {"label": "None of the above", "value": "None of the above"}
+          ]
+        },
+        {
+          "name": "Are you currently taking any medications? If so, please list them.",
+          "field_key": "qzh7p",
+          "type": "text",
+          "required": false,
+          "field_order": 105
+        },
+        {
+          "name": "Does your medical history include any of the following diseases?",
+          "field_key": "w5j4r",
+          "type": "select",
+          "required": false,
+          "field_order": 106,
+          "options_count": 23
+        },
+        {
+          "name": "Where do you currently experience pain?",
+          "field_key": "p8m3x",
+          "type": "text",
+          "required": false,
+          "field_order": 107
+        },
+        {
+          "name": "Are you currently pregnant?",
+          "field_key": "4jq8n",
+          "type": "radio",
+          "required": false,
+          "field_order": 108,
+          "options": [
+            {"label": "Yes", "value": "Yes"},
+            {"label": "No", "value": "No"}
+          ],
+          "conditional_logic": {
+            "hide_field": ["386"],
+            "hide_opt": ["Male"]
+          }
+        },
+        {
+          "name": "Are you open to trying new or challenging exercises, or do you prefer sticking to familiar routines?",
+          "field_key": "8f2kx",
+          "type": "radio",
+          "required": false,
+          "field_order": 109,
+          "options": [
+            {"label": "I'm open to trying new and challenging exercises", "value": "I'm open to trying new and challenging exercises"},
+            {"label": "I prefer sticking to familiar routines", "value": "I prefer sticking to familiar routines"}
+          ]
+        },
+        {
+          "name": "How many years have you been consistently incorporating exercise into your daily routine?",
+          "field_key": "m7n3q",
+          "type": "select",
+          "required": false,
+          "field_order": 110,
+          "options": [
+            {"label": "Less than 1 year", "value": "Less than 1 year"},
+            {"label": "1-2 years", "value": "1-2 years"},
+            {"label": "3-5 years", "value": "3-5 years"},
+            {"label": "6-10 years", "value": "6-10 years"},
+            {"label": "More than 10 years", "value": "More than 10 years"}
+          ]
+        },
+        {
+          "name": "What kinds of physical exercises do you typically participate in during a week?",
+          "field_key": "6k9r2",
+          "type": "checkbox",
+          "required": false,
+          "field_order": 111,
+          "options": [
+            {"label": "Walking", "value": "Walking"},
+            {"label": "Running", "value": "Running"},
+            {"label": "Swimming", "value": "Swimming"},
+            {"label": "Weightlifting", "value": "Weightlifting"},
+            {"label": "Yoga", "value": "Yoga"},
+            {"label": "Pilates", "value": "Pilates"},
+            {"label": "Cycling", "value": "Cycling"},
+            {"label": "Dancing", "value": "Dancing"},
+            {"label": "Martial Arts", "value": "Martial Arts"},
+            {"label": "Team Sports", "value": "Team Sports"},
+            {"label": "Rock Climbing", "value": "Rock Climbing"},
+            {"label": "Hiking", "value": "Hiking"},
+            {"label": "Tennis", "value": "Tennis"},
+            {"label": "Golf", "value": "Golf"},
+            {"label": "Boxing", "value": "Boxing"},
+            {"label": "CrossFit", "value": "CrossFit"},
+            {"label": "Stretching", "value": "Stretching"},
+            {"label": "Tai Chi", "value": "Tai Chi"},
+            {"label": "None", "value": "None"}
+          ]
+        },
+        {
+          "name": "Is there a specific type of exercise or workout that you are particularly interested in emphasizing in your routine?",
+          "field_key": "t4h8m",
+          "type": "text",
+          "required": false,
+          "field_order": 112
+        }
+      ]
+    },
+    "section_4_program_purchase": {
+      "title": "Program Interest & Purchase",
+      "description": "Information about program interest and payment processing",
+      "field_count": 15,
+      "key_fields": [
+        {
+          "name": "Based on the information you have received and your current needs and goals, would you be interested in purchasing our weekly program for $34.99 a month?",
+          "field_key": "3x7n9",
+          "type": "radio",
+          "required": false,
+          "field_order": 113,
+          "options": [
+            {"label": "Yes, I'm interested in purchasing", "value": "Yes"},
+            {"label": "No, I'm not interested at this time", "value": "No"}
+          ]
+        },
+        {
+          "name": "User ID",
+          "field_key": "bc79s",
+          "type": "user_id",
+          "required": false,
+          "field_order": 114
+        },
+        {
+          "name": "Password",
+          "field_key": "vhq4k",
+          "type": "password",
+          "required": false,
+          "field_order": 115
+        },
+        {
+          "name": "Credit Card",
+          "field_key": "2m8j6",
+          "type": "credit_card",
+          "required": false,
+          "field_order": 116,
+          "conditional_logic": {
+            "hide_field": ["546"],
+            "hide_opt": ["Credit Card"]
+          }
+        },
+        {
+          "name": "Payment Gateway",
+          "field_key": "f9p3x",
+          "type": "gateway",
+          "required": false,
+          "field_order": 117
+        }
+      ]
+    }
+  },
+  "conditional_logic_rules": [
+    {
+      "field_name": "Are you currently pregnant?",
+      "field_key": "4jq8n",
+      "trigger": "gender selection",
+      "logic": {
+        "action": "hide",
+        "target_field": "386",
+        "condition": "if gender equals 'Male'"
+      }
+    },
+    {
+      "field_name": "Credit Card",
+      "field_key": "2m8j6",
+      "trigger": "payment method selection",
+      "logic": {
+        "action": "hide",
+        "target_field": "546",
+        "condition": "if payment method equals 'Credit Card'"
+      }
+    }
+  ],
+  "implementation_recommendations": {
+    "ui_ux": [
+      "Implement progressive disclosure with clear section breaks",
+      "Add progress indicators for better user experience",
+      "Use responsive design for mobile-friendly Likert scales",
+      "Consider auto-save functionality for long form"
+    ],
+    "data_validation": [
+      "Client-side validation for required fields",
+      "Email format validation",
+      "Phone number format validation",
+      "Address validation where possible"
+    ],
+    "technical": [
+      "Use unique field keys for database mapping",
+      "Implement conditional logic engine",
+      "Consider API integration for payment processing",
+      "Plan for data export/import capabilities"
+    ],
+    "business_logic": [
+      "Payment processing integration",
+      "User account creation workflow",
+      "Email automation for follow-ups",
+      "Data analytics for form completion rates"
+    ]
+  }
+}

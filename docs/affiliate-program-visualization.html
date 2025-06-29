@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibelux Affiliate Program - Income Scenarios</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #030712;
+            color: #e5e7eb;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #111827;
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid #1f2937;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h1 {
+            background: linear-gradient(to right, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #9ca3af;
+            font-size: 20px;
+        }
+        .commission-structure {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border: 2px solid #7c3aed;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        .tier-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .tier-card {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .tier-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+        }
+        .tier-name {
+            color: #a855f7;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .commission-rate {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(to right, #10b981, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0;
+        }
+        .tier-requirement {
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .tier-benefits {
+            text-align: left;
+            margin-top: 20px;
+        }
+        .tier-benefits li {
+            color: #d1d5db;
+            margin: 8px 0;
+            list-style: none;
+            padding-left: 20px;
+            position: relative;
+        }
+        .tier-benefits li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        .scenario-section {
+            margin: 40px 0;
+        }
+        .scenario-card {
+            background: #1f2937;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid #374151;
+        }
+        .scenario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .scenario-title {
+            color: #ec4899;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .monthly-income {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .calculation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+            background: #111827;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .calc-item {
+            text-align: center;
+        }
+        .calc-label {
+            color: #9ca3af;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        .calc-value {
+            color: #f3f4f6;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .income-chart {
+            background: #111827;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .chart-label {
+            width: 150px;
+            color: #d1d5db;
+            font-size: 14px;
+        }
+        .chart-progress {
+            flex: 1;
+            height: 30px;
+            background: #374151;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+        .chart-fill {
+            height: 100%;
+            background: linear-gradient(to right, #7c3aed, #ec4899);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .bonus-section {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%);
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        h2 {
+            color: #a855f7;
+            margin: 30px 0 20px;
+            font-size: 32px;
+        }
+        h3 {
+            color: #ec4899;
+            margin: 20px 0 15px;
+            font-size: 24px;
+        }
+        .highlight-box {
+            background: #374151;
+            border-left: 4px solid #7c3aed;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .promo-materials {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .promo-card {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .promo-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .cta-section {
+            background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 40px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #7c3aed;
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 20px;
+            transition: transform 0.3s;
+        }
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Vibelux Affiliate Partner Program</h1>
+            <p class="subtitle">Turn your network into recurring revenue with the industry's best commission structure</p>
+        </div>
+
+        <div class="commission-structure">
+            <h2 style="text-align: center; margin-top: 0;">Commission Structure & Tiers</h2>
+            
+            <div class="tier-grid">
+                <div class="tier-card">
+                    <div class="tier-name">Bronze Partner</div>
+                    <div class="commission-rate">20%</div>
+                    <div class="tier-requirement">Entry Level</div>
+                    <ul class="tier-benefits">
+                        <li>Lifetime recurring commission</li>
+                        <li>Marketing materials</li>
+                        <li>Partner dashboard</li>
+                        <li>Monthly webinars</li>
+                    </ul>
+                </div>
+
+                <div class="tier-card" style="border-color: #7c3aed;">
+                    <div class="tier-name">Silver Partner</div>
+                    <div class="commission-rate">25%</div>
+                    <div class="tier-requirement">5+ Active Customers</div>
+                    <ul class="tier-benefits">
+                        <li>Everything in Bronze</li>
+                        <li>Priority support</li>
+                        <li>Co-branded materials</li>
+                        <li>Lead sharing program</li>
+                    </ul>
+                </div>
+
+                <div class="tier-card" style="border-color: #ec4899;">
+                    <div class="tier-name">Gold Partner</div>
+                    <div class="commission-rate">30%</div>
+                    <div class="tier-requirement">15+ Active Customers</div>
+                    <ul class="tier-benefits">
+                        <li>Everything in Silver</li>
+                        <li>Demo account access</li>
+                        <li>Joint case studies</li>
+                        <li>Event sponsorship</li>
+                    </ul>
+                </div>
+
+                <div class="tier-card" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);">
+                    <div class="tier-name">Platinum Partner</div>
+                    <div class="commission-rate">35%</div>
+                    <div class="tier-requirement">50+ Active Customers</div>
+                    <ul class="tier-benefits">
+                        <li>Everything in Gold</li>
+                        <li>Dedicated account manager</li>
+                        <li>Custom integrations</li>
+                        <li>Revenue share on hardware</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="scenario-section">
+            <h2>Income Scenarios - Real Partner Examples</h2>
+
+            <div class="scenario-card">
+                <div class="scenario-header">
+                    <div class="scenario-title">🌱 Scenario 1: Cannabis Consultant</div>
+                    <div class="monthly-income">$4,500/mo</div>
+                </div>
+                <p>Sarah consults for cannabis facilities on compliance and operations. She recommends Vibelux for energy savings.</p>
+                <div class="calculation-grid">
+                    <div class="calc-item">
+                        <div class="calc-label">Clients Converted</div>
+                        <div class="calc-value">6 facilities</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="calc-label">Avg Subscription</div>
+                        <div class="calc-value">$2,999/mo</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="calc-label">Commission Rate</div>
+                        <div class="calc-value">25%</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="calc-label">Monthly Recurring</div>
+                        <div class="calc-value">$4,498.50</div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <strong>Key Success Factor:</strong> Positions Vibelux as part of compliance strategy - "Reduce energy costs to meet sustainability requirements"
+                </div>
+            </div>
+
+            <div class="scenario-card">
+                <div class="scenario-header">
+                    <div class="scenario-title">🏢 Scenario 2: Equipment Distributor</div>
+                    <div class="monthly-income">$18,750/mo</div>
+                </div>
+                <p>GrowTech Supply sells lights and HVAC. They bundle Vibelux with equipment packages for complete solutions.</p>
+                <div class="calculation-grid">
+                    <div class="calc-item">
+                        <div class="calc-label">Monthly Deals</div>
+                        <div class="calc-value">25 facilities</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="calc-label">Avg Subscription</div>
+                        <div class="calc-value">$2,499/mo</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="calc-label">Commission Rate</div>
+                        <div class="calc-value">30%</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="calc-label">Monthly Recurring</div>
+                        <div class="calc-value">$18,742.50</div>
+                    </div>
+                </div>
+                <div class="income-chart">
+                    <h4 style="color: #a855f7; margin-top: 0;">Growth Trajectory</h4>
+                    <div class="chart-bar">
+                        <div class="chart-label">Month 1</div>
+                        <div class="chart-progress">
+                            <div class="chart-fill" style="width: 20%;">$3,750</div>
+                        </div>
+                    </div>
+                    <div class="chart-bar">
+                        <div class="chart-label">Month 6</div>
+                        <div class="chart-progress">
+                            <div class="chart-fill" style="width: 60%;">$11,250</div>
+                        </div>
+                    </div>
+                    <div class="chart-bar">
+                        <div class="chart-label">Month 12</div>
+                        <div class="chart-progress">
+                            <div class="chart-fill" style="width: 100%;">$18,750</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scenario-card">
+                <div class="scenario-header">
+                    <div class="scenario-title">💡 Scenario 3: Energy Consultant</div>
+                    <div class="monthly-income">$52,500/mo</div>
+                </div>
+                <p>EnergyPro Consulting specializes in utility rebates. They use Vibelux to guarantee 30-50% energy savings.</p>
+                <div class="calculation-grid">
+                    <div class="calc-item">
+                        <div class="calc-label">Enterprise Clients</div>
+                        <div class="calc-value">60 facilities</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="calc-label">Avg Subscription</div>
+                        <div class="calc-value">$2,499/mo</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="calc-label">Commission Rate</div>
+                        <div class="calc-value">35%</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="calc-label">Monthly Recurring</div>
+                        <div class="calc-value">$52,479</div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <strong>Platinum Benefits:</strong> Custom integration with utility rebate calculator, co-branded energy audits, dedicated support team
+                </div>
+            </div>
+
+            <div class="scenario-card">
+                <div class="scenario-header">
+                    <div class="scenario-title">🌾 Scenario 4: Ag Extension Agent</div>
+                    <div class="monthly-income">$2,250/mo</div>
+                </div>
+                <p>Mike works with local greenhouse growers. He recommends Vibelux for small operations looking to modernize.</p>
+                <div class="calculation-grid">
+                    <div class="calc-item">
+                        <div class="calc-label">Small Growers</div>
+                        <div class="calc-value">15 facilities</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="calc-label">Avg Subscription</div>
+                        <div class="calc-value">$599/mo</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="calc-label">Commission Rate</div>
+                        <div class="calc-value">25%</div>
+                    </div>
+                    <div class="calc-item">
+                        <div class="calc-label">Monthly Recurring</div>
+                        <div class="calc-value">$2,246.25</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bonus-section">
+            <h3 style="text-align: center; margin-top: 0;">🎯 Additional Revenue Opportunities</h3>
+            <div class="tier-grid">
+                <div class="promo-card">
+                    <div class="promo-icon">💰</div>
+                    <h4 style="color: #10b981;">Revenue Share Deals</h4>
+                    <p>Earn 10% of energy savings revenue for facilities using our $0 upfront model</p>
+                    <p style="font-size: 20px; color: #10b981; font-weight: bold;">+$500-2,000/mo per facility</p>
+                </div>
+                <div class="promo-card">
+                    <div class="promo-icon">🏆</div>
+                    <h4 style="color: #10b981;">Performance Bonuses</h4>
+                    <p>Quarterly bonuses for top performers and fast growth</p>
+                    <p style="font-size: 20px; color: #10b981; font-weight: bold;">Up to $10,000/quarter</p>
+                </div>
+                <div class="promo-card">
+                    <div class="promo-icon">🔧</div>
+                    <h4 style="color: #10b981;">Implementation Fees</h4>
+                    <p>Charge for setup and training services</p>
+                    <p style="font-size: 20px; color: #10b981; font-weight: bold;">$1,000-5,000 per install</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="scenario-section">
+            <h2>Marketing Support & Resources</h2>
+            <div class="promo-materials">
+                <div class="promo-card">
+                    <div class="promo-icon">📊</div>
+                    <h4>ROI Calculators</h4>
+                    <p>Custom calculators showing energy savings and payback period</p>
+                </div>
+                <div class="promo-card">
+                    <div class="promo-icon">🎥</div>
+                    <h4>Demo Videos</h4>
+                    <p>Professional demos you can share or embed</p>
+                </div>
+                <div class="promo-card">
+                    <div class="promo-icon">📧</div>
+                    <h4>Email Templates</h4>
+                    <p>Proven sequences that convert leads</p>
+                </div>
+                <div class="promo-card">
+                    <div class="promo-icon">🎯</div>
+                    <h4>Landing Pages</h4>
+                    <p>Custom pages with your affiliate tracking</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="income-chart">
+            <h3 style="color: #a855f7;">Realistic 12-Month Income Projection</h3>
+            <p style="color: #9ca3af; margin-bottom: 20px;">Based on converting 2 new customers per month</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 10px; text-align: center;">
+                <div>
+                    <div style="color: #9ca3af; font-size: 12px;">Month 1</div>
+                    <div style="color: #10b981; font-size: 18px; font-weight: bold;">$600</div>
+                </div>
+                <div>
+                    <div style="color: #9ca3af; font-size: 12px;">Month 3</div>
+                    <div style="color: #10b981; font-size: 18px; font-weight: bold;">$1,800</div>
+                </div>
+                <div>
+                    <div style="color: #9ca3af; font-size: 12px;">Month 6</div>
+                    <div style="color: #10b981; font-size: 18px; font-weight: bold;">$3,750</div>
+                </div>
+                <div>
+                    <div style="color: #9ca3af; font-size: 12px;">Month 9</div>
+                    <div style="color: #10b981; font-size: 18px; font-weight: bold;">$5,400</div>
+                </div>
+                <div>
+                    <div style="color: #9ca3af; font-size: 12px;">Month 12</div>
+                    <div style="color: #10b981; font-size: 18px; font-weight: bold;">$7,200</div>
+                </div>
+            </div>
+            <p style="text-align: center; color: #a855f7; margin-top: 20px; font-size: 18px;">
+                <strong>Year 1 Total: $43,200</strong> | Year 2 Projected: $86,400+
+            </p>
+        </div>
+
+        <div class="cta-section">
+            <h2 style="color: white; margin-top: 0;">Ready to Start Earning?</h2>
+            <p style="font-size: 20px; margin-bottom: 30px;">Join 200+ partners already building recurring revenue with Vibelux</p>
+            <a href="#" class="cta-button">Apply for Partner Program</a>
+            <p style="margin-top: 20px; font-size: 14px;">Average partner earns $8,400/month within 12 months</p>
+        </div>
+    </div>
+</body>
+</html>

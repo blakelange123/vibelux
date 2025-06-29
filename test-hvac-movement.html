@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HVAC Movement Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-steps { background: #f0f0f0; padding: 20px; margin: 20px 0; }
+        .step { margin: 10px 0; padding: 10px; background: white; }
+        .debug-info { background: #333; color: #0f0; padding: 10px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>HVAC Unit Movement Test</h1>
+    
+    <div class="test-steps">
+        <h2>Test Steps:</h2>
+        <div class="step">1. Open your browser's Developer Console (F12)</div>
+        <div class="step">2. Go to your VibeLux app at http://localhost:3000/design/advanced</div>
+        <div class="step">3. Create a room if you haven't already</div>
+        <div class="step">4. Add an HVAC unit from the HVAC Systems panel</div>
+        <div class="step">5. Make sure you're in "Select" mode (press V key)</div>
+        <div class="step">6. Click on the HVAC unit</div>
+        <div class="step">7. Try to drag it</div>
+    </div>
+    
+    <h2>Expected Console Output:</h2>
+    <div class="debug-info">
+        🔧 getObjectAt(x, y) found: {type: "equipment", equipmentType: "hvac", ...}<br>
+        🔧 Hit detected on equipment at (x, y): {...}<br>
+        🔧 Starting drag with object: {...} tool: "select"<br>
+        🔧 Storing original position for object_id (type: equipment): {x: ..., y: ...}<br>
+        🔧 Dragging objects: {...}<br>
+        🔧 Moving object object_id (type: equipment) from x,y by deltaX,deltaY
+    </div>
+    
+    <h2>If HVAC units aren't moving:</h2>
+    <ul>
+        <li>Check if "🔧 Hit detected on equipment" appears when clicking</li>
+        <li>Check if "🔧 Starting drag" appears</li>
+        <li>Check if "🔧 Moving object" appears when dragging</li>
+        <li>Look for any error messages in the console</li>
+    </ul>
+    
+    <h2>Quick Fix to Try:</h2>
+    <p>If the HVAC unit isn't being detected when clicked, try:</p>
+    <ol>
+        <li>Switch to "Move" mode (press M key)</li>
+        <li>Click and drag the HVAC unit</li>
+        <li>This should definitely work as an alternative</li>
+    </ol>
+</body>
+</html>

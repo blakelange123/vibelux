@@ -1,0 +1,28 @@
+# Backup service Dockerfile
+FROM node:18-alpine
+
+# Install required packages
+RUN apk add --no-cache \
+    postgresql-client \
+    curl \
+    aws-cli \
+    gzip \
+    openssl
+
+WORKDIR /backup
+
+# Copy backup scripts
+COPY scripts/backup/ ./scripts/
+COPY package.json ./
+
+# Install Node.js dependencies for backup scripts
+RUN npm install --only=production
+
+# Make scripts executable
+RUN chmod +x ./scripts/*.sh
+
+# Create backup directory
+RUN mkdir -p /backup/data
+
+# Run backup scheduler
+CMD ["node", "scripts/backup-scheduler.js"]

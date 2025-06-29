@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Canvas Test</title>
+  <style>
+    body { margin: 0; background: #111; }
+    canvas { display: block; background: #222; }
+  </style>
+</head>
+<body>
+  <canvas id="testCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById('testCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas size
+    canvas.width = 800;
+    canvas.height = 600;
+    
+    // Draw test content
+    ctx.fillStyle = '#10b981';
+    ctx.fillRect(50, 50, 200, 150);
+    
+    ctx.strokeStyle = '#fff';
+    ctx.strokeRect(100, 100, 100, 100);
+    
+    ctx.fillStyle = '#fff';
+    ctx.font = '20px Arial';
+    ctx.fillText('Canvas is working!', 300, 150);
+    
+    console.log('Canvas test rendered');
+  </script>
+</body>
+</html>

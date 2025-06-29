@@ -1,0 +1,224 @@
+// This would be added to your existing schema.prisma file
+
+model ProduceListing {
+  id                String   @id @default(cuid())
+  growerId          String
+  grower            User     @relation("GrowingsListings", fields: [growerId], references: [id])
+  
+  // Product Info
+  productType       String
+  variety           String
+  growingMethod     String
+  certifications    String[]
+  
+  // Availability
+  currentStock      Float
+  unit              String
+  harvestDate       DateTime
+  availableFrom     DateTime
+  availableUntil    DateTime
+  recurring         Boolean  @default(false)
+  frequency         String?
+  
+  // Pricing
+  price             Float
+  priceUnit         String
+  bulkDiscounts     Json?    // Array of {minQuantity, discountPercent}
+  contractPricing   Boolean  @default(false)
+  
+  // Quality
+  grade             String
+  shelfLife         Int      // days
+  packagingType     String
+  coldChainRequired Boolean  @default(true)
+  images            String[]
+  
+  // Logistics
+  deliveryAvailable Boolean  @default(true)
+  deliveryRadius    Float?   // miles
+  deliveryFee       Float?
+  minimumOrder      Float?
+  pickupAvailable   Boolean  @default(true)
+  packagingIncluded Boolean  @default(true)
+  
+  // Location
+  city              String
+  state             String
+  zipCode           String
+  
+  // Sustainability
+  carbonFootprint   Float?   // kg CO2e per unit
+  waterUsage        Float?   // gallons per unit
+  renewableEnergy   Boolean  @default(false)
+  locallyGrown      Boolean  @default(true)
+  pesticideFree     Boolean  @default(false)
+  
+  // Status
+  status            ListingStatus @default(ACTIVE)
+  views             Int      @default(0)
+  
+  // Relations
+  orders            Order[]
+  savedBy           SavedListing[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([growerId])
+  @@index([productType])
+  @@index([status])
+  @@index([city, state])
+}
+
+model Order {
+  id                String   @id @default(cuid())
+  buyerId           String
+  buyer             User     @relation("BuyerOrders", fields: [buyerId], references: [id])
+  sellerId          String
+  seller            User     @relation("SellerOrders", fields: [sellerId], references: [id])
+  
+  items             OrderItem[]
+  
+  status            OrderStatus @default(PENDING)
+  totalAmount       Float
+  
+  deliveryMethod    String   // 'delivery' or 'pickup'
+  deliveryAddress   String?
+  deliveryDate      DateTime
+  
+  notes             String?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
+}
+
+model OrderItem {
+  id                String   @id @default(cuid())
+  orderId           String
+  order             Order    @relation(fields: [orderId], references: [id])
+  listingId         String
+  listing           ProduceListing @relation(fields: [listingId], references: [id])
+  
+  productName       String
+  quantity          Float
+  unit              String
+  pricePerUnit      Float
+  totalPrice        Float
+  
+  @@index([orderId])
+  @@index([listingId])
+}
+
+model SavedListing {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+  listingId         String
+  listing           ProduceListing @relation(fields: [listingId], references: [id])
+  
+  createdAt         DateTime @default(now())
+  
+  @@unique([userId, listingId])
+  @@index([userId])
+  @@index([listingId])
+}
+
+model BuyerProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id])
+  
+  businessName      String
+  businessType      String   // restaurant, grocery, distributor, etc.
+  
+  // Location
+  address           String
+  city              String
+  state             String
+  zipCode           String
+  
+  // Preferences
+  productTypes      String[]
+  certifications    String[]
+  maxDeliveryDistance Float
+  preferredPackaging String[]
+  volumeNeeds       String   // small, medium, large, enterprise
+  
+  // Notifications
+  notifyNewListings Boolean  @default(true)
+  notifyPriceChanges Boolean @default(true)
+  notifyAvailability Boolean @default(true)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId])
+}
+
+model GrowerProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id])
+  
+  farmName          String
+  description       String?
+  
+  // Location
+  address           String
+  city              String
+  state             String
+  zipCode           String
+  
+  // Capabilities
+  growingMethods    String[]
+  certifications    String[]
+  facilitySize      Float    // sq ft
+  
+  // Ratings
+  averageRating     Float    @default(0)
+  totalReviews      Int      @default(0)
+  
+  // Verification
+  verified          Boolean  @default(false)
+  verifiedAt        DateTime?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([userId])
+}
+
+// Enums
+enum ListingStatus {
+  ACTIVE
+  SOLD_OUT
+  COMING_SOON
+  SEASONAL
+  INACTIVE
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+// Update User model to include marketplace relations
+model User {
+  // ... existing fields ...
+  
+  // Marketplace relations
+  producListings    ProduceListing[] @relation("GrowingsListings")
+  buyerOrders       Order[]          @relation("BuyerOrders")
+  sellerOrders      Order[]          @relation("SellerOrders")
+  savedListings     SavedListing[]
+  buyerProfile      BuyerProfile?
+  growerProfile     GrowerProfile?
+}

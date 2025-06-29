@@ -1,0 +1,341 @@
+// Financial Automation Schema Extensions
+// Add these models to your existing schema.prisma file
+
+model RevenueSharingAgreement {
+  id                String    @id @default(cuid())
+  customerId        String
+  customer          User      @relation(fields: [customerId], references: [id])
+  facilityId        String
+  facility          Facility  @relation(fields: [facilityId], references: [id])
+  affiliateId       String?
+  affiliate         Affiliate? @relation(fields: [affiliateId], references: [id])
+  
+  status            AgreementStatus @default(ACTIVE)
+  revenueShareRate  Float     // Percentage (e.g., 20 for 20%)
+  minimumThreshold  Float     @default(100)
+  
+  startDate         DateTime
+  endDate           DateTime?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  invoices          Invoice[]
+}
+
+model Invoice {
+  id                    String    @id @default(cuid())
+  invoiceNumber         String    @unique
+  customerId            String
+  customer              User      @relation(fields: [customerId], references: [id])
+  agreementId           String
+  agreement             RevenueSharingAgreement @relation(fields: [agreementId], references: [id])
+  
+  periodStart           DateTime
+  periodEnd             DateTime
+  
+  totalSavings          Float
+  revenueShareRate      Float
+  amountDue             Float
+  
+  dueDate               DateTime
+  status                InvoiceStatus @default(PENDING)
+  
+  paidAt                DateTime?
+  paymentTransactionId  String?
+  
+  pdfUrl                String?
+  verificationData      Json?
+  weatherNormalizationApplied Boolean @default(false)
+  thirdPartyVerified    Boolean @default(false)
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  payments              Payment[]
+  collectionActivities  CollectionActivity[]
+}
+
+model PaymentSchedule {
+  id              String    @id @default(cuid())
+  invoiceId       String
+  invoice         Invoice   @relation(fields: [invoiceId], references: [id])
+  
+  scheduledDate   DateTime
+  status          PaymentScheduleStatus @default(SCHEDULED)
+  paymentMethod   String
+  amount          Float
+  
+  retryCount      Int       @default(0)
+  maxRetries      Int       @default(3)
+  lastError       String?
+  
+  completedAt     DateTime?
+  transactionId   String?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Payment {
+  id              String    @id @default(cuid())
+  invoiceId       String
+  invoice         Invoice   @relation(fields: [invoiceId], references: [id])
+  customerId      String
+  customer        User      @relation(fields: [customerId], references: [id])
+  
+  amount          Float
+  paymentMethod   String
+  transactionId   String    @unique
+  status          PaymentStatus
+  
+  processedAt     DateTime
+  
+  createdAt       DateTime  @default(now())
+}
+
+model PaymentMethod {
+  id                    String    @id @default(cuid())
+  customerId            String
+  customer              User      @relation(fields: [customerId], references: [id])
+  
+  type                  PaymentMethodType
+  isDefault             Boolean   @default(false)
+  status                PaymentMethodStatus @default(ACTIVE)
+  
+  // Stripe fields
+  stripeCustomerId      String?
+  stripePaymentMethodId String?
+  
+  // Plaid ACH fields
+  plaidAccessToken      String?   @db.Text
+  plaidAccountId        String?
+  
+  // Bank details (encrypted)
+  bankName              String?
+  accountLastFour       String?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model UtilityConnection {
+  id                String    @id @default(cuid())
+  customerId        String
+  customer          User      @relation(fields: [customerId], references: [id])
+  
+  utilityProvider   String
+  apiProvider       String
+  utilityAccountId  String?
+  
+  status            ConnectionStatus @default(PENDING_AUTH)
+  authorizationUrl  String?
+  
+  accessToken       String?   @db.Text // Encrypted
+  refreshToken      String?   @db.Text // Encrypted
+  tokenExpiresAt    DateTime?
+  
+  lastSyncAt        DateTime?
+  lastError         String?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model WeatherNormalization {
+  id                String    @id @default(cuid())
+  facilityId        String
+  facility          Facility  @relation(fields: [facilityId], references: [id])
+  
+  periodStart       DateTime
+  periodEnd         DateTime
+  
+  originalUsage     Float
+  normalizedUsage   Float
+  adjustmentFactor  Float
+  
+  heatingDDActual   Float
+  heatingDDBaseline Float
+  coolingDDActual   Float
+  coolingDDBaseline Float
+  
+  confidence        Float
+  method            String
+  
+  createdAt         DateTime  @default(now())
+}
+
+model ThirdPartyValidation {
+  id                String    @id @default(cuid())
+  facilityId        String
+  facility          Facility  @relation(fields: [facilityId], references: [id])
+  
+  validationType    ValidationType
+  verified          Boolean
+  confidence        Float
+  
+  discrepancies     String[]
+  recommendations   String[]
+  
+  auditorNotes      String?
+  certificationId   String?
+  dataChecksum      String
+  
+  validatedAt       DateTime  @default(now())
+}
+
+model CollectionActivity {
+  id              String    @id @default(cuid())
+  invoiceId       String
+  invoice         Invoice   @relation(fields: [invoiceId], references: [id])
+  customerId      String
+  customer        User      @relation(fields: [customerId], references: [id])
+  
+  actionType      CollectionActionType
+  actionTemplate  String
+  daysPastDue     Int
+  
+  success         Boolean
+  responseDetails Json?
+  
+  createdAt       DateTime  @default(now())
+}
+
+model CollectionCase {
+  id              String    @id @default(cuid())
+  invoiceId       String    @unique
+  invoice         Invoice   @relation(fields: [invoiceId], references: [id])
+  customerId      String
+  customer        User      @relation(fields: [customerId], references: [id])
+  
+  amount          Float
+  status          CaseStatus @default(OPEN)
+  priority        CasePriority @default(MEDIUM)
+  
+  assignedTo      String
+  
+  resolvedAt      DateTime?
+  resolutionType  String?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model AffiliateCommission {
+  id              String    @id @default(cuid())
+  affiliateId     String
+  affiliate       Affiliate @relation(fields: [affiliateId], references: [id])
+  invoiceId       String
+  invoice         Invoice   @relation(fields: [invoiceId], references: [id])
+  customerId      String
+  customer        User      @relation(fields: [customerId], references: [id])
+  
+  amount          Float
+  rate            Float
+  tier            String
+  
+  status          CommissionStatus @default(PENDING)
+  payoutDate      DateTime
+  paidAt          DateTime?
+  transactionId   String?
+  
+  createdAt       DateTime  @default(now())
+}
+
+model FacilityTrustScore {
+  id              String    @id @default(cuid())
+  facilityId      String    @unique
+  facility        Facility  @relation(fields: [facilityId], references: [id])
+  
+  score           Float     // 0-1
+  lastValidation  DateTime
+  validationCount Int       @default(0)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// Enums
+enum AgreementStatus {
+  ACTIVE
+  PAUSED
+  TERMINATED
+  EXPIRED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  PENDING
+  OVERDUE
+  PAID
+  CANCELLED
+}
+
+enum PaymentScheduleStatus {
+  SCHEDULED
+  RETRY
+  COMPLETED
+  FAILED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethodType {
+  CARD
+  ACH
+  WIRE
+}
+
+enum PaymentMethodStatus {
+  ACTIVE
+  EXPIRED
+  SUSPENDED
+}
+
+enum ConnectionStatus {
+  PENDING_AUTH
+  CONNECTED
+  ACTIVE
+  ERROR
+  DISCONNECTED
+}
+
+enum ValidationType {
+  AUTOMATED
+  MANUAL
+  CERTIFIED
+}
+
+enum CollectionActionType {
+  EMAIL
+  SMS
+  CALL
+  LEGAL
+}
+
+enum CaseStatus {
+  OPEN
+  RESOLVED
+  ESCALATED
+  LEGAL
+}
+
+enum CasePriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum CommissionStatus {
+  PENDING
+  APPROVED
+  PAID
+  CANCELLED
+}

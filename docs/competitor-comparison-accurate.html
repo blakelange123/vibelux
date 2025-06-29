@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibelux Competitor Analysis - Honest Comparison</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #030712;
+            color: #e5e7eb;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: #111827;
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid #1f2937;
+        }
+        h1 {
+            background: linear-gradient(to right, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #9ca3af;
+            margin-bottom: 40px;
+        }
+        h2 {
+            color: #a855f7;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        h3 {
+            color: #ec4899;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #1f2937;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th {
+            background: #374151;
+            color: #f3f4f6;
+            padding: 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 1px solid #4b5563;
+        }
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #374151;
+            font-size: 14px;
+            color: #e5e7eb;
+        }
+        tr:hover {
+            background: #374151;
+        }
+        .yes {
+            color: #10b981;
+            font-weight: 600;
+        }
+        .no {
+            color: #6b7280;
+        }
+        .partial {
+            color: #f59e0b;
+        }
+        .excellent {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .good {
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .basic {
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .none {
+            color: #6b7280;
+        }
+        .unique {
+            background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .advantage-box {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .advantage-box h4 {
+            color: #a855f7;
+            margin-bottom: 15px;
+        }
+        .competitor-strength {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .competitor-strength h4 {
+            color: #ef4444;
+            margin-bottom: 10px;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .feature-card {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .feature-card h4 {
+            color: #a855f7;
+            margin-bottom: 10px;
+        }
+        .price-comparison {
+            background: #1f2937;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .price-card {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .price-card h5 {
+            color: #ec4899;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .price-card .price {
+            font-size: 24px;
+            color: #10b981;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .price-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .price-card li {
+            padding: 5px 0;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        .summary-box {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border: 1px solid #7c3aed;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vibelux vs Competitors: Honest Analysis</h1>
+        <p class="subtitle">Comprehensive comparison including strengths and limitations</p>
+
+        <div class="legend">
+            <div class="legend-item">
+                <span class="excellent">Excellent</span>
+            </div>
+            <div class="legend-item">
+                <span class="good">Good</span>
+            </div>
+            <div class="legend-item">
+                <span class="basic">Basic</span>
+            </div>
+            <div class="legend-item">
+                <span class="none">None/Limited</span>
+            </div>
+            <div class="legend-item">
+                <span class="unique">Unique Feature</span>
+            </div>
+        </div>
+
+        <h2>Market Position & Core Strengths</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Founded</th>
+                    <th>Market Position</th>
+                    <th>Core Strength</th>
+                    <th>Primary Customers</th>
+                    <th>Typical Deal Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Vibelux</strong></td>
+                    <td>2024</td>
+                    <td>Emerging/Startup</td>
+                    <td><span class="unique">Energy Revenue + $0 Upfront</span></td>
+                    <td>Small-Large CEA</td>
+                    <td>$0 upfront</td>
+                </tr>
+                <tr>
+                    <td><strong>Priva</strong></td>
+                    <td>1959</td>
+                    <td><span class="excellent">Industry Leader</span></td>
+                    <td>Proven Climate Control</td>
+                    <td>Large Commercial</td>
+                    <td>$100k-500k+</td>
+                </tr>
+                <tr>
+                    <td><strong>TrolMaster</strong></td>
+                    <td>2010</td>
+                    <td>Cannabis Specialist</td>
+                    <td>Affordable & Modular</td>
+                    <td>Cannabis Growers</td>
+                    <td>$5k-20k</td>
+                </tr>
+                <tr>
+                    <td><strong>Source.ag</strong></td>
+                    <td>2017</td>
+                    <td>Vertical Farm Focus</td>
+                    <td>Financial Analytics</td>
+                    <td>Vertical Farms</td>
+                    <td>$10k-50k/year</td>
+                </tr>
+                <tr>
+                    <td><strong>IUNU</strong></td>
+                    <td>2013</td>
+                    <td>Computer Vision Leader</td>
+                    <td><span class="excellent">AI Plant Monitoring</span></td>
+                    <td>Large Operations</td>
+                    <td>$50k-200k/year</td>
+                </tr>
+                <tr>
+                    <td><strong>Growlink</strong></td>
+                    <td>2014</td>
+                    <td>Entry-Level</td>
+                    <td>Simple & Affordable</td>
+                    <td>Small Growers</td>
+                    <td>$3k-10k/year</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Environmental Control Capabilities</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Vibelux</th>
+                    <th>Priva</th>
+                    <th>TrolMaster</th>
+                    <th>Source.ag</th>
+                    <th>IUNU</th>
+                    <th>Growlink</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Climate Control</strong></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="excellent">Industry Best</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="basic">Basic</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Hardware Reliability</strong></td>
+                    <td><span class="basic">Growing</span></td>
+                    <td><span class="excellent">65+ Years Proven</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td>N/A</td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="basic">Basic</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Fertigation Control</strong></td>
+                    <td><span class="basic">Basic</span></td>
+                    <td><span class="excellent">Advanced</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="basic">Basic</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Water Management</strong></td>
+                    <td><span class="basic">Basic</span></td>
+                    <td><span class="excellent">Advanced</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="basic">Basic</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Greenhouse Screens</strong></td>
+                    <td><span class="none">Limited</span></td>
+                    <td><span class="excellent">Full Control</span></td>
+                    <td><span class="basic">Basic</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="none">None</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Heating Systems</strong></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="excellent">Comprehensive</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="basic">Basic</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Business & Operations Management</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Vibelux</th>
+                    <th>Priva</th>
+                    <th>TrolMaster</th>
+                    <th>Source.ag</th>
+                    <th>IUNU</th>
+                    <th>Growlink</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Labor Management</strong></td>
+                    <td><span class="basic">Basic</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="excellent">Best in Class</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="none">None</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Task Assignment</strong></td>
+                    <td><span class="basic">Basic</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="excellent">Advanced</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="basic">Basic</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Cost Tracking</strong></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="basic">Basic</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="excellent">Detailed</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="none">None</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Compliance (GMP/GAP)</strong></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="excellent">Certified</span></td>
+                    <td><span class="basic">Basic</span></td>
+                    <td><span class="excellent">Strong</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="basic">Basic</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Harvest Planning</strong></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="excellent">Advanced</span></td>
+                    <td><span class="excellent">Vision-based</span></td>
+                    <td><span class="none">None</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Inventory Tracking</strong></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="basic">Basic</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="excellent">Advanced</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="basic">Basic</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Technology & Innovation</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Vibelux</th>
+                    <th>Priva</th>
+                    <th>TrolMaster</th>
+                    <th>Source.ag</th>
+                    <th>IUNU</th>
+                    <th>Growlink</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>AI/ML Capabilities</strong></td>
+                    <td><span class="excellent">Advanced</span></td>
+                    <td><span class="basic">Limited</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="basic">Basic</span></td>
+                    <td><span class="excellent">Vision AI</span></td>
+                    <td><span class="none">None</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Computer Vision</strong></td>
+                    <td><span class="basic">Planned</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="excellent">Market Leader</span></td>
+                    <td><span class="none">None</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Predictive Analytics</strong></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="basic">Basic</span></td>
+                    <td><span class="none">None</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="excellent">Advanced</span></td>
+                    <td><span class="none">None</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Mobile App</strong></td>
+                    <td><span class="good">Modern</span></td>
+                    <td><span class="basic">Functional</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="good">Good</span></td>
+                </tr>
+                <tr>
+                    <td><strong>API/Integrations</strong></td>
+                    <td><span class="excellent">Open API</span></td>
+                    <td><span class="basic">Limited</span></td>
+                    <td><span class="basic">Limited</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="good">Good</span></td>
+                    <td><span class="good">Good</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Unique Differentiators</h2>
+        
+        <div class="advantage-box">
+            <h4>🟣 Vibelux Exclusive Features</h4>
+            <ul>
+                <li>✅ <strong>Energy Grid Revenue:</strong> Only platform that generates income from demand response</li>
+                <li>✅ <strong>$0 Upfront Revenue Share:</strong> No capital required for software platform</li>
+                <li>✅ <strong>AI Design Assistant:</strong> Natural language facility design</li>
+                <li>✅ <strong>Integrated Marketplace:</strong> Buy/sell produce within platform</li>
+                <li>✅ <strong>Energy Optimization AI:</strong> 30-50% cost reduction</li>
+            </ul>
+        </div>
+
+        <div class="competitor-strength">
+            <h4>What Competitors Do Better</h4>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Priva Advantages</h4>
+                    <ul>
+                        <li>• 65+ years of proven reliability</li>
+                        <li>• Industry-standard greenhouse automation</li>
+                        <li>• Global support network</li>
+                        <li>• Advanced water recycling systems</li>
+                        <li>• Certified for food safety compliance</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>IUNU Advantages</h4>
+                    <ul>
+                        <li>• Best-in-class computer vision</li>
+                        <li>• Automated plant health detection</li>
+                        <li>• Growth rate tracking via cameras</li>
+                        <li>• Early pest/disease identification</li>
+                        <li>• No sensor installation needed</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>Source.ag Advantages</h4>
+                    <ul>
+                        <li>• Superior labor management tools</li>
+                        <li>• Detailed cost accounting</li>
+                        <li>• Advanced scheduling algorithms</li>
+                        <li>• Strong compliance features</li>
+                        <li>• Proven with large vertical farms</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>TrolMaster Advantages</h4>
+                    <ul>
+                        <li>• Lower hardware costs</li>
+                        <li>• Cannabis-specific features</li>
+                        <li>• Easy DIY installation</li>
+                        <li>• Strong community support</li>
+                        <li>• Modular expansion options</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>Pricing Reality Check</h2>
+        <div class="price-comparison">
+            <div class="price-grid">
+                <div class="price-card">
+                    <h5>Vibelux</h5>
+                    <div class="price">$0</div>
+                    <ul>
+                        <li>• Software platform at $0 upfront</li>
+                        <li>• 80/20 revenue share on savings</li>
+                        <li>• Optional: $299-2,999/mo traditional</li>
+                        <li>• Hardware: Use existing or buy any brand</li>
+                    </ul>
+                </div>
+                
+                <div class="price-card">
+                    <h5>Priva</h5>
+                    <div class="price" style="color: #ef4444;">$100k-500k</div>
+                    <ul>
+                        <li>• Large upfront investment</li>
+                        <li>• $500-5,000/mo software</li>
+                        <li>• Annual service contracts</li>
+                        <li>• Training costs additional</li>
+                    </ul>
+                </div>
+                
+                <div class="price-card">
+                    <h5>IUNU</h5>
+                    <div class="price" style="color: #f59e0b;">$50k-200k/yr</div>
+                    <ul>
+                        <li>• Camera hardware required</li>
+                        <li>• Per-camera licensing</li>
+                        <li>• Installation services</li>
+                        <li>• Annual contracts only</li>
+                    </ul>
+                </div>
+                
+                <div class="price-card">
+                    <h5>Others</h5>
+                    <div class="price" style="color: #3b82f6;">Varies</div>
+                    <ul>
+                        <li>• TrolMaster: $5k-20k hardware</li>
+                        <li>• Source.ag: $500-2k/mo</li>
+                        <li>• Growlink: $300-1k/mo</li>
+                        <li>• All require upfront costs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-box">
+            <h2>Bottom Line</h2>
+            <p><strong>Choose Vibelux if:</strong> You want to reduce energy costs by 30-50%, generate grid revenue, and avoid upfront costs. Best for facilities focused on profitability and sustainability.</p>
+            
+            <p><strong>Choose Priva if:</strong> You need proven, industrial-grade greenhouse automation and have $100k+ budget. Best for large commercial greenhouses.</p>
+            
+            <p><strong>Choose IUNU if:</strong> Computer vision for plant monitoring is critical and you have $50k+ annual budget. Best for high-value crops.</p>
+            
+            <p><strong>Choose Source.ag if:</strong> Labor management and detailed cost tracking are priorities. Best for vertical farms with complex operations.</p>
+            
+            <p><strong>Choose TrolMaster if:</strong> You grow cannabis and want affordable, modular control systems. Best for small-medium cannabis operations.</p>
+        </div>
+    </div>
+</body>
+</html>

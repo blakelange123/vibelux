@@ -1,0 +1,314 @@
+import { NextResponse } from 'next/server'
+import { auth } from '@clerk/nextjs/server'
+
+interface SensorReading {
+  id: string
+  userId?: string
+  designId?: string
+  timestamp: string
+  type?: string
+  brand?: string
+  sensorModel?: string
+  ppfd?: number
+  temperature?: number
+  humidity?: number
+  co2?: number
+  vpd?: number
+  location?: {
+    x: number
+    y: number
+    z: number
+  }
+  position?: {
+    x: number
+    y: number
+    z: number
+  }
+  measurements?: {
+    ppfd?: number
+    spectrum?: any
+  }
+  environmentalData?: {
+    temperature?: number
+    humidity?: number
+    co2?: number
+    vpd?: number
+  }
+}
+
+interface ImportResult {
+  success: boolean
+  totalRows: number
+  imported: number
+  failed: number
+  errors: string[]
+  readings: SensorReading[]
+}
+
+// POST /api/sensors/import - Import sensor data from CSV/Excel
+export async function POST(request: Request) {
+  try {
+    const session = await auth()
+    if (!session?.userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const formData = await request.formData()
+    const file = formData.get('file') as File
+    const sensorType = formData.get('sensorType') as string
+    const designId = formData.get('designId') as string | null
+
+    if (!file) {
+      return NextResponse.json(
+        { error: 'No file provided' },
+        { status: 400 }
+      )
+    }
+
+    // Parse file based on type
+    const fileContent = await file.text()
+    const result = await parseCSV(fileContent, sensorType, session.userId, designId)
+
+    // Store imported readings
+    if (result.readings.length > 0) {
+      await storeSensorReadings(session.userId, result.readings)
+    }
+
+    return NextResponse.json(result)
+  } catch (error) {
+    console.error('Error importing sensor data:', error)
+    return NextResponse.json(
+      { error: 'Failed to import sensor data' },
+      { status: 500 }
+    )
+  }
+}
+
+async function parseCSV(
+  content: string,
+  sensorType: string,
+  userId: string,
+  designId: string | null
+): Promise<ImportResult> {
+  const lines = content.split('\n').filter(line => line.trim())
+  const headers = lines[0].toLowerCase().split(',').map(h => h.trim())
+  
+  const result: ImportResult = {
+    success: true,
+    totalRows: lines.length - 1,
+    imported: 0,
+    failed: 0,
+    errors: [],
+    readings: []
+  }
+
+  // Define parser configurations for different sensor types
+  const parserConfig = getParserConfig(sensorType)
+
+  for (let i = 1; i < lines.length; i++) {
+    try {
+      const values = lines[i].split(',').map(v => v.trim())
+      if (values.length < 3) continue
+
+      const reading = parseRow(headers, values, parserConfig, userId, designId)
+      if (reading) {
+        result.readings.push(reading)
+        result.imported++
+      } else {
+        result.failed++
+        result.errors.push(`Row ${i + 1}: Invalid data format`)
+      }
+    } catch (error) {
+      result.failed++
+      result.errors.push(`Row ${i + 1}: ${error instanceof Error ? error.message : 'Parse error'}`)
+    }
+  }
+
+  return result
+}
+
+function getParserConfig(sensorType: string) {
+  const configs: Record<string, any> = {
+    aranet: {
+      ppfdColumn: ['ppfd', 'par'],
+      positionColumns: ['x', 'y', 'position'],
+      timestampColumn: ['timestamp', 'time', 'date'],
+      spectrumColumns: {
+        blue: ['blue', 'blue_percentage'],
+        red: ['red', 'red_percentage'],
+        farRed: ['far_red', 'farred', 'fr']
+      }
+    },
+    apogee: {
+      ppfdColumn: ['ppfd', 'par', 'photon_flux'],
+      positionColumns: ['position', 'location', 'x', 'y'],
+      timestampColumn: ['date_time', 'timestamp'],
+      additionalColumns: {
+        temperature: ['temp', 'temperature'],
+        vpd: ['vpd', 'vapor_pressure_deficit']
+      }
+    },
+    licor: {
+      ppfdColumn: ['ppfd', 'par', 'quantum'],
+      positionColumns: ['x', 'y', 'plot'],
+      timestampColumn: ['timestamp', 'datetime'],
+      spectrumColumns: {
+        blue: ['blue_photon_flux'],
+        green: ['green_photon_flux'],
+        red: ['red_photon_flux'],
+        farRed: ['far_red_photon_flux']
+      }
+    },
+    generic: {
+      ppfdColumn: ['ppfd', 'par', 'light_intensity', 'intensity'],
+      positionColumns: ['x', 'y', 'position', 'location'],
+      timestampColumn: ['timestamp', 'time', 'date', 'datetime']
+    }
+  }
+
+  return configs[sensorType] || configs.generic
+}
+
+function parseRow(
+  headers: string[],
+  values: string[],
+  config: any,
+  userId: string,
+  designId: string | null
+): SensorReading | null {
+  // Find PPFD value
+  let ppfd = 0
+  for (const col of config.ppfdColumn) {
+    const idx = headers.indexOf(col)
+    if (idx >= 0 && values[idx]) {
+      ppfd = parseFloat(values[idx])
+      break
+    }
+  }
+
+  if (!ppfd || isNaN(ppfd)) return null
+
+  // Parse position
+  const position = parsePosition(headers, values, config.positionColumns)
+
+  // Parse timestamp
+  let timestamp = new Date().toISOString()
+  if (config.timestampColumn) {
+    for (const col of config.timestampColumn) {
+      const idx = headers.indexOf(col)
+      if (idx >= 0 && values[idx]) {
+        try {
+          timestamp = new Date(values[idx]).toISOString()
+          break
+        } catch {}
+      }
+    }
+  }
+
+  // Parse spectrum data if available
+  let spectrum: any = undefined
+  if (config.spectrumColumns) {
+    spectrum = {}
+    for (const [key, columns] of Object.entries(config.spectrumColumns) as [string, string[]][]) {
+      for (const col of columns) {
+        const idx = headers.indexOf(col)
+        if (idx >= 0 && values[idx]) {
+          spectrum[key] = parseFloat(values[idx])
+          break
+        }
+      }
+    }
+  }
+
+  // Parse environmental data
+  let environmentalData: any = undefined
+  if (config.additionalColumns) {
+    environmentalData = {}
+    for (const [key, columns] of Object.entries(config.additionalColumns) as [string, string[]][]) {
+      for (const col of columns) {
+        const idx = headers.indexOf(col)
+        if (idx >= 0 && values[idx]) {
+          environmentalData[key] = parseFloat(values[idx])
+          break
+        }
+      }
+    }
+  }
+
+  return {
+    id: generateId(),
+    userId,
+    designId: designId || undefined,
+    timestamp,
+    type: 'physical',
+    sensorModel: config.sensorType,
+    position,
+    measurements: {
+      ppfd,
+      spectrum: Object.keys(spectrum || {}).length > 0 ? spectrum : undefined
+    },
+    environmentalData: Object.keys(environmentalData || {}).length > 0 ? environmentalData : undefined
+  }
+}
+
+function parsePosition(
+  headers: string[],
+  values: string[],
+  positionColumns: string[]
+): { x: number; y: number; z: number } {
+  let x = 0, y = 0, z = 2 // Default z to 2 feet (canopy height)
+
+  // Try to find x and y directly
+  const xIdx = headers.indexOf('x')
+  const yIdx = headers.indexOf('y')
+  const zIdx = headers.indexOf('z')
+
+  if (xIdx >= 0) x = parseFloat(values[xIdx]) || 0
+  if (yIdx >= 0) y = parseFloat(values[yIdx]) || 0
+  if (zIdx >= 0) z = parseFloat(values[zIdx]) || 2
+
+  // If not found, try position columns
+  if (x === 0 && y === 0) {
+    for (const col of positionColumns) {
+      const idx = headers.indexOf(col)
+      if (idx >= 0 && values[idx]) {
+        // Try to parse "Row X, Col Y" format
+        const match = values[idx].match(/(\d+)[,\s]+(\d+)/)
+        if (match) {
+          x = parseInt(match[1]) * 2 // Convert to feet
+          y = parseInt(match[2]) * 2
+          break
+        }
+        // Try to parse "X,Y" format
+        const coords = values[idx].split(',')
+        if (coords.length >= 2) {
+          x = parseFloat(coords[0]) || 0
+          y = parseFloat(coords[1]) || 0
+          break
+        }
+      }
+    }
+  }
+
+  return { x, y, z }
+}
+
+async function storeSensorReadings(userId: string, readings: SensorReading[]): Promise<void> {
+  // In production, this would store to a database
+  // For now, we'll use the in-memory storage from the main route
+  const response = await fetch('/api/sensors', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ readings })
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to store sensor readings')
+  }
+}
+
+function generateId(): string {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+}

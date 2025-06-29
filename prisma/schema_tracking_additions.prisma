@@ -1,0 +1,184 @@
+// Add these models to your schema.prisma file
+
+// Location tracking
+model LocationUpdate {
+  id          String   @id @default(cuid())
+  userId      String
+  facilityId  String
+  latitude    Float
+  longitude   Float
+  accuracy    Float
+  altitude    Float?
+  speed       Float?
+  heading     Float?
+  batteryLevel Float?
+  timestamp   DateTime @default(now())
+  metadata    Json?
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  facility    Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, facilityId])
+  @@index([timestamp])
+}
+
+// Geofence zones
+model GeofenceZone {
+  id          String   @id @default(cuid())
+  facilityId  String
+  name        String
+  type        GeofenceType
+  boundaries  Json     // { center: {lat, lng}, radius } or { polygon: [{lat, lng}] }
+  alerts      Json     // { onEnter: boolean, onExit: boolean, onDwell: { duration } }
+  restrictions Json?   // { allowedUsers: [], restrictedUsers: [], schedule: [] }
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  active      Boolean  @default(true)
+  
+  facility    Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  creator     User     @relation(fields: [createdBy], references: [id])
+  
+  @@index([facilityId])
+}
+
+// Tracking alerts
+model TrackingAlert {
+  id            String   @id @default(cuid())
+  facilityId    String
+  type          AlertType
+  severity      AlertSeverity
+  title         String
+  message       String
+  location      Json?
+  triggeredBy   String
+  targetUsers   String[]
+  metadata      Json?
+  acknowledged  Boolean  @default(false)
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+  timestamp     DateTime @default(now())
+  
+  facility      Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  triggerer     User     @relation(fields: [triggeredBy], references: [id], relation: "AlertTriggerer")
+  acknowledger  User?    @relation(fields: [acknowledgedBy], references: [id], relation: "AlertAcknowledger")
+  
+  @@index([facilityId])
+  @@index([timestamp])
+}
+
+// Messages
+model TrackingMessage {
+  id          String   @id @default(cuid())
+  facilityId  String
+  fromUser    String
+  toUser      String?  // NULL for broadcast
+  type        MessageType
+  content     String
+  location    Json?
+  attachments String[]
+  priority    MessagePriority @default(NORMAL)
+  read        Boolean  @default(false)
+  readAt      DateTime?
+  metadata    Json?
+  timestamp   DateTime @default(now())
+  
+  facility    Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  sender      User     @relation(fields: [fromUser], references: [id], relation: "MessageSender")
+  recipient   User?    @relation(fields: [toUser], references: [id], relation: "MessageRecipient")
+  
+  @@index([facilityId])
+  @@index([fromUser, toUser])
+}
+
+// Worker devices
+model WorkerDevice {
+  id                 String   @id @default(cuid())
+  userId             String
+  deviceId           String
+  facilityId         String
+  phoneModel         String?
+  bleVersion         String?
+  meshSupport        Boolean  @default(false)
+  backgroundScanning Boolean  @default(false)
+  trackingConsent    Boolean  @default(false)
+  consentGivenAt     DateTime?
+  lastSeen           DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  facility           Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, deviceId])
+  @@index([userId])
+}
+
+// Location sharing sessions
+model LocationSharing {
+  id          String   @id @default(cuid())
+  sharedBy    String
+  sharedWith  String[]
+  facilityId  String
+  startTime   DateTime @default(now())
+  endTime     DateTime
+  active      Boolean  @default(true)
+  
+  sharer      User     @relation(fields: [sharedBy], references: [id])
+  facility    Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+}
+
+// Enums for tracking
+enum GeofenceType {
+  CIRCULAR
+  POLYGON
+  INDOOR
+}
+
+enum AlertType {
+  GEOFENCE
+  PROXIMITY
+  SOS
+  BATTERY
+  INACTIVITY
+  SPEED
+  CUSTOM
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum MessageType {
+  TEXT
+  LOCATION
+  IMAGE
+  ALERT
+  TASK
+}
+
+enum MessagePriority {
+  NORMAL
+  HIGH
+  URGENT
+}
+
+// Add these relations to the User model:
+// locationUpdates     LocationUpdate[]
+// geofenceZones      GeofenceZone[]
+// triggeredAlerts    TrackingAlert[] @relation("AlertTriggerer")
+// acknowledgedAlerts TrackingAlert[] @relation("AlertAcknowledger")
+// sentMessages       TrackingMessage[] @relation("MessageSender")
+// receivedMessages   TrackingMessage[] @relation("MessageRecipient")
+// workerDevices      WorkerDevice[]
+// locationSharing    LocationSharing[]
+
+// Add these relations to the Facility model:
+// locationUpdates    LocationUpdate[]
+// geofenceZones      GeofenceZone[]
+// trackingAlerts     TrackingAlert[]
+// trackingMessages   TrackingMessage[]
+// workerDevices      WorkerDevice[]
+// locationSharing    LocationSharing[]

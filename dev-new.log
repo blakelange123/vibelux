@@ -1,0 +1,72 @@
+
+> vibelux-app@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.3.3
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.86.31:3000
+   - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 1424ms
+ ✓ Compiled /middleware in 210ms (224 modules)
+ ✓ Compiled /api/ai-design-chat in 406ms (535 modules)
+Creating Claude client with key: sk-ant-api03-YtNIwI_...
+Claude client initialized successfully
+Facility area: 100 sq ft, using 4000 max tokens
+Attempting Claude call (attempt 1/5) with model: claude-3-5-haiku-20241022
+Request message: design me a 2x4 bench with 5 layers with an efficient 4 foot bar light fixture from the dlc list
+ POST /api/ai-design-chat 200 in 15867ms
+ ○ Compiling /design/advanced ...
+ ✓ Compiled /design/advanced in 6.3s (3529 modules)
+ GET /design/advanced 200 in 103ms
+ GET /design/advanced 200 in 111ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 1667ms (3440 modules)
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 2382ms
+ ○ Compiling /api/subscription ...
+ ✓ Compiled /api/subscription in 1728ms (3561 modules)
+Reading CSV from: /Users/blakelange/vibelux-app/public/data/dlc-fixtures.csv
+ GET /api/subscription 200 in 1946ms
+CSV file read successfully, length: 1410043
+Parsing CSV...
+Parsed records count: 2436
+Converted fixtures count: 2436
+ GET /api/fixtures?limit=1000&minPPE=0&maxPPE=10&minWattage=0&maxWattage=2000 200 in 2053ms
+ ✓ Compiled /api/ai-design-chat in 225ms (1409 modules)
+Creating Claude client with key: sk-ant-api03-YtNIwI_...
+Claude client initialized successfully
+Facility area: 1600 sq ft, using 4000 max tokens
+Attempting Claude call (attempt 1/5) with model: claude-3-5-haiku-20241022
+Request message: design me a 10x 20' foot room with 4 signify topighting force fixtures at 400 ppdf from 3' from canopy
+ POST /api/ai-design-chat 200 in 17299ms
+ ✓ Compiled in 1072ms (2215 modules)
+ GET /design/advanced 200 in 146ms
+ ✓ Compiled in 6.4s (3451 modules)
+ GET /design/advanced 200 in 540ms
+ ✓ Compiled in 1069ms (3451 modules)
+ GET /design/advanced 200 in 108ms
+ ✓ Compiled /api/fixtures in 341ms (1252 modules)
+Reading CSV from: /Users/blakelange/vibelux-app/public/data/dlc-fixtures.csv
+CSV file read successfully, length: 1410043
+Parsing CSV...
+Parsed records count: 2436
+Converted fixtures count: 2436
+ GET /api/fixtures?limit=1000&minPPE=0&maxPPE=10&minWattage=0&maxWattage=2000 200 in 683ms
+ ✓ Compiled in 800ms (3467 modules)
+ GET /design/advanced 200 in 183ms
+Reading CSV from: /Users/blakelange/vibelux-app/public/data/dlc-fixtures.csv
+CSV file read successfully, length: 1410043
+Parsing CSV...
+Parsed records count: 2436
+Converted fixtures count: 2436
+ GET /api/fixtures?limit=1000&minPPE=0&maxPPE=10&minWattage=0&maxWattage=2000 200 in 157ms
+ ✓ Compiled in 1577ms (3467 modules)
+ GET /design/advanced 200 in 167ms
+Reading CSV from: /Users/blakelange/vibelux-app/public/data/dlc-fixtures.csv
+CSV file read successfully, length: 1410043
+Parsing CSV...
+Parsed records count: 2436
+Converted fixtures count: 2436
+ GET /api/fixtures?limit=1000&minPPE=0&maxPPE=10&minWattage=0&maxWattage=2000 200 in 190ms
+[?25h

@@ -1,0 +1,71 @@
+// Email logging schema to add to main schema
+
+model EmailLog {
+  id              String   @id @default(cuid())
+  recipient       String
+  type            String   // 'consultation_request', 'consultation_confirmation', 'consultation_reminder', etc.
+  consultationId  String?
+  consultation    Consultation? @relation(fields: [consultationId], references: [id])
+  
+  subject         String?
+  status          String   @default("sent") // 'sent', 'failed', 'bounced', 'opened'
+  
+  sentAt          DateTime @default(now())
+  openedAt        DateTime?
+  clickedAt       DateTime?
+  
+  errorMessage    String?
+  
+  // For compliance and unsubscribe
+  unsubscribed    Boolean  @default(false)
+  unsubscribedAt  DateTime?
+  
+  @@index([recipient])
+  @@index([type])
+  @@index([consultationId])
+  @@index([sentAt])
+}
+
+// Expert notification preferences
+model ExpertNotificationPreferences {
+  id                String   @id @default(cuid())
+  expertId          String   @unique
+  expert            Expert   @relation(fields: [expertId], references: [id])
+  
+  // Email notifications
+  newBookings       Boolean  @default(true)
+  cancellations     Boolean  @default(true)
+  reviews           Boolean  @default(true)
+  payouts           Boolean  @default(true)
+  marketing         Boolean  @default(false)
+  
+  // SMS notifications (future)
+  smsEnabled        Boolean  @default(false)
+  smsNumber         String?
+  
+  // Push notifications (future)
+  pushEnabled       Boolean  @default(true)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Email templates for different types
+model EmailTemplate {
+  id          String   @id @default(cuid())
+  type        String   @unique // 'consultation_request', 'consultation_confirmation', etc.
+  subject     String
+  htmlContent String   @db.Text
+  textContent String?  @db.Text
+  
+  // Template variables that can be substituted
+  variables   String[] // ['expertName', 'clientName', 'consultationDate', etc.]
+  
+  isActive    Boolean  @default(true)
+  version     Int      @default(1)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([type])
+}

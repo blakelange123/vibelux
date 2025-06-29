@@ -1,0 +1,121 @@
+{
+  "buildCommand": "npx prisma generate && npm run build",
+  "outputDirectory": ".next",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "DATABASE_URL": "@database_url",
+      "SUPABASE_URL": "@supabase_url",
+      "SUPABASE_ANON_KEY": "@supabase_anon_key",
+      "CLERK_SECRET_KEY": "@clerk_secret_key",
+      "JWT_SECRET": "@jwt_secret",
+      "ENCRYPTION_KEY": "@encryption_key",
+      "STRIPE_SECRET_KEY": "@stripe_secret_key",
+      "STRIPE_WEBHOOK_SECRET": "@stripe_webhook_secret",
+      "OPENWEATHER_API_KEY": "@openweather_api_key",
+      "OPENAI_API_KEY": "@openai_api_key",
+      "CLAUDE_API_KEY": "@claude_api_key",
+      "REDIS_URL": "@redis_url",
+      "AWS_ACCESS_KEY_ID": "@aws_access_key_id",
+      "AWS_SECRET_ACCESS_KEY": "@aws_secret_access_key",
+      "AWS_S3_BUCKET": "@aws_s3_bucket",
+      "SENDGRID_API_KEY": "@sendgrid_api_key",
+      "NEXT_TELEMETRY_DISABLED": "1"
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-Requested-With, Content-Type, Authorization" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/health",
+      "destination": "/api/system/health"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/admin",
+      "destination": "/admin/dashboard",
+      "permanent": false
+    }
+  ],
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
+    "app/api/financial/invoice/generate.ts": {
+      "maxDuration": 60,
+      "memory": 2048
+    },
+    "app/api/ml/train.ts": {
+      "maxDuration": 300,
+      "memory": 3008
+    },
+    "app/api/ai-assistant/*.ts": {
+      "maxDuration": 30
+    },
+    "app/api/fixtures/search/*.ts": {
+      "maxDuration": 10
+    },
+    "app/api/websocket/*.ts": {
+      "maxDuration": 60
+    },
+    "app/api/sensors/**/*.ts": {
+      "maxDuration": 120,
+      "memory": 1024
+    },
+    "app/api/analytics/**/*.ts": {
+      "maxDuration": 180,
+      "memory": 2048
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/sync-utility-data",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/generate-invoices",
+      "schedule": "0 0 1 * *"
+    },
+    {
+      "path": "/api/cron/cleanup-sessions",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/cleanup",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/backup",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}

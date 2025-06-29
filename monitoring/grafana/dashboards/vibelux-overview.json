@@ -1,0 +1,269 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "VibeLux Overview Dashboard",
+    "tags": ["vibelux", "overview"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Active Users",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "vibelux_users_active_30d",
+            "interval": "",
+            "legendFormat": "",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 100 },
+                { "color": "green", "value": 500 }
+              ]
+            },
+            "unit": "short"
+          }
+        },
+        "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 }
+      },
+      {
+        "id": 2,
+        "title": "Monthly Recurring Revenue",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "vibelux_mrr_usd",
+            "interval": "",
+            "legendFormat": "",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 10000 },
+                { "color": "green", "value": 50000 }
+              ]
+            },
+            "unit": "currencyUSD"
+          }
+        },
+        "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 }
+      },
+      {
+        "id": 3,
+        "title": "Churn Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "vibelux_churn_rate_percent",
+            "interval": "",
+            "legendFormat": "",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": 0 },
+                { "color": "yellow", "value": 5 },
+                { "color": "red", "value": 10 }
+              ]
+            },
+            "unit": "percent"
+          }
+        },
+        "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 }
+      },
+      {
+        "id": 4,
+        "title": "System Uptime",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "vibelux_uptime_seconds",
+            "interval": "",
+            "legendFormat": "",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 3600 },
+                { "color": "green", "value": 86400 }
+              ]
+            },
+            "unit": "dtdurations"
+          }
+        },
+        "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 }
+      },
+      {
+        "id": 5,
+        "title": "User Growth",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "vibelux_users_total",
+            "interval": "",
+            "legendFormat": "Total Users",
+            "refId": "A"
+          },
+          {
+            "expr": "vibelux_users_new_month",
+            "interval": "",
+            "legendFormat": "New This Month",
+            "refId": "B"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Users",
+            "logBase": 1,
+            "max": null,
+            "min": 0,
+            "show": true
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
+      },
+      {
+        "id": 6,
+        "title": "Revenue Trends",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "vibelux_mrr_usd",
+            "interval": "",
+            "legendFormat": "MRR",
+            "refId": "A"
+          },
+          {
+            "expr": "vibelux_arr_usd",
+            "interval": "",
+            "legendFormat": "ARR",
+            "refId": "B"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "USD",
+            "logBase": 1,
+            "max": null,
+            "min": 0,
+            "show": true
+          }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 }
+      },
+      {
+        "id": 7,
+        "title": "Subscription Distribution",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "vibelux_subscriptions_by_plan",
+            "interval": "",
+            "legendFormat": "{{plan}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 8, "x": 0, "y": 16 }
+      },
+      {
+        "id": 8,
+        "title": "Platform Usage",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "vibelux_rooms_total",
+            "interval": "",
+            "legendFormat": "Total Rooms",
+            "refId": "A"
+          },
+          {
+            "expr": "vibelux_designs_completed",
+            "interval": "",
+            "legendFormat": "Designs Completed",
+            "refId": "B"
+          },
+          {
+            "expr": "vibelux_reports_generated",
+            "interval": "",
+            "legendFormat": "Reports Generated",
+            "refId": "C"
+          },
+          {
+            "expr": "vibelux_facilities_total",
+            "interval": "",
+            "legendFormat": "Facilities",
+            "refId": "D"
+          }
+        ],
+        "gridPos": { "h": 8, "w": 8, "x": 8, "y": 16 }
+      },
+      {
+        "id": 9,
+        "title": "System Performance",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "vibelux_http_request_duration_seconds",
+            "interval": "",
+            "legendFormat": "Avg Response Time",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(vibelux_http_requests_total[5m])",
+            "interval": "",
+            "legendFormat": "Requests/sec",
+            "refId": "B"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Seconds / RPS",
+            "logBase": 1,
+            "max": null,
+            "min": 0,
+            "show": true
+          }
+        ],
+        "gridPos": { "h": 8, "w": 8, "x": 16, "y": 16 }
+      }
+    ],
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "VibeLux Overview",
+    "uid": "vibelux-overview",
+    "version": 1,
+    "weekStart": ""
+  }
+}

@@ -1,0 +1,49 @@
+# InfluxDB 3 Enterprise Configuration for Vibelux
+
+# Server configuration
+[http]
+  bind-address = ":8086"
+  auth-enabled = true
+  log-enabled = true
+  write-tracing = false
+  pprof-enabled = false
+  https-enabled = false
+
+# Data storage configuration
+[data]
+  dir = "/Users/blakelange/vibelux-app/influxdb-data/data"
+  wal-dir = "/Users/blakelange/vibelux-app/influxdb-data/wal"
+  
+  # Retention policies
+  retention-check-interval = "30m"
+  
+  # Cache settings
+  cache-max-memory-size = "1g"
+  cache-snapshot-memory-size = "25m"
+
+# Meta data configuration  
+[meta]
+  dir = "/Users/blakelange/vibelux-app/influxdb-data/meta"
+
+# Write Ahead Log configuration
+[wal]
+  wal-fsync-delay = "0s"
+
+# Query configuration
+[query]
+  max-concurrent-queries = 0
+  query-timeout = "0s"
+  log-queries-after = "0s"
+  max-select-point = 0
+  max-select-series = 0
+  max-select-buckets = 0
+
+# Continuous queries
+[continuous_queries]
+  enabled = true
+  run-interval = "1s"
+
+# Logging
+[logging]
+  format = "auto"
+  level = "info"

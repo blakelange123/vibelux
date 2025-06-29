@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHP Decision Matrix Flowchart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: white;
+            color: black;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .box {
+            border: 2px solid #333;
+            padding: 15px 25px;
+            text-align: center;
+            background: white;
+            min-width: 200px;
+            font-weight: 500;
+        }
+        
+        .input-box {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+        
+        .calculation-box {
+            background: #fff3e0;
+            border-color: #f57c00;
+        }
+        
+        .decision-box {
+            background: #f3e5f5;
+            border-color: #7b1fa2;
+            font-weight: bold;
+        }
+        
+        .output-box {
+            background: #e8f5e8;
+            border-color: #388e3c;
+            font-weight: bold;
+        }
+        
+        .warning-box {
+            background: #ffebee;
+            border-color: #d32f2f;
+            font-weight: bold;
+        }
+        
+        .arrow {
+            font-size: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .horizontal-group {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .formula-box {
+            border: 1px solid #666;
+            padding: 20px;
+            background: #f9f9f9;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+            max-width: 600px;
+        }
+        
+        .decision-table {
+            border-collapse: collapse;
+            margin: 20px 0;
+            width: 100%;
+            max-width: 700px;
+        }
+        
+        .decision-table th,
+        .decision-table td {
+            border: 1px solid #333;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .decision-table th {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        .run-chp {
+            background: #e8f5e8;
+        }
+        
+        .marginal {
+            background: #fff8e1;
+        }
+        
+        .purchase-co2 {
+            background: #ffebee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">CHP Decision Matrix - Economic Logic Flow</div>
+        
+        <div class="flowchart">
+            <!-- Market Inputs -->
+            <div class="horizontal-group">
+                <div class="box input-box">Grid Price<br>($/kWh)</div>
+                <div class="box input-box">Gas Price<br>($/therm)</div>
+                <div class="box input-box">CO₂ Price<br>($/lb)</div>
+            </div>
+            
+            <div class="arrow">↓</div>
+            
+            <!-- Revenue Calculations -->
+            <div class="box calculation-box">Calculate Revenue Streams</div>
+            
+            <div class="formula-box">
+                <strong>Grid Revenue:</strong> Grid Price × 500 kW<br>
+                <strong>CO₂ Offset Value:</strong> CO₂ Price × 2,500 CFH ÷ 1000<br>
+                <strong>Heat Recovery:</strong> $15/hour<br>
+                <strong>Fuel Cost:</strong> -(Gas Price × 58 therms)<br>
+                <strong>O&M Cost:</strong> -$30/hour
+            </div>
+            
+            <div class="arrow">↓</div>
+            
+            <!-- Net Benefit -->
+            <div class="box calculation-box">Net Benefit = Revenue - Costs</div>
+            
+            <div class="arrow">↓</div>
+            
+            <!-- Breakeven Analysis -->
+            <div class="box calculation-box">Calculate Breakeven & Safety Margin</div>
+            
+            <div class="formula-box">
+                <strong>Breakeven Grid Price:</strong> (Fuel Cost - CO₂ Offset - Heat Recovery) ÷ 500 kW<br>
+                <strong>Safety Margin:</strong> (Current Grid Price - Breakeven Price) ÷ Breakeven Price × 100%
+            </div>
+            
+            <div class="arrow">↓</div>
+            
+            <!-- Decision Logic -->
+            <div class="box decision-box">Evaluate Safety Margin</div>
+            
+            <div class="arrow">↓</div>
+            
+            <!-- Decision Matrix Table -->
+            <table class="decision-table">
+                <thead>
+                    <tr>
+                        <th>Safety Margin</th>
+                        <th>Decision</th>
+                        <th>Confidence Range</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="run-chp">
+                        <td>>50%</td>
+                        <td><strong>RUN CHP</strong></td>
+                        <td>75-95%</td>
+                        <td>Start/Continue CHP Operation</td>
+                    </tr>
+                    <tr class="marginal">
+                        <td>15-50%</td>
+                        <td><strong>MARGINAL</strong></td>
+                        <td>60-75%</td>
+                        <td>Monitor Closely, Manual Review</td>
+                    </tr>
+                    <tr class="purchase-co2">
+                        <td><15%</td>
+                        <td><strong>PURCHASE CO₂</strong></td>
+                        <td>70-90%</td>
+                        <td>Stop CHP, Buy CO₂ Direct</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="arrow">↓</div>
+            
+            <!-- Final Outputs -->
+            <div class="horizontal-group">
+                <div class="box output-box">Execute Decision</div>
+                <div class="box calculation-box">Update Next<br>Evaluation Time</div>
+                <div class="box calculation-box">Log Economic<br>Performance</div>
+            </div>
+        </div>
+        
+        <!-- Example Calculation -->
+        <div style="margin-top: 40px; border-top: 2px solid #333; padding-top: 20px;">
+            <div style="text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px;">
+                Example Calculation
+            </div>
+            
+            <div class="formula-box" style="max-width: none;">
+                <strong>Given:</strong> Grid Price = $0.42/kWh, Gas Price = $6.50/therm, CO₂ Price = $1.20/lb<br><br>
+                
+                <strong>Revenue Calculations:</strong><br>
+                • Grid Revenue: $0.42 × 500 kW = $210/hour<br>
+                • CO₂ Offset: $1.20 × (2,500 ÷ 1000) = $3.00/hour<br>
+                • Heat Recovery: $15/hour<br>
+                • Total Revenue: $228/hour<br><br>
+                
+                <strong>Cost Calculations:</strong><br>
+                • Fuel Cost: $6.50 × 58 = $377/hour<br>
+                • O&M Cost: $30/hour<br>
+                • Total Costs: $407/hour<br><br>
+                
+                <strong>Net Benefit:</strong> $228 - $407 = -$179/hour (LOSS)<br><br>
+                
+                <strong>Breakeven Analysis:</strong><br>
+                • Breakeven Grid Price: ($377 - $3 - $15) ÷ 500 = $0.718/kWh<br>
+                • Current vs Breakeven: $0.42 vs $0.718<br>
+                • Safety Margin: ($0.42 - $0.718) ÷ $0.718 × 100% = -41.5%<br><br>
+                
+                <strong>Decision:</strong> PURCHASE CO₂ (Grid price too low, CHP not economical)
+            </div>
+        </div>
+    </div>
+</body>
+</html>

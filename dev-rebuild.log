@@ -1,0 +1,134 @@
+
+> vibelux-app@0.1.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, using available port 3003 instead.
+   ▲ Next.js 15.3.3
+   - Local:        http://localhost:3003
+   - Network:      http://192.168.86.31:3003
+   - Environments: .env.local, .env.development, .env
+
+ ✓ Starting...
+ ✓ Ready in 1278ms
+ ✓ Compiled /middleware in 429ms (213 modules)
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+ ○ Compiling / ...
+ ✓ Compiled / in 3.7s (1858 modules)
+[Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/" used `headers().get('Content-Security-Policy')`. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET / 200 in 4161ms
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+ ○ Compiling /design ...
+ ✓ Compiled /design in 818ms (1904 modules)
+[Error: Route "/design" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/design" used `headers().get('Content-Security-Policy')`. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /design 200 in 983ms
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+ ✓ Compiled /fixtures in 264ms (1913 modules)
+[Error: Route "/fixtures" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/fixtures" used `headers().get('Content-Security-Policy')`. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /fixtures 200 in 453ms
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+ ✓ Compiled /calculators in 319ms (1932 modules)
+[Error: Route "/calculators" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/calculators" used `headers().get('Content-Security-Policy')`. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /calculators 200 in 513ms
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+ ✓ Compiled /dashboard in 212ms (1945 modules)
+[Error: Route "/dashboard" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/dashboard" used `headers().get('Content-Security-Policy')`. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /dashboard 200 in 338ms
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+[Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/" used `headers().get('Content-Security-Policy')`. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET / 200 in 124ms
+ ✓ Compiled in 1075ms (845 modules)
+ ✓ Compiled in 7.3s (2131 modules)
+ ✓ Compiled in 5.2s (1044 modules)
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+ ○ Compiling /test-errors ...
+ ✓ Compiled /test-errors in 753ms (1875 modules)
+[Error: Route "/test-errors" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/test-errors" used `headers().get('Content-Security-Policy')`. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /test-errors 200 in 1026ms
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+ ✓ Compiled /_not-found in 169ms (1879 modules)
+[Error: Route "/_not-found" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/_not-found" used `headers().get('Content-Security-Policy')`. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /design/advanced-v3 404 in 310ms
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+ ✓ Compiled /design/advanced-v3-standalone in 299ms (1887 modules)
+[Error: Route "/design/advanced-v3-standalone" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/design/advanced-v3-standalone" used `headers().get('Content-Security-Policy')`. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /design/advanced-v3-standalone 200 in 419ms
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+ ✓ Compiled in 3.7s (1051 modules)
+ ✓ Compiled in 3.8s (852 modules)
+ ✓ Compiled in 2.7s (1051 modules)
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+Error: Route "/" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis {
+  
+}
+ ○ Compiling /test-auth ...
+ ✓ Compiled /test-auth in 867ms (1894 modules)
+[Error: Route "/test-auth" used `...headers()` or similar iteration. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+[Error: Route "/test-auth" used `headers().get('Content-Security-Policy')`. `headers()` should be awaited before using its value. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis]
+ GET /test-auth 200 in 1430ms
+ ✓ Compiled in 5.4s (1074 modules)
+ ✓ Compiled in 1465ms (861 modules)
+ ✓ Compiled in 2.4s (861 modules)
+ ✓ Compiled in 2.1s (1060 modules)
+ ✓ Compiled in 729ms (861 modules)
+[?25h
