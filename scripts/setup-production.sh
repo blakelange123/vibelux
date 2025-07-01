@@ -78,7 +78,7 @@ else
     docker run -d \
         --name vibelux-postgres \
         -e POSTGRES_USER=vibelux \
-        -e POSTGRES_PASSWORD=vibelux_secure_password_$(openssl rand -hex 16) \
+        -e POSTGRES_PASSWORD="$(openssl rand -hex 32)" \
         -e POSTGRES_DB=vibelux_production \
         -p 5432:5432 \
         -v vibelux_postgres_data:/var/lib/postgresql/data \
@@ -104,12 +104,15 @@ echo -e "\n${YELLOW}Setting up Redis...${NC}"
 if docker ps | grep -q vibelux-redis; then
     echo -e "${YELLOW}Redis container already running${NC}"
 else
+    # Generate random Redis password
+    REDIS_INIT_PASSWORD=$(openssl rand -hex 16)
+    
     docker run -d \
         --name vibelux-redis \
         -p 6379:6379 \
         -v vibelux_redis_data:/data \
         redis:7-alpine \
-        redis-server --appendonly yes --requirepass vibelux_redis_$(openssl rand -hex 16)
+        redis-server --appendonly yes --requirepass "${REDIS_INIT_PASSWORD}"
     
     echo -e "${GREEN}✓ Redis started${NC}"
 fi
