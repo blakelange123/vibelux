@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import nodemailer from 'nodemailer';
+import { TwilioService } from '@/lib/communications/twilio-service';
+import { getNotificationService } from '@/lib/notifications/notification-service';
 
 interface AlertConfig {
   email?: {
@@ -15,6 +17,11 @@ interface AlertConfig {
       };
     };
   };
+  sms?: {
+    enabled: boolean;
+    recipients: string[];
+    criticalOnly: boolean;
+  };
   slack?: {
     enabled: boolean;
     webhookUrl: string;
@@ -29,6 +36,7 @@ interface AlertConfig {
 export class AlertManager {
   private config: AlertConfig;
   private emailTransporter?: nodemailer.Transporter;
+  private twilioService?: TwilioService;
 
   constructor() {
     this.config = {
@@ -45,6 +53,11 @@ export class AlertManager {
           },
         },
       },
+      sms: {
+        enabled: process.env.ALERT_SMS_ENABLED === 'true',
+        recipients: (process.env.ALERT_SMS_RECIPIENTS || '').split(',').filter(Boolean),
+        criticalOnly: process.env.ALERT_SMS_CRITICAL_ONLY === 'true',
+      },
       slack: {
         enabled: process.env.SLACK_ALERTS_ENABLED === 'true',
         webhookUrl: process.env.SLACK_WEBHOOK_URL || '',
@@ -58,6 +71,34 @@ export class AlertManager {
 
     if (this.config.email?.enabled) {
       this.initializeEmailTransporter();
+    }
+    
+    if (this.config.sms?.enabled) {
+      this.initializeTwilioService();
+    }
+  }
+  
+  private initializeTwilioService(): void {
+    try {
+      this.twilioService = new TwilioService({
+        region: process.env.TWILIO_REGION || 'us-east',
+        multiRegion: {
+          primary: 'us-east',
+          fallback: ['us-west', 'eu-west'],
+          loadBalancing: 'geographic',
+        },
+        phoneNumbers: {
+          sms: process.env.TWILIO_SMS_NUMBERS?.split(',') || [],
+        },
+        messaging: {
+          rateLimits: {
+            smsPerMinute: 100,
+            voicePerMinute: 60,
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Failed to initialize Twilio service:', error);
     }
   }
 
@@ -113,6 +154,7 @@ export class AlertManager {
 
     await Promise.allSettled([
       this.sendEmailAlert(message, `CRITICAL: ${alert.title}`),
+      this.sendSMSAlert(message, alert),
       this.sendSlackAlert(message, true),
       this.sendTeamsAlert(message, true),
     ]);
@@ -295,6 +337,67 @@ export class AlertManager {
       case 'low': return '🟢';
       default: return '⚠️';
     }
+  }
+  
+  private async sendSMSAlert(message: string, alert: any): Promise<void> {
+    if (!this.config.sms?.enabled || !this.twilioService) {
+      return;
+    }
+    
+    // Skip non-critical alerts if configured
+    if (this.config.sms.criticalOnly && alert.severity !== 'critical') {
+      return;
+    }
+    
+    try {
+      const smsMessage = this.formatSMSMessage(alert);
+      
+      // Send to all configured recipients
+      const results = await this.twilioService.sendBulkSMS({
+        recipients: this.config.sms.recipients.map(to => ({
+          to,
+          message: smsMessage,
+        })),
+        batchSize: 5,
+        delayMs: 500,
+      });
+      
+      const failedCount = results.filter(r => r.status === 'failed').length;
+      if (failedCount > 0) {
+        console.error(`Failed to send ${failedCount} SMS alerts`);
+      }
+    } catch (error) {
+      console.error('Failed to send SMS alert:', error);
+    }
+  }
+  
+  private formatSMSMessage(alert: any): string {
+    const severityIcon = this.getSeverityIcon(alert.severity);
+    const shortType = alert.type.replace(/_/g, ' ').toLowerCase();
+    
+    // Keep SMS messages concise
+    let message = `${severityIcon} VibeLux Alert\n`;
+    message += `${alert.title}\n`;
+    message += `Type: ${shortType}\n`;
+    
+    // Add critical details for plant health alerts
+    if (alert.type === 'PLANT_STRESS' && alert.metadata?.stressLevel) {
+      message += `Stress: ${alert.metadata.stressLevel}%\n`;
+    }
+    if (alert.type === 'CO2_CRITICAL' && alert.metadata?.currentLevel) {
+      message += `CO2: ${alert.metadata.currentLevel}ppm\n`;
+    }
+    if (alert.type === 'NUTRIENT_DEFICIENCY' && alert.metadata?.nutrients) {
+      const deficientNutrients = Object.entries(alert.metadata.nutrients)
+        .filter(([_, level]) => level > 10)
+        .map(([nutrient, _]) => nutrient.charAt(0).toUpperCase())
+        .join(', ');
+      message += `Deficient: ${deficientNutrients}\n`;
+    }
+    
+    message += `View: ${process.env.NEXT_PUBLIC_APP_URL}/alerts`;
+    
+    return message.substring(0, 160); // SMS character limit
   }
 
   // Health check monitoring

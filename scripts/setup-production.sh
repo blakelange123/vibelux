@@ -1,253 +1,224 @@
 #!/bin/bash
 
-# =================================================================
-# VibeLux Production Setup Script
-# =================================================================
-# This script helps you set up VibeLux for production deployment
-# =================================================================
+# Production Setup Script for Vibelux
+# This script sets up all required services and configurations for production deployment
 
-set -e
+set -e  # Exit on error
 
-echo "🚀 VibeLux Production Setup"
+echo "🚀 Vibelux Production Setup Script"
 echo "=================================="
 
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Function to print colored output
-print_step() {
-    echo -e "${BLUE}📋 $1${NC}"
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
 }
 
-print_success() {
-    echo -e "${GREEN}✅ $1${NC}"
+# Function to generate secure random strings
+generate_secret() {
+    openssl rand -base64 32
 }
 
-print_warning() {
-    echo -e "${YELLOW}⚠️  $1${NC}"
-}
+# Check prerequisites
+echo -e "\n${YELLOW}Checking prerequisites...${NC}"
 
-print_error() {
-    echo -e "${RED}❌ $1${NC}"
-}
+if ! command_exists docker; then
+    echo -e "${RED}Docker is not installed. Please install Docker first.${NC}"
+    exit 1
+fi
 
-# Check if required tools are installed
-check_dependencies() {
-    print_step "Checking dependencies..."
+if ! command_exists psql; then
+    echo -e "${YELLOW}PostgreSQL client not found. Installing...${NC}"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install postgresql
+    else
+        sudo apt-get update && sudo apt-get install -y postgresql-client
+    fi
+fi
+
+# 1. Generate secure secrets
+echo -e "\n${YELLOW}Generating secure secrets...${NC}"
+
+if [ ! -f .env.production ]; then
+    cp .env.example .env.production
     
-    if ! command -v node &> /dev/null; then
-        print_error "Node.js is not installed. Please install Node.js 18+ from https://nodejs.org"
-        exit 1
+    # Generate secrets
+    JWT_SECRET=$(generate_secret)
+    SESSION_SECRET=$(generate_secret)
+    ENCRYPTION_KEY=$(generate_secret)
+    NEXTAUTH_SECRET=$(generate_secret)
+    
+    # Update .env.production with generated secrets
+    sed -i.bak "s/JWT_SECRET=.*/JWT_SECRET=$JWT_SECRET/" .env.production
+    sed -i.bak "s/SESSION_SECRET=.*/SESSION_SECRET=$SESSION_SECRET/" .env.production
+    sed -i.bak "s/ENCRYPTION_KEY=.*/ENCRYPTION_KEY=$ENCRYPTION_KEY/" .env.production
+    
+    # Add NEXTAUTH_SECRET if not present
+    if ! grep -q "NEXTAUTH_SECRET" .env.production; then
+        echo "NEXTAUTH_SECRET=$NEXTAUTH_SECRET" >> .env.production
     fi
     
-    if ! command -v npm &> /dev/null; then
-        print_error "npm is not installed. Please install npm"
-        exit 1
+    echo -e "${GREEN}✓ Secrets generated${NC}"
+else
+    echo -e "${YELLOW}! .env.production already exists. Skipping secret generation.${NC}"
+fi
+
+# 2. Set up PostgreSQL
+echo -e "\n${YELLOW}Setting up PostgreSQL...${NC}"
+
+# Check if PostgreSQL is already running
+if docker ps | grep -q vibelux-postgres; then
+    echo -e "${YELLOW}PostgreSQL container already running${NC}"
+else
+    docker run -d \
+        --name vibelux-postgres \
+        -e POSTGRES_USER=vibelux \
+        -e POSTGRES_PASSWORD=vibelux_secure_password_$(openssl rand -hex 16) \
+        -e POSTGRES_DB=vibelux_production \
+        -p 5432:5432 \
+        -v vibelux_postgres_data:/var/lib/postgresql/data \
+        postgres:15-alpine
+    
+    echo -e "${GREEN}✓ PostgreSQL started${NC}"
+    
+    # Wait for PostgreSQL to be ready
+    echo "Waiting for PostgreSQL to be ready..."
+    sleep 5
+fi
+
+# Get PostgreSQL container details
+POSTGRES_PASSWORD=$(docker exec vibelux-postgres printenv POSTGRES_PASSWORD)
+DATABASE_URL="postgresql://vibelux:${POSTGRES_PASSWORD}@localhost:5432/vibelux_production"
+
+# Update DATABASE_URL in .env.production
+sed -i.bak "s|DATABASE_URL=.*|DATABASE_URL=$DATABASE_URL|" .env.production
+
+# 3. Set up Redis
+echo -e "\n${YELLOW}Setting up Redis...${NC}"
+
+if docker ps | grep -q vibelux-redis; then
+    echo -e "${YELLOW}Redis container already running${NC}"
+else
+    docker run -d \
+        --name vibelux-redis \
+        -p 6379:6379 \
+        -v vibelux_redis_data:/data \
+        redis:7-alpine \
+        redis-server --appendonly yes --requirepass vibelux_redis_$(openssl rand -hex 16)
+    
+    echo -e "${GREEN}✓ Redis started${NC}"
+fi
+
+# Get Redis password
+REDIS_PASSWORD=$(docker exec vibelux-redis redis-cli CONFIG GET requirepass | tail -1)
+REDIS_URL="redis://default:${REDIS_PASSWORD}@localhost:6379"
+
+# Add Redis URL to .env.production
+if ! grep -q "REDIS_URL" .env.production; then
+    echo "REDIS_URL=$REDIS_URL" >> .env.production
+fi
+
+# 4. Set up InfluxDB
+echo -e "\n${YELLOW}Setting up InfluxDB...${NC}"
+
+if docker ps | grep -q vibelux-influxdb; then
+    echo -e "${YELLOW}InfluxDB container already running${NC}"
+else
+    # Generate InfluxDB credentials
+    INFLUX_PASSWORD=$(openssl rand -hex 16)
+    INFLUX_TOKEN=$(openssl rand -base64 32)
+    
+    docker run -d \
+        --name vibelux-influxdb \
+        -p 8086:8086 \
+        -v vibelux_influxdb_data:/var/lib/influxdb2 \
+        -e DOCKER_INFLUXDB_INIT_MODE=setup \
+        -e DOCKER_INFLUXDB_INIT_USERNAME=vibelux \
+        -e DOCKER_INFLUXDB_INIT_PASSWORD=$INFLUX_PASSWORD \
+        -e DOCKER_INFLUXDB_INIT_ORG=vibelux \
+        -e DOCKER_INFLUXDB_INIT_BUCKET=vibelux_metrics \
+        -e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=$INFLUX_TOKEN \
+        influxdb:2.7-alpine
+    
+    echo -e "${GREEN}✓ InfluxDB started${NC}"
+    
+    # Add InfluxDB configuration to .env.production
+    if ! grep -q "INFLUXDB_URL" .env.production; then
+        cat >> .env.production << EOF
+
+# InfluxDB Configuration
+INFLUXDB_URL=http://localhost:8086
+INFLUXDB_TOKEN=$INFLUX_TOKEN
+INFLUXDB_ORG=vibelux
+INFLUXDB_BUCKET=vibelux_metrics
+EOF
     fi
-    
-    if ! command -v git &> /dev/null; then
-        print_error "Git is not installed. Please install Git"
-        exit 1
-    fi
-    
-    print_success "All dependencies are installed"
-}
+fi
 
-# Generate secure secrets
-generate_secrets() {
-    print_step "Generating secure secrets..."
-    
-    JWT_SECRET=$(openssl rand -base64 32)
-    SESSION_SECRET=$(openssl rand -base64 32)
-    ENCRYPTION_KEY=$(openssl rand -base64 32)
-    
-    print_success "Secrets generated"
-}
+# 5. Run database migrations
+echo -e "\n${YELLOW}Running database migrations...${NC}"
 
-# Validate environment
-validate_environment() {
-    print_step "Validating environment configuration..."
-    
-    if [ ! -f ".env.production" ]; then
-        print_error ".env.production file not found"
-        exit 1
-    fi
-    
-    # Check if required environment variables are set
-    required_vars=(
-        "DATABASE_URL"
-        "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"
-        "CLERK_SECRET_KEY"
-    )
-    
-    for var in "${required_vars[@]}"; do
-        if ! grep -q "^${var}=" .env.production; then
-            print_warning "$var not found in .env.production"
-        fi
-    done
-    
-    print_success "Environment validation complete"
-}
+# Install dependencies if needed
+if [ ! -d "node_modules" ]; then
+    echo "Installing dependencies..."
+    npm install
+fi
 
-# Install dependencies
-install_dependencies() {
-    print_step "Installing dependencies..."
-    npm ci
-    print_success "Dependencies installed"
-}
+# Generate Prisma client
+npx prisma generate
 
-# Build application
-build_application() {
-    print_step "Building application..."
-    npm run build
-    print_success "Application built successfully"
-}
+# Run migrations
+npx prisma migrate deploy
 
-# Run tests
-run_tests() {
-    print_step "Running tests..."
-    npm run test:unit
-    npm run type-check
-    npm run lint
-    print_success "All tests passed"
-}
+echo -e "${GREEN}✓ Database migrations completed${NC}"
 
-# Setup database
-setup_database() {
-    print_step "Setting up database..."
-    npm run db:generate
-    print_success "Database setup complete"
-}
+# 6. Create initial admin user (optional)
+echo -e "\n${YELLOW}Database setup complete!${NC}"
 
-# Deployment checklist
-deployment_checklist() {
-    echo ""
-    print_step "Deployment Checklist"
-    echo "=================================="
-    
-    checklist_items=(
-        "✅ Supabase project created and configured"
-        "✅ Vercel account set up and repository connected"
-        "✅ Upstash Redis database created"
-        "✅ AWS S3 bucket created with proper permissions"
-        "✅ Clerk authentication configured"
-        "✅ Environment variables added to Vercel"
-        "✅ Custom domain configured (optional)"
-        "✅ SSL certificate enabled"
-    )
-    
-    for item in "${checklist_items[@]}"; do
-        echo "$item"
-    done
-    
-    echo ""
-    print_warning "Make sure all items above are completed before deploying"
-}
+# 7. Display important information
+echo -e "\n${GREEN}=== Setup Complete ===${NC}"
+echo -e "\n${YELLOW}Important: Save these credentials securely:${NC}"
+echo -e "PostgreSQL Password: ${POSTGRES_PASSWORD}"
+echo -e "Redis Password: ${REDIS_PASSWORD}"
+echo -e "InfluxDB Token: ${INFLUX_TOKEN}"
 
-# Service setup instructions
-service_instructions() {
-    echo ""
-    print_step "Service Setup Instructions"
-    echo "=================================="
-    
-    echo -e "${BLUE}1. Supabase Setup:${NC}"
-    echo "   • Go to https://supabase.com"
-    echo "   • Create new project"
-    echo "   • Copy DATABASE_URL, SUPABASE_URL, and keys"
-    echo ""
-    
-    echo -e "${BLUE}2. Vercel Setup:${NC}"
-    echo "   • Go to https://vercel.com"
-    echo "   • Import your GitHub repository"
-    echo "   • Add environment variables"
-    echo ""
-    
-    echo -e "${BLUE}3. Upstash Redis Setup:${NC}"
-    echo "   • Go to https://upstash.com"
-    echo "   • Create new Redis database"
-    echo "   • Copy REDIS_URL"
-    echo ""
-    
-    echo -e "${BLUE}4. AWS S3 Setup:${NC}"
-    echo "   • Go to AWS Console → S3"
-    echo "   • Create bucket: vibelux-production-[random]"
-    echo "   • Create IAM user with S3 permissions"
-    echo "   • Copy access keys"
-    echo ""
-    
-    echo -e "${BLUE}5. Clerk Setup:${NC}"
-    echo "   • Go to https://clerk.com"
-    echo "   • Create new application"
-    echo "   • Configure OAuth providers"
-    echo "   • Copy publishable and secret keys"
-}
+echo -e "\n${YELLOW}Services running:${NC}"
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep vibelux
 
-# Cost estimation
-cost_estimation() {
-    echo ""
-    print_step "Monthly Cost Estimation"
-    echo "=================================="
-    
-    echo "🆓 Development (Free Tier):"
-    echo "   • Vercel: $0 (Hobby plan)"
-    echo "   • Supabase: $0 (Free tier - 2 projects)"
-    echo "   • Upstash: $0 (Free tier - 10K requests)"
-    echo "   • AWS S3: $0 (Free tier - 5GB)"
-    echo "   Total: $0/month"
-    echo ""
-    
-    echo "💰 Production (Paid Tiers):"
-    echo "   • Vercel Pro: $20/month"
-    echo "   • Supabase Pro: $25/month"
-    echo "   • Upstash Redis: $10-25/month"
-    echo "   • AWS S3: $5-15/month"
-    echo "   Total: $60-85/month"
-    echo ""
-    
-    echo "📈 Scale (High Traffic):"
-    echo "   • Vercel Team: $50/month"
-    echo "   • Supabase Team: $100/month"
-    echo "   • Upstash: $50+/month"
-    echo "   • AWS S3: $20+/month"
-    echo "   Total: $220+/month"
-}
+echo -e "\n${YELLOW}Next steps:${NC}"
+echo "1. Update .env.production with your Clerk API keys"
+echo "2. Update .env.production with your Stripe API keys"
+echo "3. Update .env.production with any other API keys (OpenAI, etc.)"
+echo "4. Run: npm run build:production"
+echo "5. Run: npm start"
 
-# Main execution
-main() {
-    clear
-    echo "🌱 Welcome to VibeLux Production Setup!"
-    echo "======================================"
-    echo ""
-    
-    check_dependencies
-    generate_secrets
-    install_dependencies
-    validate_environment
-    setup_database
-    build_application
-    run_tests
-    
-    echo ""
-    print_success "Setup completed successfully!"
-    
-    deployment_checklist
-    service_instructions
-    cost_estimation
-    
-    echo ""
-    print_step "Next Steps:"
-    echo "1. Review the PRODUCTION_SETUP_GUIDE.md for detailed instructions"
-    echo "2. Set up your cloud services (Supabase, Vercel, etc.)"
-    echo "3. Add environment variables to Vercel"
-    echo "4. Deploy your application"
-    echo ""
-    
-    print_success "You're ready to deploy VibeLux to production! 🚀"
-}
+echo -e "\n${GREEN}Production environment is ready! 🎉${NC}"
 
-# Run the main function
-main "$@"
+# Save service information
+cat > docker-services.json << EOF
+{
+  "postgres": {
+    "container": "vibelux-postgres",
+    "url": "$DATABASE_URL",
+    "password": "$POSTGRES_PASSWORD"
+  },
+  "redis": {
+    "container": "vibelux-redis",
+    "url": "$REDIS_URL",
+    "password": "$REDIS_PASSWORD"
+  },
+  "influxdb": {
+    "container": "vibelux-influxdb",
+    "url": "http://localhost:8086",
+    "token": "$INFLUX_TOKEN",
+    "password": "$INFLUX_PASSWORD"
+  }
+}
+EOF
+
+echo -e "\n${YELLOW}Service credentials saved to docker-services.json${NC}"

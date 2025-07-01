@@ -8,31 +8,31 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   
-  // Build performance - temporarily ignore errors for production deployment
+  // Build performance - enforce type safety
   typescript: {
-    ignoreBuildErrors: process.env.NODE_ENV === 'production',
+    ignoreBuildErrors: false,
   },
   eslint: {
-    ignoreDuringBuilds: process.env.NODE_ENV === 'production',
+    ignoreDuringBuilds: false,
   },
   
   // External packages for server components
   serverExternalPackages: ['@prisma/client'],
   
+  // Turbopack configuration (now stable)
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
+  },
+  
   // Experimental optimizations
   experimental: {
     optimizePackageImports: ['lucide-react', '@clerk/nextjs', 'framer-motion'],
     typedRoutes: true,
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
-    // Enable parallel builds
-    serverComponentsExternalPackages: ['@prisma/client'],
     // Optimize compilation
     optimizeCss: true,
   },

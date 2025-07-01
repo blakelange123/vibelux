@@ -54,13 +54,30 @@ export class TwilioService {
   private initializeClients(): void {
     const accountSid = this.config.accountSid || process.env.TWILIO_ACCOUNT_SID;
     const authToken = this.config.authToken || process.env.TWILIO_AUTH_TOKEN;
+    const apiKeySid = process.env.TWILIO_API_KEY_SID;
+    const apiKeySecret = process.env.TWILIO_API_KEY_SECRET;
 
-    if (!accountSid || !authToken) {
+    if (!accountSid) {
+      throw new Error('Twilio account SID not configured');
+    }
+
+    // Use API key if available (more secure), otherwise fall back to auth token
+    let twilioAuth: string;
+    let twilioSid: string;
+    
+    if (apiKeySid && apiKeySecret) {
+      twilioSid = apiKeySid;
+      twilioAuth = apiKeySecret;
+    } else if (authToken) {
+      twilioSid = accountSid;
+      twilioAuth = authToken;
+    } else {
       throw new Error('Twilio credentials not configured');
     }
 
     // Initialize primary client
-    this.client = twilio(accountSid, authToken, {
+    this.client = twilio(twilioSid, twilioAuth, {
+      accountSid: accountSid, // Always specify the account SID when using API keys
       region: this.config.region,
       edge: REGIONAL_ENDPOINTS[this.config.region] ? 'dublin' : 'sydney',
     });
@@ -69,7 +86,8 @@ export class TwilioService {
     const allRegions = [this.config.multiRegion.primary, ...this.config.multiRegion.fallback];
     
     for (const region of allRegions) {
-      const regionalClient = twilio(accountSid, authToken, {
+      const regionalClient = twilio(twilioSid, twilioAuth, {
+        accountSid: accountSid,
         region,
         edge: REGIONAL_ENDPOINTS[region] ? 'dublin' : 'sydney',
       });

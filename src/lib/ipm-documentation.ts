@@ -1,4 +1,5 @@
-// IPM Photo Scouting with AI Pest Detection
+// IPM Documentation Service - For compliance record keeping
+// NOT for automated monitoring or pest detection
 import { RealtimeTracker, LocationUpdate } from './realtime-tracker';
 
 export interface IPMPhoto {

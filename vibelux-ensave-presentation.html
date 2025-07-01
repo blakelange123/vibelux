@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeLux EnSave - Energy Optimization & Rebate Services</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0e1a;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .presentation-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.prev {
+            transform: translateX(-100%);
+        }
+
+        /* Hero Slide */
+        .hero-slide {
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a237e 100%);
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #00e5ff, #1de9b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.8rem;
+            color: #b3e5fc;
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .hero-description {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            line-height: 1.8;
+            color: #e1f5fe;
+        }
+
+        /* Executive Summary */
+        .executive-summary {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+            max-width: 1200px;
+            margin-top: 2rem;
+        }
+
+        .summary-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-item h3 {
+            color: #00e5ff;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        /* Content Slides */
+        .content-slide {
+            background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
+        }
+
+        .slide h2 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(45deg, #00e5ff, #1de9b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #00e5ff;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #00e5ff, #1de9b6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .feature-title {
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+            color: #00e5ff;
+        }
+
+        .feature-description {
+            line-height: 1.6;
+            color: #b3e5fc;
+        }
+
+        /* Statistics */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1000px;
+            margin-top: 3rem;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #00e5ff, #1de9b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #b3e5fc;
+            margin-top: 0.5rem;
+        }
+
+        /* Process Steps */
+        .process-timeline {
+            max-width: 1000px;
+            margin: 3rem auto;
+        }
+
+        .process-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #00e5ff, #1de9b6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 2rem;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .step-title {
+            font-size: 1.3rem;
+            color: #00e5ff;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Pricing */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card.featured {
+            transform: scale(1.05);
+            border-color: #00e5ff;
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            border-color: #00e5ff;
+        }
+
+        .pricing-tier {
+            font-size: 1.8rem;
+            color: #00e5ff;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .pricing-features li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #1de9b6;
+        }
+
+        /* FAQ */
+        .faq-container {
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2rem;
+            color: #00e5ff;
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem 1.5rem;
+            color: #b3e5fc;
+            line-height: 1.6;
+        }
+
+        /* Rebate Info */
+        .rebate-highlight {
+            background: rgba(29, 233, 182, 0.1);
+            border: 2px solid #1de9b6;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .rebate-percentage {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1de9b6;
+        }
+
+        /* Navigation */
+        .nav-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .nav-btn:hover {
+            background: rgba(0, 229, 255, 0.3);
+            border-color: #00e5ff;
+            transform: translateY(-2px);
+        }
+
+        .slide-indicator {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            font-size: 1rem;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            background: linear-gradient(45deg, #00e5ff, #1de9b6);
+            color: #0a0e1a;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.5);
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            max-width: 1000px;
+            margin: 2rem auto;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: rgba(0, 229, 255, 0.2);
+            padding: 1.5rem;
+            text-align: left;
+            font-size: 1.2rem;
+        }
+
+        .comparison-table td {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .check-mark {
+            color: #1de9b6;
+            font-size: 1.3rem;
+        }
+
+        .x-mark {
+            color: #ff5252;
+            font-size: 1.3rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.3rem;
+            }
+
+            .slide h2 {
+                font-size: 2rem;
+            }
+
+            .feature-grid,
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-container {
+                padding: 0.8rem 1rem;
+            }
+
+            .nav-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Slide 1: Hero -->
+        <div class="slide hero-slide active">
+            <h1 class="hero-title">VibeLux EnSave</h1>
+            <p class="hero-subtitle">Comprehensive Energy Optimization & Rebate Management</p>
+            <p class="hero-description">
+                Unlock substantial energy savings and maximize rebate opportunities with our integrated platform. 
+                Combining advanced lighting design, real-time monitoring, and automated rebate processing 
+                to deliver measurable ROI for agricultural and commercial facilities.
+            </p>
+            <a href="#contact" class="cta-button">Start Saving Today</a>
+        </div>
+
+        <!-- Slide 2: Executive Summary -->
+        <div class="slide executive-summary">
+            <h2>Executive Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <h3>Market Opportunity</h3>
+                    <p>The agricultural energy efficiency market is projected to reach $15.8B by 2027, with lighting representing 20-40% of facility energy costs.</p>
+                </div>
+                <div class="summary-item">
+                    <h3>Our Solution</h3>
+                    <p>VibeLux EnSave combines intelligent lighting design with automated rebate capture, delivering 30-50% energy savings and maximizing available incentives.</p>
+                </div>
+                <div class="summary-item">
+                    <h3>Value Proposition</h3>
+                    <p>We simplify the complex rebate process while providing ongoing optimization, ensuring customers capture all available savings opportunities.</p>
+                </div>
+                <div class="summary-item">
+                    <h3>Revenue Model</h3>
+                    <p>Performance-based pricing aligned with customer savings, creating a win-win partnership that scales with success.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: The Problem -->
+        <div class="slide content-slide">
+            <h2>The Energy Efficiency Challenge</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💸</div>
+                    <h3 class="feature-title">Rising Energy Costs</h3>
+                    <p class="feature-description">Commercial electricity rates have increased 15% over the past 3 years, significantly impacting operational margins.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="feature-title">Complex Rebate Landscape</h3>
+                    <p class="feature-description">Over 2,500 utility rebate programs nationwide, each with unique requirements and documentation needs.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⏰</div>
+                    <h3 class="feature-title">Missed Opportunities</h3>
+                    <p class="feature-description">Industry studies show 70% of eligible businesses fail to claim available energy rebates due to complexity.</p>
+                </div>
+            </div>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-number">$3.4B</div>
+                    <div class="stat-label">Unclaimed Rebates Annually</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">18 mo</div>
+                    <div class="stat-label">Average Payback Period</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">40%</div>
+                    <div class="stat-label">Potential Energy Savings</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Our Solution -->
+        <div class="slide content-slide">
+            <h2>The VibeLux EnSave Solution</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Intelligent Design</h3>
+                    <p class="feature-description">AI-powered lighting design optimized for your specific crop requirements and facility layout.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Real-Time Monitoring</h3>
+                    <p class="feature-description">Continuous energy tracking with automated reporting for rebate compliance and verification.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">Automated Rebate Processing</h3>
+                    <p class="feature-description">We handle all paperwork, submissions, and follow-ups to maximize your rebate capture.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💡</div>
+                    <h3 class="feature-title">Ongoing Optimization</h3>
+                    <p class="feature-description">Machine learning algorithms continuously improve efficiency based on actual performance data.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3 class="feature-title">Performance Guarantee</h3>
+                    <p class="feature-description">We guarantee minimum energy savings or we refund the difference.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3 class="feature-title">Turnkey Implementation</h3>
+                    <p class="feature-description">From design to installation to rebate capture - we manage the entire process.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: VibeLux vs VibeLux+EnSave -->
+        <div class="slide content-slide">
+            <h2>Service Comparison</h2>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>VibeLux Only</th>
+                            <th>VibeLux + EnSave</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Advanced Lighting Design</td>
+                            <td class="check-mark">✓</td>
+                            <td class="check-mark">✓</td>
+                        </tr>
+                        <tr>
+                            <td>3D Visualization</td>
+                            <td class="check-mark">✓</td>
+                            <td class="check-mark">✓</td>
+                        </tr>
+                        <tr>
+                            <td>Energy Monitoring</td>
+                            <td class="x-mark">✗</td>
+                            <td class="check-mark">✓</td>
+                        </tr>
+                        <tr>
+                            <td>Rebate Identification</td>
+                            <td class="x-mark">✗</td>
+                            <td class="check-mark">✓</td>
+                        </tr>
+                        <tr>
+                            <td>Application Management</td>
+                            <td class="x-mark">✗</td>
+                            <td class="check-mark">✓</td>
+                        </tr>
+                        <tr>
+                            <td>Performance Tracking</td>
+                            <td class="x-mark">✗</td>
+                            <td class="check-mark">✓</td>
+                        </tr>
+                        <tr>
+                            <td>Optimization Algorithms</td>
+                            <td class="x-mark">✗</td>
+                            <td class="check-mark">✓</td>
+                        </tr>
+                        <tr>
+                            <td>Compliance Reporting</td>
+                            <td class="x-mark">✗</td>
+                            <td class="check-mark">✓</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="rebate-highlight">
+                <p>VibeLux + EnSave customers capture an average of <span class="rebate-percentage">3.5x more rebates</span> than those who manage the process independently</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Process -->
+        <div class="slide content-slide">
+            <h2>Our Proven Process</h2>
+            <div class="process-timeline">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Energy Audit & Assessment</h3>
+                        <p>Comprehensive facility analysis to identify savings opportunities and applicable rebate programs.</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Custom Design & Proposal</h3>
+                        <p>Tailored lighting solution with ROI projections and identified rebate opportunities.</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Rebate Pre-Approval</h3>
+                        <p>We secure utility pre-approval to ensure rebate eligibility before installation.</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Professional Installation</h3>
+                        <p>Certified contractors install equipment to rebate program specifications.</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Monitoring & Optimization</h3>
+                        <p>Continuous performance tracking and adjustment to maximize savings.</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Rebate Processing</h3>
+                        <p>Complete documentation, submission, and follow-up until funds are received.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Available Rebates -->
+        <div class="slide content-slide">
+            <h2>Rebate Programs We Access</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🌱</div>
+                    <h3 class="feature-title">USDA REAP Grants</h3>
+                    <p class="feature-description">Rural Energy for America Program</p>
+                    <div class="rebate-highlight">
+                        <span class="rebate-percentage">Up to 25%</span>
+                        <p>of total project costs</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Utility Rebates</h3>
+                    <p class="feature-description">Direct incentives from energy providers</p>
+                    <div class="rebate-highlight">
+                        <span class="rebate-percentage">$0.10-$0.50</span>
+                        <p>per kWh saved annually</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏛️</div>
+                    <h3 class="feature-title">Federal Tax Credits</h3>
+                    <p class="feature-description">Section 179D deductions</p>
+                    <div class="rebate-highlight">
+                        <span class="rebate-percentage">Up to $5.00</span>
+                        <p>per square foot</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏢</div>
+                    <h3 class="feature-title">State Programs</h3>
+                    <p class="feature-description">Location-specific incentives</p>
+                    <div class="rebate-highlight">
+                        <span class="rebate-percentage">10-30%</span>
+                        <p>additional savings</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">Demand Response</h3>
+                    <p class="feature-description">Load management incentives</p>
+                    <div class="rebate-highlight">
+                        <span class="rebate-percentage">$50-200</span>
+                        <p>per kW reduced</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3 class="feature-title">Carbon Credits</h3>
+                    <p class="feature-description">Emissions reduction programs</p>
+                    <div class="rebate-highlight">
+                        <span class="rebate-percentage">$15-50</span>
+                        <p>per ton CO2 reduced</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Technology -->
+        <div class="slide content-slide">
+            <h2>Advanced Technology Platform</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">AI-Powered Optimization</h3>
+                    <p class="feature-description">Machine learning algorithms analyze thousands of data points to optimize lighting schedules and intensity for maximum efficiency.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📡</div>
+                    <h3 class="feature-title">IoT Integration</h3>
+                    <p class="feature-description">Seamless connection with existing building management systems and smart sensors for comprehensive monitoring.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">Mobile Dashboard</h3>
+                    <p class="feature-description">Real-time access to energy consumption, savings metrics, and rebate status from any device.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Secure Cloud Platform</h3>
+                    <p class="feature-description">Bank-level encryption and SOC 2 compliance ensure your data is protected.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Advanced Analytics</h3>
+                    <p class="feature-description">Detailed reporting and predictive analytics to identify future savings opportunities.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">Automated Compliance</h3>
+                    <p class="feature-description">Automatic generation of all required documentation for rebate programs and regulatory compliance.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Pricing -->
+        <div class="slide content-slide">
+            <h2>Flexible Pricing Options</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3 class="pricing-tier">Starter</h3>
+                    <div class="pricing-price">15% of Savings</div>
+                    <ul class="pricing-features">
+                        <li>Basic energy monitoring</li>
+                        <li>Utility rebate processing</li>
+                        <li>Quarterly optimization</li>
+                        <li>Standard reporting</li>
+                        <li>Email support</li>
+                    </ul>
+                    <a href="#contact" class="cta-button">Get Started</a>
+                </div>
+                <div class="pricing-card featured">
+                    <h3 class="pricing-tier">Professional</h3>
+                    <div class="pricing-price">20% of Savings</div>
+                    <ul class="pricing-features">
+                        <li>Advanced monitoring & AI</li>
+                        <li>All rebate programs</li>
+                        <li>Monthly optimization</li>
+                        <li>Custom reporting</li>
+                        <li>Priority phone support</li>
+                        <li>Performance guarantee</li>
+                    </ul>
+                    <a href="#contact" class="cta-button">Most Popular</a>
+                </div>
+                <div class="pricing-card">
+                    <h3 class="pricing-tier">Enterprise</h3>
+                    <div class="pricing-price">Custom</div>
+                    <ul class="pricing-features">
+                        <li>Full platform access</li>
+                        <li>Dedicated account team</li>
+                        <li>Real-time optimization</li>
+                        <li>White-label options</li>
+                        <li>24/7 support</li>
+                        <li>Multi-site management</li>
+                    </ul>
+                    <a href="#contact" class="cta-button">Contact Sales</a>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 2rem; color: #b3e5fc;">
+                No upfront costs • Pay only from verified savings • Cancel anytime
+            </p>
+        </div>
+
+        <!-- Slide 10: Case Study -->
+        <div class="slide content-slide">
+            <h2>Success Stories</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3 class="feature-title">Midwest Greenhouse Complex</h3>
+                    <p class="feature-description">200,000 sq ft tomato operation</p>
+                    <div class="stats-container" style="grid-template-columns: repeat(2, 1fr); margin-top: 1rem;">
+                        <div class="stat-box">
+                            <div class="stat-number">42%</div>
+                            <div class="stat-label">Energy Reduction</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number">$185K</div>
+                            <div class="stat-label">Annual Savings</div>
+                        </div>
+                    </div>
+                    <p style="margin-top: 1rem;">Captured $250K in utility rebates and REAP grants</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Vertical Farm Network</h3>
+                    <p class="feature-description">5 facilities across 3 states</p>
+                    <div class="stats-container" style="grid-template-columns: repeat(2, 1fr); margin-top: 1rem;">
+                        <div class="stat-box">
+                            <div class="stat-number">38%</div>
+                            <div class="stat-label">Energy Reduction</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number">$420K</div>
+                            <div class="stat-label">Total Rebates</div>
+                        </div>
+                    </div>
+                    <p style="margin-top: 1rem;">ROI achieved in 14 months</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title">Cannabis Cultivation</h3>
+                    <p class="feature-description">50,000 sq ft indoor facility</p>
+                    <div class="stats-container" style="grid-template-columns: repeat(2, 1fr); margin-top: 1rem;">
+                        <div class="stat-box">
+                            <div class="stat-number">35%</div>
+                            <div class="stat-label">Energy Reduction</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number">$95K</div>
+                            <div class="stat-label">First Year Savings</div>
+                        </div>
+                    </div>
+                    <p style="margin-top: 1rem;">Improved crop quality while reducing costs</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: FAQ -->
+        <div class="slide content-slide">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How quickly can I start seeing savings?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        Energy savings begin immediately upon installation. Rebate processing typically takes 60-90 days, though some programs offer faster timelines. We provide bridge financing options if needed.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What if I've already upgraded my lighting?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        We can still help! Our optimization algorithms and monitoring can increase efficiency by 15-25% even with newer systems. Plus, you may qualify for retroactive rebates or performance-based incentives.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Do you work with specific fixture brands?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        We're brand-agnostic and work with all major manufacturers. Our platform integrates with any DLC-listed fixtures and can optimize performance regardless of brand.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What happens if rebate programs change?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        Our team continuously monitors all rebate programs and adjusts strategies accordingly. We guarantee to maximize available incentives and will identify new opportunities as they arise.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Is there a minimum facility size?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        We typically work with facilities over 10,000 sq ft, but we evaluate each opportunity individually. Smaller facilities can often be bundled for portfolio-level savings.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Contact -->
+        <div class="slide content-slide">
+            <h2>Start Saving Today</h2>
+            <div style="text-align: center; max-width: 800px; margin: 0 auto;">
+                <p style="font-size: 1.5rem; margin-bottom: 3rem; line-height: 1.8;">
+                    Join hundreds of facilities already maximizing their energy efficiency and rebate capture with VibeLux EnSave.
+                </p>
+                <div class="feature-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 600px; margin: 0 auto 3rem;">
+                    <div class="feature-card" style="text-align: center;">
+                        <div class="feature-icon">📞</div>
+                        <h3 class="feature-title">Schedule a Call</h3>
+                        <p class="feature-description">Free 30-minute consultation to discuss your facility's potential</p>
+                    </div>
+                    <div class="feature-card" style="text-align: center;">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">Get Your Report</h3>
+                        <p class="feature-description">Receive a custom savings analysis and rebate assessment</p>
+                    </div>
+                </div>
+                <a href="mailto:energy@vibelux.com" class="cta-button" style="font-size: 1.5rem; padding: 1.5rem 4rem;">
+                    Get Your Free Energy Assessment
+                </a>
+                <div style="margin-top: 3rem;">
+                    <p style="color: #b3e5fc; margin-bottom: 1rem;">Or contact us directly:</p>
+                    <p style="font-size: 1.2rem;">📧 energy@vibelux.com</p>
+                    <p style="font-size: 1.2rem;">📞 1-800-VIBELUX</p>
+                    <p style="font-size: 1.2rem;">🌐 vibelux.com/ensave</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-container">
+        <button class="nav-btn" onclick="previousSlide()">← Previous</button>
+        <button class="nav-btn" onclick="showSlide(0)">Start</button>
+        <button class="nav-btn" onclick="nextSlide()">Next →</button>
+    </div>
+
+    <!-- Slide Indicator -->
+    <div class="slide-indicator">
+        <span id="current-slide">1</span> / <span id="total-slides">12</span>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 12;
+        const slides = document.querySelectorAll('.slide');
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active', 'prev');
+                if (i === index) {
+                    slide.classList.add('active');
+                } else if (i < index) {
+                    slide.classList.add('prev');
+                }
+            });
+            currentSlide = index;
+            updateIndicator();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        function updateIndicator() {
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            document.getElementById('total-slides').textContent = totalSlides;
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+            if (e.key === 'Home') showSlide(0);
+            if (e.key === 'End') showSlide(totalSlides - 1);
+        });
+
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) nextSlide();
+            if (touchEndX > touchStartX + 50) previousSlide();
+        }
+
+        // FAQ interaction
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                const isOpen = answer.style.display === 'block';
+                answer.style.display = isOpen ? 'none' : 'block';
+                question.querySelector('span:last-child').textContent = isOpen ? '+' : '-';
+            });
+        });
+
+        // Initialize
+        updateIndicator();
+    </script>
+</body>
+</html>

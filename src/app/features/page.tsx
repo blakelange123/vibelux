@@ -47,6 +47,51 @@ import {
 
 const featureCategories = [
   {
+    title: 'Advanced Dutch Research Cultivation',
+    description: 'Professional tomato cultivation tools based on proven Dutch greenhouse research',
+    icon: Leaf,
+    color: 'from-green-500 to-emerald-600',
+    badge: 'NEW',
+    features: [
+      {
+        name: '🍅 Plant Physiological Monitor',
+        description: 'Complete tomato plant health monitoring with VeGe balance analysis and exhaustion detection',
+        href: '/calculators/environmental',
+        highlights: ['Head width monitoring (6-9.5mm target)', 'VeGe balance analysis', 'Exhaustion detection', 'Fruit size tracking']
+      },
+      {
+        name: '🍅 Tomato IPM Dashboard',
+        description: 'Integrated pest management with Advanced Dutch Research thresholds and protocols',
+        href: '/calculators/environmental',
+        highlights: ['Zero tolerance for mites', 'Whitefly: 10/card/week threshold', 'Thrips: 6/card/week threshold', 'Nursery quality control']
+      },
+      {
+        name: 'Advanced VPD Calculator',
+        description: 'Humidity deficit calculations with tomato pollination success analysis',
+        href: '/calculators/environmental',
+        highlights: ['5 g/m³ HD target', 'Pollination success probability', 'Critical temperature alerts', 'Real-time optimization']
+      },
+      {
+        name: 'P-Band Climate Control',
+        description: 'Advanced temperature control with momentum prevention for tomato crops',
+        href: '/calculators/environmental',
+        highlights: ['Light-based temperature targets', 'Momentum risk assessment', 'Semi-closed greenhouse optimization', '8-9 air exchanges/hour']
+      },
+      {
+        name: 'Tomato Nutrient Calculator',
+        description: 'Complete nutrient analysis for drip and drain water with Dutch research targets',
+        href: '/calculators/water',
+        highlights: ['K: 6.0-8.4 drip target', 'NO3: 10.8-24 drip range', 'Real-time element status', 'Automated recommendations']
+      },
+      {
+        name: 'Light-Based Irrigation',
+        description: 'DLI-driven irrigation with drain percentage optimization for tomato production',
+        href: '/calculators/environmental',
+        highlights: ['DLI-based drain %', 'Growth stage specific', 'Water use efficiency', 'Yield optimization']
+      }
+    ]
+  },
+  {
     title: 'Insurance & Risk Management',
     description: 'Future: Partner with insurers to reduce premiums through monitoring',
     icon: Shield,
@@ -545,10 +590,10 @@ const featureCategories = [
 ];
 
 const stats = [
-  { label: 'Insurance Savings', value: 'Up to 40%' },
-  { label: 'Risk Score Improvement', value: '35%' },
-  { label: 'Energy Saved', value: '$100M+' },
-  { label: 'Premium Providers', value: '12+' }
+  { label: 'Total Calculators', value: '25+' },
+  { label: 'Feature Categories', value: '18' },
+  { label: 'Crop-Specific Tools', value: '6' },
+  { label: 'Research Sources', value: '130M+' }
 ];
 
 const additionalFeatures = [
@@ -578,7 +623,7 @@ export default function FeaturesPage() {
             className="inline-flex items-center gap-2 px-4 py-2 bg-purple-900/30 backdrop-blur-sm rounded-full border border-purple-700/50 mb-6"
           >
             <Sparkles className="w-4 h-4 text-purple-400" />
-            <span className="text-sm font-medium text-purple-200">170+ Professional Features</span>
+            <span className="text-sm font-medium text-purple-200">Complete Visual Operations Intelligence Platform</span>
           </motion.div>
           
           <motion.h1 
@@ -586,10 +631,10 @@ export default function FeaturesPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-5xl md:text-6xl font-bold mb-6"
           >
-            Everything You Need to
+            The Complete Suite for
             <br />
             <span className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
-              Design Like a Pro
+              Professional Cultivation
             </span>
           </motion.h1>
           
@@ -599,8 +644,8 @@ export default function FeaturesPage() {
             transition={{ delay: 0.1 }}
             className="text-xl text-gray-300 max-w-3xl mx-auto mb-8"
           >
-            The platform that combines AI-powered lighting design with future insurance partnerships. 
-            Coming soon: Qualify for premium discounts through certified risk monitoring.
+            From Advanced Dutch Research tomato cultivation to AI-powered design, energy optimization, 
+            equipment investment, and comprehensive analytics. Everything you need in one platform.
           </motion.p>
           
           <motion.div 
@@ -746,24 +791,24 @@ export default function FeaturesPage() {
           <h2 className="text-3xl font-bold text-center mb-12">Why Professionals Choose Vibelux</h2>
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-5xl font-bold text-purple-400 mb-4">40%</div>
-              <h3 className="text-xl font-semibold mb-2">Insurance Savings</h3>
-              <p className="text-gray-400">Group buying power reduces premiums dramatically</p>
+              <div className="text-5xl font-bold text-purple-400 mb-4">25+</div>
+              <h3 className="text-xl font-semibold mb-2">Pro Calculators</h3>
+              <p className="text-gray-400">Environmental, financial, electrical, and crop-specific tools</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-purple-400 mb-4">24hr</div>
-              <h3 className="text-xl font-semibold mb-2">Claim Payouts</h3>
-              <p className="text-gray-400">Parametric insurance pays within 24 hours</p>
+              <div className="text-5xl font-bold text-purple-400 mb-4">6</div>
+              <h3 className="text-xl font-semibold mb-2">Tomato Tools</h3>
+              <p className="text-gray-400">Advanced Dutch Research cultivation protocols</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-purple-400 mb-4">92%</div>
-              <h3 className="text-xl font-semibold mb-2">Risk Prediction</h3>
-              <p className="text-gray-400">AI prevents failures before they happen</p>
+              <div className="text-5xl font-bold text-purple-400 mb-4">130M+</div>
+              <h3 className="text-xl font-semibold mb-2">Research Papers</h3>
+              <p className="text-gray-400">Research-backed recommendations and protocols</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-purple-400 mb-4">342%</div>
-              <h3 className="text-xl font-semibold mb-2">Insurance ROI</h3>
-              <p className="text-gray-400">Risk mitigation value proven</p>
+              <div className="text-5xl font-bold text-purple-400 mb-4">18</div>
+              <h3 className="text-xl font-semibold mb-2">Feature Categories</h3>
+              <p className="text-gray-400">Complete platform for professional operations</p>
             </div>
           </div>
         </div>
@@ -772,16 +817,17 @@ export default function FeaturesPage() {
       {/* CTA Section */}
       <div className="bg-gradient-to-br from-purple-900/20 to-gray-950 py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold mb-6">The Future of Grow Monitoring & Risk Reduction</h2>
+          <h2 className="text-4xl font-bold mb-6">Ready to Optimize Your Entire Operation?</h2>
           <p className="text-xl text-gray-300 mb-8">
-            Coming soon: Insurance partnerships to help reduce your premiums
+            Join professional growers using Vibelux for crop optimization, energy management, 
+            equipment investment, and comprehensive facility intelligence.
           </p>
           <div className="flex justify-center gap-4">
             <Link
-              href="/design"
+              href="/calculators"
               className="px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105"
             >
-              Start Free Trial
+              Try Calculators Free
             </Link>
             <Link
               href="/pricing"

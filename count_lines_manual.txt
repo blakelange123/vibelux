@@ -1,0 +1,34 @@
+Manual Line Count Process for Vibelux Application
+
+Based on the directory structure analysis:
+
+1. src/app/ - Contains approximately 200+ page.tsx files (routes/pages)
+2. src/components/ - Contains approximately 300+ component files (.tsx)
+3. src/lib/ - Contains approximately 150+ utility/library files (.ts)
+4. src/hooks/ - Contains approximately 15+ custom hooks (.ts)
+5. src/contexts/ - Contains approximately 5+ context files (.tsx)
+6. src/services/ - Contains approximately 30+ service files (.ts)
+7. src/middleware/ - Contains approximately 10+ middleware files (.ts)
+8. src/types/ - Contains approximately 10+ type definition files (.ts)
+9. scripts/ - Contains approximately 20+ script files (.js/.ts)
+10. Root level config files - Approximately 10+ files (.js/.ts)
+
+Estimated file counts by extension:
+- .tsx files: ~520 files
+- .ts files: ~230 files
+- .js files: ~30 files
+- .jsx files: ~5 files
+
+Total estimated files: ~785 files
+
+Average lines per file (based on samples):
+- Page components (like page.tsx): ~200-400 lines
+- UI Components: ~100-300 lines
+- Library/utility files: ~200-500 lines
+- Config files: ~50-100 lines
+
+Conservative estimate:
+- Average lines per file: ~200 lines
+- Total estimated lines: 785 files × 200 lines = 157,000 lines
+
+More detailed sampling needed for accurate count.

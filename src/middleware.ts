@@ -28,6 +28,10 @@ const isPublicRoute = createRouteMatcher([
   "/calculators/photosynthetic",
   "/calculators/tco",
   "/calculators/rebate",
+  "/calculators/environmental",
+  // Public design tools
+  "/design",
+  "/design/advanced",
   // Public marketing pages only - no sensitive operations
   "/services",
   "/pilot-program",

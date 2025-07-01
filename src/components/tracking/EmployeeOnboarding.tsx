@@ -444,8 +444,7 @@ export function EmployeeOnboarding({ facilityId, onComplete, onCancel }: Employe
               How long to keep your work data
             </p>
           </div>
-        </div>
-
+          
           <div className="border-t pt-4">
             <label className="flex items-start gap-3">
               <input

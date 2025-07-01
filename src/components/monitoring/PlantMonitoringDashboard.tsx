@@ -66,6 +66,22 @@ interface PlantHealth {
   issues: string[];
   growthRate: number;
   estimatedHarvest: Date;
+  // Advanced stress detection
+  stressLevel: number;
+  nutrientDeficiencies?: {
+    nitrogen?: number;
+    phosphorus?: number;
+    potassium?: number;
+    calcium?: number;
+    magnesium?: number;
+  };
+  diseaseRisk: number;
+  waterStress: number;
+  lightStress: number;
+  // Photosynthesis metrics
+  photosynthesisRate: number;
+  lightUseEfficiency: number;
+  waterUseEfficiency: number;
 }
 
 export function PlantMonitoringDashboard() {
@@ -126,28 +142,70 @@ export function PlantMonitoringDashboard() {
       }
     ]);
 
-    // Mock plant health data
+    // Mock plant health data with advanced metrics
     setPlantHealth([
       {
         zone: 'flower-a',
         healthScore: 92,
         issues: [],
         growthRate: 1.2,
-        estimatedHarvest: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+        estimatedHarvest: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+        stressLevel: 8,
+        nutrientDeficiencies: {
+          nitrogen: 0,
+          phosphorus: 0,
+          potassium: 5,
+          calcium: 0,
+          magnesium: 3
+        },
+        diseaseRisk: 12,
+        waterStress: 5,
+        lightStress: 0,
+        photosynthesisRate: 28.5,
+        lightUseEfficiency: 0.045,
+        waterUseEfficiency: 4.2
       },
       {
         zone: 'veg-1',
         healthScore: 85,
         issues: ['Minor nutrient deficiency detected'],
         growthRate: 0.9,
-        estimatedHarvest: new Date(Date.now() + 35 * 24 * 60 * 60 * 1000)
+        estimatedHarvest: new Date(Date.now() + 35 * 24 * 60 * 60 * 1000),
+        stressLevel: 15,
+        nutrientDeficiencies: {
+          nitrogen: 15,
+          phosphorus: 8,
+          potassium: 0,
+          calcium: 5,
+          magnesium: 12
+        },
+        diseaseRisk: 18,
+        waterStress: 8,
+        lightStress: 12,
+        photosynthesisRate: 22.3,
+        lightUseEfficiency: 0.038,
+        waterUseEfficiency: 3.5
       },
       {
         zone: 'clone',
         healthScore: 78,
         issues: ['High humidity warning', 'Slow root development'],
         growthRate: 0.7,
-        estimatedHarvest: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000)
+        estimatedHarvest: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
+        stressLevel: 22,
+        nutrientDeficiencies: {
+          nitrogen: 5,
+          phosphorus: 0,
+          potassium: 8,
+          calcium: 18,
+          magnesium: 10
+        },
+        diseaseRisk: 35,
+        waterStress: 20,
+        lightStress: 5,
+        photosynthesisRate: 15.8,
+        lightUseEfficiency: 0.032,
+        waterUseEfficiency: 2.8
       }
     ]);
 
@@ -386,10 +444,44 @@ export function PlantMonitoringDashboard() {
                       </span>
                     </div>
                     <div className="flex justify-between">
+                      <span className="text-gray-400">Stress Level</span>
+                      <span className={health.stressLevel < 10 ? 'text-green-400' : health.stressLevel < 20 ? 'text-yellow-400' : 'text-red-400'}>
+                        {health.stressLevel}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Photosynthesis</span>
+                      <span className="text-green-400">
+                        {health.photosynthesisRate.toFixed(1)} μmol/m²/s
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Disease Risk</span>
+                      <span className={health.diseaseRisk < 20 ? 'text-green-400' : health.diseaseRisk < 40 ? 'text-yellow-400' : 'text-red-400'}>
+                        {health.diseaseRisk}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
                       <span className="text-gray-400">Est. Harvest</span>
                       <span>{health.estimatedHarvest.toLocaleDateString()}</span>
                     </div>
                   </div>
+                  
+                  {/* Nutrient deficiencies indicator */}
+                  {health.nutrientDeficiencies && Object.entries(health.nutrientDeficiencies).some(([_, value]) => value > 10) && (
+                    <div className="mt-3 pt-3 border-t border-gray-800">
+                      <p className="text-xs text-gray-400 mb-2">Nutrient Status</p>
+                      <div className="flex gap-2 flex-wrap">
+                        {Object.entries(health.nutrientDeficiencies).map(([nutrient, level]) => (
+                          level > 10 && (
+                            <span key={nutrient} className="text-xs px-2 py-1 rounded bg-yellow-900/50 text-yellow-400">
+                              {nutrient.charAt(0).toUpperCase()} -{level}%
+                            </span>
+                          )
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
           </div>

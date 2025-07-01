@@ -24,13 +24,37 @@ export function CO2SystemPanel({ isOpen = true, onClose }: CO2SystemPanelProps) 
   const [preferNoHeat, setPreferNoHeat] = useState(false);
   const [showSpecSheet, setShowSpecSheet] = useState(false);
   const [specSheetProduct, setSpecSheetProduct] = useState<CO2System | null>(null);
+  
+  // Advanced CO2 enrichment settings
+  const [enrichmentMode, setEnrichmentMode] = useState<'standard' | 'null-balance'>('standard');
+  const [plantUptakeRate, setPlantUptakeRate] = useState(0.5); // g/m²/hr
+  const [ventilationRate, setVentilationRate] = useState(0.1); // air changes per hour
 
-  // Calculate room requirements
+  // Calculate room requirements with null-balance methodology
   const roomRequirements = useMemo(() => {
     if (!state.room) return null;
     const roomVolume = state.room.width * state.room.length * state.room.height;
-    return calculateCO2Requirement(roomVolume, targetPPM);
-  }, [state.room, targetPPM]);
+    const basicRequirement = calculateCO2Requirement(roomVolume, targetPPM);
+    
+    if (enrichmentMode === 'null-balance') {
+      // Null-balance CO2 calculation for maximum yield
+      const roomAreaM2 = (state.room.width * state.room.length) * 0.0929; // ft² to m²
+      const plantUptake = plantUptakeRate * roomAreaM2; // g/hr
+      const ventilationLoss = (ventilationRate * roomVolume * 0.0283168 * 1.8) / 1000; // kg/hr
+      const totalDemand = (plantUptake / 1000) + ventilationLoss; // kg/hr
+      const co2FlowRate = totalDemand * 548.8; // Convert kg/hr to ft³/hr
+      
+      return {
+        ...basicRequirement,
+        nullBalanceRate: co2FlowRate,
+        plantUptake: plantUptake,
+        ventilationLoss: ventilationLoss * 1000,
+        yieldIncrease: Math.min((targetPPM - 400) / 400 * 30, 30) // Up to 30% yield increase
+      };
+    }
+    
+    return basicRequirement;
+  }, [state.room, targetPPM, enrichmentMode, plantUptakeRate, ventilationRate]);
 
   // Get recommendations
   const recommendations = useMemo(() => {
@@ -160,6 +184,26 @@ export function CO2SystemPanel({ isOpen = true, onClose }: CO2SystemPanelProps) 
                     <span className="text-gray-400">Maintenance Rate:</span>
                     <span className="text-green-400">{roomRequirements.maintenanceRate.toFixed(1)} ft³/hr</span>
                   </div>
+                  
+                  {enrichmentMode === 'null-balance' && roomRequirements.nullBalanceRate && (
+                    <>
+                      <div className="mt-2 pt-2 border-t border-gray-700">
+                        <div className="text-yellow-400 text-xs mb-1">Null-Balance Enrichment</div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Optimal Flow:</span>
+                          <span className="text-yellow-400">{roomRequirements.nullBalanceRate.toFixed(1)} ft³/hr</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Plant Uptake:</span>
+                          <span className="text-white">{roomRequirements.plantUptake.toFixed(1)} g/hr</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Yield Increase:</span>
+                          <span className="text-green-400">+{roomRequirements.yieldIncrease.toFixed(0)}%</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
 
@@ -182,6 +226,47 @@ export function CO2SystemPanel({ isOpen = true, onClose }: CO2SystemPanelProps) 
                   />
                   <span className="text-gray-300">Avoid heat/humidity</span>
                 </label>
+                
+                <div className="pt-2">
+                  <label className="text-xs text-gray-400">Enrichment Mode:</label>
+                  <select
+                    value={enrichmentMode}
+                    onChange={(e) => setEnrichmentMode(e.target.value as 'standard' | 'null-balance')}
+                    className="w-full mt-1 bg-gray-800 text-white text-xs px-2 py-1 rounded"
+                  >
+                    <option value="standard">Standard (Basic)</option>
+                    <option value="null-balance">Null-Balance (Max Yield)</option>
+                  </select>
+                </div>
+                
+                {enrichmentMode === 'null-balance' && (
+                  <div className="space-y-1 pt-1">
+                    <div>
+                      <label className="text-xs text-gray-400">Plant Uptake (g/m²/hr):</label>
+                      <input
+                        type="number"
+                        value={plantUptakeRate}
+                        onChange={(e) => setPlantUptakeRate(Number(e.target.value))}
+                        className="w-full mt-0.5 bg-gray-800 text-white text-xs px-2 py-1 rounded"
+                        min="0.1"
+                        max="2.0"
+                        step="0.1"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-400">Air Changes/hr:</label>
+                      <input
+                        type="number"
+                        value={ventilationRate}
+                        onChange={(e) => setVentilationRate(Number(e.target.value))}
+                        className="w-full mt-0.5 bg-gray-800 text-white text-xs px-2 py-1 rounded"
+                        min="0.05"
+                        max="1.0"
+                        step="0.05"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {recommendations && (

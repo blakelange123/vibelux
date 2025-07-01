@@ -7,7 +7,7 @@ import {
   Check, X, Sparkles, Home, Flower2, Briefcase, Zap, Microscope, 
   Building, Rocket, Globe, Crown, Users, GraduationCap, Beaker, 
   Shield, Wrench, ChevronDown, ChevronUp, ArrowRight, Info,
-  Star, TrendingUp, Award, Percent, ShoppingCart, Brain, Camera
+  Star, TrendingUp, Award, Percent, ShoppingCart, Brain, Camera, Network, Layers, CircuitBoard
 } from 'lucide-react';
 import { SAFE_SUBSCRIPTION_TIERS, SAFE_FEATURE_CATEGORIES } from '@/lib/subscription-tiers-safe';
 import PricingNavigation from '@/components/PricingNavigation';
