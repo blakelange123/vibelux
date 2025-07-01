@@ -22,7 +22,7 @@ export async function validateApiKey(
   req: NextRequest,
   requiredPermission?: string
 ): Promise<AuthContext | NextResponse> {
-  const headersList = headers();
+  const headersList = await headers();
   const apiKey = headersList.get('x-api-key');
 
   if (!apiKey) {

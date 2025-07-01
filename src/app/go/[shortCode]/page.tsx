@@ -25,7 +25,7 @@ export default async function AffiliateRedirect({
   
   try {
     // Get request information
-    const headersList = headers()
+    const headersList = await headers()
     const userAgent = headersList.get('user-agent') || ''
     const referrer = headersList.get('referer') || undefined
     const forwarded = headersList.get('x-forwarded-for')
@@ -50,7 +50,7 @@ export default async function AffiliateRedirect({
     })
 
     // Set affiliate tracking cookie
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     cookieStore.set('vbl_aff', JSON.stringify(clickResult.cookieData), {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       httpOnly: true,

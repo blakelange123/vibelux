@@ -68,7 +68,7 @@ export interface RateLimitResult {
 
 // Get client identifier (IP + user agent fingerprint)
 export async function getClientIdentifier(req: NextRequest): Promise<string> {
-  const headersList = headers()
+  const headersList = await headers()
   const forwarded = headersList.get('x-forwarded-for')
   const ip = forwarded ? forwarded.split(',')[0] : headersList.get('x-real-ip') || 'unknown'
   const userAgent = headersList.get('user-agent') || 'unknown'
@@ -209,7 +209,7 @@ export async function checkAIRateLimit(
 
 // DDoS detection
 export async function checkDDoSPattern(req: NextRequest): Promise<boolean> {
-  const headersList = headers()
+  const headersList = await headers()
   const forwarded = headersList.get('x-forwarded-for')
   const ip = forwarded ? forwarded.split(',')[0] : headersList.get('x-real-ip') || 'unknown'
   const now = Date.now()
@@ -247,7 +247,7 @@ export async function checkDDoSPattern(req: NextRequest): Promise<boolean> {
 
 // Check for suspicious request patterns
 async function checkSuspiciousPatterns(req: NextRequest): Promise<{ score: number; reasons: string[] }> {
-  const headersList = headers()
+  const headersList = await headers()
   let score = 0
   const reasons: string[] = []
   

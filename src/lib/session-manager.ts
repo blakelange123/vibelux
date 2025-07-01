@@ -40,7 +40,7 @@ export class SessionManager {
    * Create device fingerprint from request data
    */
   async createDeviceFingerprint(req: Request): Promise<string> {
-    const headersList = headers();
+    const headersList = await headers();
     const userAgent = headersList.get('user-agent') || 'unknown';
     const acceptLanguage = headersList.get('accept-language') || 'unknown';
     const acceptEncoding = headersList.get('accept-encoding') || 'unknown';
@@ -56,7 +56,7 @@ export class SessionManager {
    * Get client IP address
    */
   async getClientIP(): Promise<string> {
-    const headersList = headers();
+    const headersList = await headers();
     const forwardedFor = headersList.get('x-forwarded-for');
     const realIP = headersList.get('x-real-ip');
     
