@@ -89,7 +89,6 @@
     "@visx/heatmap": "^3.12.0",
     "@visx/pattern": "^3.12.0",
     "@visx/visx": "^3.12.0",
-    "autoprefixer": "^10.4.21",
     "axios": "^1.10.0",
     "bcryptjs": "^3.0.2",
     "brain.js": "^2.0.0-beta.24",
@@ -150,7 +149,6 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.8",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",
@@ -165,6 +163,7 @@
     "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-dom": "^18.3.7",
     "@types/three": "^0.177.0",
+    "autoprefixer": "^10.4.21",
     "babel-jest": "^29.7.0",
     "eslint": "^9.30.0",
     "eslint-config-next": "^15.3.4",
@@ -172,7 +171,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "node-mocks-http": "^1.15.1",
     "postcss": "^8.5.6",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.1.11",
     "typescript": "^5"
   }
 }
