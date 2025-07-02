@@ -4,11 +4,11 @@ Go to: https://vercel.com/blakelange123/vibelux-app/settings/environment-variabl
 
 Copy and paste each line below as separate environment variables:
 
-## 🔴 DATABASE & CACHE (You need to get these):
+## 🔴 DATABASE & CACHE:
 
 ```
-DATABASE_URL=[PASTE_YOUR_NEON_DATABASE_URL_HERE]
-REDIS_URL=[PASTE_YOUR_UPSTASH_REDIS_URL_HERE]
+DATABASE_URL=postgres://neondb_owner:npg_q9kupLF1BIzE@ep-muddy-brook-ade61hva-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require
+REDIS_URL=rediss://default:AarDAAIjcDFmNTRlYmMyNTciNjk0ZDc3YWI2YTRlMWFlZmIzYWJkMHAxMA@witty-cow-43715.upstash.io:6379
 ```
 
 ## 🔴 SECURITY KEYS (Copy exactly as shown):
