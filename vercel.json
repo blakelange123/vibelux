@@ -10,22 +10,6 @@
   },
   "build": {
     "env": {
-      "DATABASE_URL": "@database_url",
-      "SUPABASE_URL": "@supabase_url",
-      "SUPABASE_ANON_KEY": "@supabase_anon_key",
-      "CLERK_SECRET_KEY": "@clerk_secret_key",
-      "JWT_SECRET": "@jwt_secret",
-      "ENCRYPTION_KEY": "@encryption_key",
-      "STRIPE_SECRET_KEY": "@stripe_secret_key",
-      "STRIPE_WEBHOOK_SECRET": "@stripe_webhook_secret",
-      "OPENWEATHER_API_KEY": "@openweather_api_key",
-      "OPENAI_API_KEY": "@openai_api_key",
-      "CLAUDE_API_KEY": "@claude_api_key",
-      "REDIS_URL": "@redis_url",
-      "AWS_ACCESS_KEY_ID": "@aws_access_key_id",
-      "AWS_SECRET_ACCESS_KEY": "@aws_secret_access_key",
-      "AWS_S3_BUCKET": "@aws_s3_bucket",
-      "SENDGRID_API_KEY": "@sendgrid_api_key",
       "NEXT_TELEMETRY_DISABLED": "1"
     }
   },
