@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, useCallback, Suspense } from 'react
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Grid, Box as ThreeBox, Text, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
+import { FixtureLibrary, type FixtureModel } from '../FixtureLibrary';
 import {
   Grid3x3,
   Move3d,
@@ -306,13 +307,7 @@ export function ProfessionalCADDesigner() {
     { id: 'pan', icon: Hand, label: 'Pan', shortcut: 'Space' }
   ];
 
-  const fixtureLibrary = [
-    { id: 'led-panel', name: 'LED Panel', type: 'lighting', wattage: 650, ppfd: 850, coverage: '4x4' },
-    { id: 'led-bar', name: 'LED Bar', type: 'lighting', wattage: 320, ppfd: 450, coverage: '2x4' },
-    { id: 'cmh-fixture', name: 'CMH Fixture', type: 'lighting', wattage: 315, ppfd: 400, coverage: '3x3' },
-    { id: 'hps-fixture', name: 'HPS Fixture', type: 'lighting', wattage: 1000, ppfd: 500, coverage: '4x4' },
-    { id: 'uv-supplement', name: 'UV Supplement', type: 'lighting', wattage: 25, ppfd: 50, coverage: '2x2' }
-  ];
+  const [selectedFixture, setSelectedFixture] = useState<FixtureModel | null>(null);
 
   const equipmentLibrary = [
     { id: 'hvac-unit', name: 'HVAC Unit', type: 'climate', capacity: '5 ton', dimensions: '48x24x36' },
@@ -478,7 +473,32 @@ export function ProfessionalCADDesigner() {
     }
   };
 
-  const addCADObject = (type: string, name: string) => {
+  const addCADObject = (type: string, name: string, fixture?: FixtureModel) => {
+    let dimensions = { length: 2, width: 2, height: 2.5 };
+    let properties: Record<string, any> = {};
+    
+    if (fixture) {
+      // Use fixture data to set realistic dimensions and properties
+      const fixtureWidth = fixture.dlcData?.width ? fixture.dlcData.width / 12 : 2; // Convert inches to feet
+      const fixtureLength = fixture.dlcData?.length ? fixture.dlcData.length / 12 : 4;
+      const fixtureHeight = fixture.dlcData?.height ? fixture.dlcData.height / 12 : 0.25;
+      
+      dimensions = {
+        length: fixtureLength,
+        width: fixtureWidth,
+        height: fixtureHeight
+      };
+      
+      properties = {
+        fixture: fixture,
+        wattage: fixture.wattage,
+        ppf: fixture.ppf,
+        efficacy: fixture.efficacy,
+        spectrum: fixture.spectrum,
+        dlcQualified: true
+      };
+    }
+    
     const newObject: CADObject = {
       id: `obj-${Date.now()}`,
       type: type as any,
@@ -486,8 +506,8 @@ export function ProfessionalCADDesigner() {
       position: { x: 0, y: 0, z: 0 },
       rotation: { x: 0, y: 0, z: 0 },
       scale: { x: 1, y: 1, z: 1 },
-      dimensions: { length: 2, width: 2, height: 2.5 },
-      properties: {},
+      dimensions,
+      properties,
       visible: true,
       locked: false,
       selected: false,
@@ -504,6 +524,11 @@ export function ProfessionalCADDesigner() {
         ? { ...layer, objects: [...layer.objects, newObject.id] }
         : layer
     ));
+  };
+  
+  const addFixtureFromLibrary = (fixture: FixtureModel) => {
+    addCADObject('fixture', `${fixture.brand} ${fixture.model}`, fixture);
+    setSelectedFixture(fixture);
   };
 
   const selectObject = (objectId: string, multiSelect = false) => {
@@ -744,23 +769,19 @@ export function ProfessionalCADDesigner() {
         {/* Left Sidebar - Object Library */}
         <div className="w-64 bg-gray-900 border-r border-gray-800 p-4 overflow-y-auto">
           <div className="space-y-4">
-            {/* Fixture Library */}
+            {/* DLC Fixture Library */}
             <div>
               <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
                 <Lightbulb className="w-4 h-4" />
-                Fixture Library
+                DLC Fixture Library
               </h3>
-              <div className="space-y-1">
-                {fixtureLibrary.map(fixture => (
-                  <button
-                    key={fixture.id}
-                    onClick={() => addCADObject('fixture', fixture.name)}
-                    className="w-full text-left p-2 text-sm hover:bg-gray-800 rounded border border-gray-700"
-                  >
-                    <div className="font-medium">{fixture.name}</div>
-                    <div className="text-xs text-gray-400">{fixture.wattage}W • {fixture.ppfd} PPFD</div>
-                  </button>
-                ))}
+              <div className="max-h-64 overflow-hidden">
+                <FixtureLibrary 
+                  onSelectFixture={addFixtureFromLibrary}
+                  selectedFixtureId={selectedFixture?.id}
+                  showDetails={false}
+                  customFilter={(fixtures) => fixtures.slice(0, 20)} // Show top 20 efficient fixtures
+                />
               </div>
             </div>
 
@@ -1071,21 +1092,43 @@ export function ProfessionalCADDesigner() {
                         </div>
                       </div>
                       
-                      {obj.type === 'fixture' && (
+                      {obj.type === 'fixture' && obj.properties?.fixture && (
                         <div className="border-t border-gray-800 pt-3">
-                          <h4 className="text-xs font-semibold text-gray-400 mb-2">Lighting Properties</h4>
+                          <h4 className="text-xs font-semibold text-gray-400 mb-2">DLC Fixture Properties</h4>
                           <div className="space-y-2 text-xs">
                             <div className="flex justify-between">
-                              <span>PPFD Output:</span>
-                              <span>850 μmol/m²/s</span>
+                              <span>Brand:</span>
+                              <span>{obj.properties.fixture.brand}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Model:</span>
+                              <span>{obj.properties.fixture.model}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>PPF Output:</span>
+                              <span>{obj.properties.fixture.ppf} μmol/s</span>
                             </div>
                             <div className="flex justify-between">
                               <span>Power Draw:</span>
-                              <span>650W</span>
+                              <span>{obj.properties.fixture.wattage}W</span>
                             </div>
                             <div className="flex justify-between">
-                              <span>Efficiency:</span>
-                              <span>2.7 μmol/J</span>
+                              <span>Efficacy:</span>
+                              <span>{obj.properties.fixture.efficacy.toFixed(1)} μmol/J</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Spectrum:</span>
+                              <span>{obj.properties.fixture.spectrum}</span>
+                            </div>
+                            {obj.properties.fixture.voltage && (
+                              <div className="flex justify-between">
+                                <span>Voltage:</span>
+                                <span>{obj.properties.fixture.voltage}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between">
+                              <span>DLC Qualified:</span>
+                              <span className="text-green-400">✓ Yes</span>
                             </div>
                           </div>
                         </div>

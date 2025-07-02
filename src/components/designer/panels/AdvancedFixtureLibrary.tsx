@@ -270,6 +270,11 @@ export function AdvancedFixtureLibrary() {
 
   const handlePlaceFixture = () => {
     if (!selectedFixture) return;
+    
+    console.log('Place fixture button clicked!', {
+      selectedFixture,
+      currentTool: state.ui.selectedTool
+    });
 
     // Set tool to placement mode so user can click to place
     dispatch({ type: 'SET_TOOL', payload: 'place' });

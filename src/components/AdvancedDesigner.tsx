@@ -106,13 +106,13 @@ export function AdvancedDesigner() {
   const [showModeDetails, setShowModeDetails] = useState<string | null>(null);
 
   // If CAD mode is selected, show the Professional CAD Designer
-  if (selectedMode === 'cad') {
+  if (selectedMode === 'cad' || selectedMode === null) {
     return (
       <div className="min-h-screen bg-gray-950">
         <div className="bg-gray-900 border-b border-gray-800 p-4">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setSelectedMode(null)}
+              onClick={() => setSelectedMode('menu')}
               className="flex items-center gap-2 px-3 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -121,6 +121,9 @@ export function AdvancedDesigner() {
             <div className="flex items-center gap-2 text-white">
               <Box className="w-5 h-5 text-blue-400" />
               <span className="font-semibold">Professional CAD Designer</span>
+            </div>
+            <div className="px-3 py-1 bg-green-600/20 text-green-400 rounded-full text-xs font-semibold">
+              DLC Fixtures Loaded
             </div>
           </div>
         </div>
@@ -153,17 +156,19 @@ export function AdvancedDesigner() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      {/* Header */}
-      <div className="bg-gray-900 border-b border-gray-800 p-6">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2">Advanced Design Studio</h1>
-          <p className="text-gray-400">
-            Professional-grade tools for designing, optimizing, and managing cultivation facilities
-          </p>
+  // Show menu selection only when explicitly requested
+  if (selectedMode === 'menu') {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white">
+        {/* Header */}
+        <div className="bg-gray-900 border-b border-gray-800 p-6">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-3xl font-bold mb-2">Advanced Design Studio</h1>
+            <p className="text-gray-400">
+              Professional-grade tools for designing, optimizing, and managing cultivation facilities
+            </p>
+          </div>
         </div>
-      </div>
 
       {/* Designer Mode Selection */}
       <div className="max-w-7xl mx-auto p-6">
@@ -281,6 +286,32 @@ export function AdvancedDesigner() {
           </div>
         </div>
       </div>
+    </div>
+    );
+  }
+  
+  // Default to CAD Designer
+  return (
+    <div className="min-h-screen bg-gray-950">
+      <div className="bg-gray-900 border-b border-gray-800 p-4">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setSelectedMode('menu')}
+            className="flex items-center gap-2 px-3 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Designer Selection
+          </button>
+          <div className="flex items-center gap-2 text-white">
+            <Box className="w-5 h-5 text-blue-400" />
+            <span className="font-semibold">Professional CAD Designer</span>
+          </div>
+          <div className="px-3 py-1 bg-green-600/20 text-green-400 rounded-full text-xs font-semibold">
+            DLC Fixtures Ready
+          </div>
+        </div>
+      </div>
+      <ProfessionalCADDesigner />
     </div>
   );
 }

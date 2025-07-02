@@ -15,7 +15,7 @@ export async function GET() {
     }
 
     // Get user's subscription from database
-    const user = await db.users.findUnique(userId);
+    const user = await db.users.findByClerkId(userId);
     
     // Get usage records for current month
     const now = new Date();

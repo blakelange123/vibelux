@@ -1913,6 +1913,12 @@ export function SimpleCanvas2D() {
 
   // Handle canvas click (for placing fixtures and fans)
   const handleCanvasClick = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
+    console.log('Canvas clicked!', {
+      hasRoom: !!room,
+      hasCanvas: !!canvasRef.current,
+      selectedTool: ui.selectedTool,
+      selectedFixture: ui.selectedFixtureModel
+    });
     
     if (!room || !canvasRef.current || ui.selectedTool !== 'place') {
       return;
@@ -1946,6 +1952,7 @@ export function SimpleCanvas2D() {
     }
     
     const selectedFixture = ui.selectedFixtureModel;
+    console.log('About to place fixture:', selectedFixture);
     if (!selectedFixture) {
       showNotification('error', 'Please select a fixture or fan first');
       return;
@@ -2019,8 +2026,10 @@ export function SimpleCanvas2D() {
         dimmingLevel: 100
       };
       
+      console.log('Adding fixture object:', fixture);
       addObject(fixture);
       showNotification('success', `Placed ${selectedFixture.brand} ${selectedFixture.model}`);
+      console.log('Fixture placed successfully');
     }
     
     dispatch({ type: 'SET_TOOL', payload: 'select' });
@@ -2871,6 +2880,21 @@ export function SimpleCanvas2D() {
         isOpen={showPropertiesPanel}
         onClose={() => setShowPropertiesPanel(false)}
       />
+      
+      {/* Debug Info */}
+      <div className="absolute bottom-4 left-4 bg-gray-900/90 backdrop-blur p-2 rounded-lg text-xs text-gray-300 font-mono">
+        <div>Tool: {ui.selectedTool}</div>
+        <div>Fixture: {ui.selectedFixtureModel ? `${ui.selectedFixtureModel.brand} ${ui.selectedFixtureModel.model}` : 'None'}</div>
+        <div>Objects: {objects.length}</div>
+      </div>
+      
+      {/* Place Mode Indicator */}
+      {ui.selectedTool === 'place' && ui.selectedFixtureModel && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 z-50">
+          <span className="text-lg">➕</span>
+          <span>Click to place: {ui.selectedFixtureModel.brand} {ui.selectedFixtureModel.model}</span>
+        </div>
+      )}
     </div>
   );
 }

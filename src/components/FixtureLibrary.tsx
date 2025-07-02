@@ -1,24 +1,8 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { 
-  Search, 
-  Filter, 
-  ChevronRight, 
-  FileText, 
-  Download, 
-  X, 
-  SlidersHorizontal,
-  Grid3X3,
-  List,
-  RotateCcw,
-  ChevronDown,
-  ChevronUp,
-  Star,
-  Zap,
-  DollarSign,
-  Target
-} from 'lucide-react'
+import { Search, Filter, ChevronRight, FileText, Download } from 'lucide-react'
+import { dlcFixturesParser } from '@/lib/dlc-fixtures-parser'
 import type { ParsedIESFile } from '@/lib/ies-parser'
 import type { IESPhotometry } from '@/lib/ies-generator'
 
@@ -43,7 +27,6 @@ export interface FixtureModel {
   voltage?: string
   dimmable?: boolean
   warranty?: number
-  cct?: number // Correlated Color Temperature in Kelvin
   customIES?: {
     parsedData: ParsedIESFile
     photometry: IESPhotometry
@@ -51,665 +34,572 @@ export interface FixtureModel {
   dlcData?: any // DLC specific data
 }
 
-interface FilterOptions {
-  wattageRange: [number, number]
-  ppfRange: [number, number]
-  efficacyRange: [number, number]
-  priceRange: [number, number]
-  dimmable: 'all' | 'yes' | 'no'
-  voltage: string[]
-  spectrumTypes: string[]
-}
-
-interface SortOption {
-  key: keyof FixtureModel
-  label: string
-  direction: 'asc' | 'desc'
-}
+const fixtureDatabase: FixtureModel[] = [
+  {
+    id: 'fl-001',
+    brand: 'Fluence',
+    model: 'SPYDR 2p',
+    category: 'LED Bar',
+    wattage: 645,
+    ppf: 1700,
+    efficacy: 2.6,
+    spectrum: 'Full Spectrum',
+    spectrumData: {
+      blue: 18,
+      green: 8,
+      red: 68,
+      farRed: 6
+    },
+    coverage: 16
+  },
+  {
+    id: 'fl-002',
+    brand: 'Gavita',
+    model: 'Pro 1700e LED',
+    category: 'LED Panel',
+    wattage: 645,
+    ppf: 1700,
+    efficacy: 2.6,
+    spectrum: 'Full Spectrum',
+    spectrumData: {
+      blue: 20,
+      green: 10,
+      red: 65,
+      farRed: 5
+    },
+    coverage: 20
+  },
+  {
+    id: 'fl-003',
+    brand: 'California Lightworks',
+    model: 'MegaDrive 1000',
+    category: 'LED Panel',
+    wattage: 1000,
+    ppf: 2200,
+    efficacy: 2.2,
+    spectrum: 'Variable Spectrum',
+    spectrumData: {
+      blue: 22,
+      green: 12,
+      red: 60,
+      farRed: 6
+    },
+    coverage: 25
+  },
+  {
+    id: 'fl-004',
+    brand: 'Black Dog',
+    model: 'PhytoMAX-2 1000',
+    category: 'LED Panel',
+    wattage: 1050,
+    ppf: 2150,
+    efficacy: 2.05,
+    spectrum: 'Full Spectrum',
+    spectrumData: {
+      blue: 25,
+      green: 15,
+      red: 55,
+      farRed: 5
+    },
+    coverage: 25
+  },
+  {
+    id: 'fl-005',
+    brand: 'ChilLED',
+    model: 'X6 600W',
+    category: 'LED Bar',
+    wattage: 600,
+    ppf: 1620,
+    efficacy: 2.7,
+    spectrum: 'Full Spectrum',
+    spectrumData: {
+      blue: 19,
+      green: 9,
+      red: 67,
+      farRed: 5
+    },
+    coverage: 16
+  },
+  {
+    id: 'fl-006',
+    brand: 'Mars Hydro',
+    model: 'FC-E6500',
+    category: 'LED Bar',
+    wattage: 650,
+    ppf: 1711,
+    efficacy: 2.6,
+    spectrum: 'Full Spectrum',
+    spectrumData: {
+      blue: 17,
+      green: 7,
+      red: 70,
+      farRed: 6
+    },
+    coverage: 20
+  },
+  {
+    id: 'fl-007',
+    brand: 'Spider Farmer',
+    model: 'SF7000',
+    category: 'LED Bar',
+    wattage: 650,
+    ppf: 1676,
+    efficacy: 2.58,
+    spectrum: 'Full Spectrum',
+    spectrumData: {
+      blue: 21,
+      green: 11,
+      red: 63,
+      farRed: 5
+    },
+    coverage: 20
+  },
+  {
+    id: 'fl-008',
+    brand: 'Growers Choice',
+    model: 'ROI-E720',
+    category: 'LED Bar',
+    wattage: 720,
+    ppf: 1944,
+    efficacy: 2.7,
+    spectrum: 'Full Spectrum',
+    spectrumData: {
+      blue: 18,
+      green: 8,
+      red: 69,
+      farRed: 5
+    },
+    coverage: 20
+  },
+  {
+    id: 'fl-009',
+    brand: 'Signify',
+    model: 'GreenPower LED TL',
+    category: 'LED Bar',
+    wattage: 320,
+    ppf: 850,
+    efficacy: 2.65,
+    spectrum: 'Red/Blue',
+    spectrumData: {
+      blue: 15,
+      green: 5,
+      red: 75,
+      farRed: 5
+    },
+    coverage: 12
+  },
+  {
+    id: 'fl-010',
+    brand: 'Heliospectra',
+    model: 'MITRA X60',
+    category: 'LED Panel',
+    wattage: 600,
+    ppf: 1550,
+    efficacy: 2.58,
+    spectrum: 'Adjustable',
+    spectrumData: {
+      blue: 20,
+      green: 10,
+      red: 65,
+      farRed: 5
+    },
+    coverage: 16
+  },
+  {
+    id: 'fl-011',
+    brand: 'Lumigrow',
+    model: 'TopLight 634',
+    category: 'LED Panel',
+    wattage: 634,
+    ppf: 1650,
+    efficacy: 2.6,
+    spectrum: 'Full Spectrum',
+    spectrumData: {
+      blue: 18,
+      green: 12,
+      red: 64,
+      farRed: 6
+    },
+    coverage: 18
+  },
+  {
+    id: 'fl-012',
+    brand: 'Thrive Agritech',
+    model: 'Pinnacle 1000',
+    category: 'LED Panel',
+    wattage: 1000,
+    ppf: 2750,
+    efficacy: 2.75,
+    spectrum: 'Full Spectrum',
+    spectrumData: {
+      blue: 19,
+      green: 9,
+      red: 66,
+      farRed: 6
+    },
+    coverage: 25
+  },
+  {
+    id: 'fl-013',
+    brand: 'Fohse',
+    model: 'A3i',
+    category: 'LED Panel',
+    wattage: 1500,
+    ppf: 4200,
+    efficacy: 2.8,
+    spectrum: 'Full Spectrum',
+    spectrumData: {
+      blue: 18,
+      green: 8,
+      red: 68,
+      farRed: 6
+    },
+    coverage: 30
+  },
+  {
+    id: 'fl-014',
+    brand: 'TSRgrow',
+    model: 'TOTALgrow TG-1000',
+    category: 'LED Bar',
+    wattage: 320,
+    ppf: 864,
+    efficacy: 2.7,
+    spectrum: 'Broad Spectrum',
+    spectrumData: {
+      blue: 20,
+      green: 15,
+      red: 60,
+      farRed: 5
+    },
+    coverage: 10
+  },
+  {
+    id: 'fl-015',
+    brand: 'P.L. Light Systems',
+    model: 'HortiLED Top 1000',
+    category: 'LED Panel',
+    wattage: 1000,
+    ppf: 2700,
+    efficacy: 2.7,
+    spectrum: 'Broad Spectrum',
+    spectrumData: {
+      blue: 17,
+      green: 10,
+      red: 67,
+      farRed: 6
+    },
+    coverage: 24
+  },
+  {
+    id: 'fl-016',
+    brand: 'Osram',
+    model: 'Zelion HL300',
+    category: 'LED Bar',
+    wattage: 300,
+    ppf: 810,
+    efficacy: 2.7,
+    spectrum: 'Full Spectrum',
+    spectrumData: {
+      blue: 20,
+      green: 8,
+      red: 66,
+      farRed: 6
+    },
+    coverage: 10
+  },
+  {
+    id: 'fl-017',
+    brand: 'Valoya',
+    model: 'RX-GH 500',
+    category: 'LED Panel',
+    wattage: 500,
+    ppf: 1375,
+    efficacy: 2.75,
+    spectrum: 'NS1 Spectrum',
+    spectrumData: {
+      blue: 16,
+      green: 12,
+      red: 65,
+      farRed: 7
+    },
+    coverage: 15
+  },
+  {
+    id: 'fl-018',
+    brand: 'NextLight',
+    model: 'Mega Pro',
+    category: 'LED Panel',
+    wattage: 640,
+    ppf: 1696,
+    efficacy: 2.65,
+    spectrum: 'Full Spectrum',
+    spectrumData: {
+      blue: 19,
+      green: 11,
+      red: 64,
+      farRed: 6
+    },
+    coverage: 20
+  },
+  {
+    id: 'fl-019',
+    brand: 'Illumitex',
+    model: 'PowerHarvest X600',
+    category: 'LED Bar',
+    wattage: 600,
+    ppf: 1620,
+    efficacy: 2.7,
+    spectrum: 'Variable',
+    spectrumData: {
+      blue: 18,
+      green: 10,
+      red: 66,
+      farRed: 6
+    },
+    coverage: 18
+  },
+  {
+    id: 'fl-020',
+    brand: 'Lighting Science',
+    model: 'VividGro V2',
+    category: 'LED Panel',
+    wattage: 200,
+    ppf: 520,
+    efficacy: 2.6,
+    spectrum: 'Balanced',
+    spectrumData: {
+      blue: 22,
+      green: 13,
+      red: 60,
+      farRed: 5
+    },
+    coverage: 6
+  }
+]
 
 interface FixtureLibraryProps {
-  onSelectFixture?: (fixture: FixtureModel) => void
+  onSelectFixture: (fixture: FixtureModel) => void
   selectedFixtureId?: string
-  showDetails?: boolean
-  customFilter?: (fixtures: FixtureModel[]) => FixtureModel[]
+  customFixtures?: FixtureModel[]
 }
 
-export function FixtureLibrary({ 
-  onSelectFixture, 
-  selectedFixtureId,
-  showDetails = true,
-  customFilter
-}: FixtureLibraryProps) {
-  const [fixtures, setFixtures] = useState<FixtureModel[]>([])
-  const [filteredFixtures, setFilteredFixtures] = useState<FixtureModel[]>([])
+export function FixtureLibrary({ onSelectFixture, selectedFixtureId, customFixtures = [] }: FixtureLibraryProps) {
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [showFilters, setShowFilters] = useState(false)
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
-  const [sortBy, setSortBy] = useState<SortOption>({ key: 'efficacy', label: 'Efficacy', direction: 'desc' })
-  
-  // Advanced filter state
-  const [filters, setFilters] = useState<FilterOptions>({
-    wattageRange: [0, 1000],
-    ppfRange: [0, 3000],
-    efficacyRange: [0, 4],
-    priceRange: [0, 5000],
-    dimmable: 'all',
-    voltage: [],
-    spectrumTypes: []
-  })
-  
-  // Calculate filter ranges from fixtures
-  const [filterRanges, setFilterRanges] = useState({
-    wattageRange: [0, 1000],
-    ppfRange: [0, 3000],
-    efficacyRange: [0, 4],
-    priceRange: [0, 5000]
-  })
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [dlcFixtures, setDlcFixtures] = useState<FixtureModel[]>([])
+  const [isLoadingDLC, setIsLoadingDLC] = useState(false)
+  const [dlcLoadError, setDlcLoadError] = useState<string | null>(null)
 
-  // Load DLC fixtures on mount
+  // Load DLC fixtures on mount (only on client side)
   useEffect(() => {
-    const loadDLCFixtures = async () => {
-      try {
-        setIsLoading(true)
-        
-        // Load fixtures from API
-        const response = await fetch('/api/fixtures?limit=1000')
-        const data = await response.json()
-        
-        let loadedFixtures: FixtureModel[] = []
-        
-        if (data.fixtures && data.fixtures.length > 0) {
-          // Convert API fixtures to FixtureModel format
-          loadedFixtures = data.fixtures.map((f: any) => {
-            // Calculate spectrum data
-            const totalFlux = (f.blueFlux || 0) + (f.greenFlux || 0) + 
-                             (f.redFlux || 0) + (f.farRedFlux || 0)
-            
-            let spectrumData = {
-              blue: 20,   // Default values if no spectrum data
-              green: 10,
-              red: 65,
-              farRed: 5
-            }
-            
-            if (totalFlux > 0) {
-              spectrumData = {
-                blue: Math.round(((f.blueFlux || 0) / totalFlux) * 100),
-                green: Math.round(((f.greenFlux || 0) / totalFlux) * 100),
-                red: Math.round(((f.redFlux || 0) / totalFlux) * 100),
-                farRed: Math.round(((f.farRedFlux || 0) / totalFlux) * 100)
-              }
-            }
-            
-            // Categorize spectrum
-            let spectrum = 'Full Spectrum'
-            if (spectrumData.red > 70) spectrum = 'Flowering'
-            else if (spectrumData.blue > 30) spectrum = 'Vegetative'
-            else if (spectrumData.farRed > 5) spectrum = 'Full Spectrum + Far Red'
-            
-            return {
-              id: `dlc-${f.id}`,
-              brand: f.brand || f.manufacturer,
-              model: f.modelNumber,
-              category: f.category || 'DLC Qualified',
-              wattage: f.reportedWattage,
-              ppf: f.reportedPPF,
-              efficacy: f.reportedPPE,
-              spectrum,
-              spectrumData,
-              coverage: Math.round(f.reportedPPF / 125), // Estimate coverage
-              price: undefined, // No price data available
-              voltage: f.minVoltage && f.maxVoltage ? `${f.minVoltage}-${f.maxVoltage}V` : '120-277V',
-              dimmable: f.dimmable,
-              warranty: f.warranty,
-              dlcData: f
-            } as FixtureModel
-          })
-        } else {
-          // Fallback to sample fixtures if API fails
-          loadedFixtures = getSampleFixtures()
-        }
-        
-        setFixtures(loadedFixtures)
-        setFilteredFixtures(loadedFixtures)
-        
-        // Calculate filter ranges based on loaded fixtures
-        const wattages = loadedFixtures.map(f => f.wattage)
-        const ppfs = loadedFixtures.map(f => f.ppf)
-        const efficacies = loadedFixtures.map(f => f.efficacy)
-        const prices = loadedFixtures.map(f => f.price || 0).filter(p => p > 0)
-        
-        const newRanges = {
-          wattageRange: [Math.min(...wattages), Math.max(...wattages)] as [number, number],
-          ppfRange: [Math.min(...ppfs), Math.max(...ppfs)] as [number, number],
-          efficacyRange: [Math.min(...efficacies), Math.max(...efficacies)] as [number, number],
-          priceRange: prices.length > 0 ? [Math.min(...prices), Math.max(...prices)] as [number, number] : [0, 5000] as [number, number]
-        }
-        
-        setFilterRanges(newRanges)
-        setFilters({
-          wattageRange: newRanges.wattageRange,
-          ppfRange: newRanges.ppfRange,
-          efficacyRange: newRanges.efficacyRange,
-          priceRange: newRanges.priceRange,
-          dimmable: 'all',
-          voltage: [],
-          spectrumTypes: []
-        })
-        
-      } catch (err) {
-        console.error('Error loading DLC fixtures:', err)
-        setError('Failed to load DLC fixtures. Using sample data.')
-        // Use sample fixtures as fallback
-        const sampleFixtures = getSampleFixtures()
-        setFixtures(sampleFixtures)
-        setFilteredFixtures(sampleFixtures)
-      } finally {
-        setIsLoading(false)
-      }
+    if (typeof window !== 'undefined') {
+      loadDLCFixtures();
     }
+  }, []);
 
-    loadDLCFixtures()
-  }, [])
-
-  // Advanced filtering and sorting
-  useEffect(() => {
-    let filtered = fixtures
-
-    // Apply custom filter if provided
-    if (customFilter) {
-      filtered = customFilter(filtered)
-    } else {
-      // Search filter
-      if (searchTerm) {
-        filtered = filtered.filter(f => 
-          f.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          f.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          f.spectrum.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          f.category.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+  const loadDLCFixtures = async () => {
+    setIsLoadingDLC(true);
+    setDlcLoadError(null);
+    try {
+      // Load from public directory
+      const response = await fetch('/dlc_hort_full_2025-05-29.csv');
+      if (!response.ok) {
+        // Silently fail if file doesn't exist - DLC fixtures are optional
+        console.log('DLC fixtures file not found, using default fixtures only');
+        return;
       }
-
-      // Category filter
-      if (selectedCategory !== 'all') {
-        filtered = filtered.filter(f => f.category === selectedCategory)
+      const csvText = await response.text();
+      await dlcFixturesParser.parseCSV(csvText);
+      const fixtures = dlcFixturesParser.getFixtureModels();
+      setDlcFixtures(fixtures);
+      console.log(`Loaded ${fixtures.length} DLC qualified fixtures`);
+    } catch (error: any) {
+      console.error('Error loading DLC fixtures:', error);
+      // Don't show error to user if it's just a missing file
+      if (!error.message?.includes('404')) {
+        setDlcLoadError('DLC fixtures unavailable');
       }
-
-      // Advanced filters
-      filtered = filtered.filter(f => {
-        // Wattage range
-        if (f.wattage < filters.wattageRange[0] || f.wattage > filters.wattageRange[1]) return false
-        
-        // PPF range
-        if (f.ppf < filters.ppfRange[0] || f.ppf > filters.ppfRange[1]) return false
-        
-        // Efficacy range
-        if (f.efficacy < filters.efficacyRange[0] || f.efficacy > filters.efficacyRange[1]) return false
-        
-        // Price range (if price is available)
-        if (f.price && (f.price < filters.priceRange[0] || f.price > filters.priceRange[1])) return false
-        
-        // Dimmable filter
-        if (filters.dimmable === 'yes' && !f.dimmable) return false
-        if (filters.dimmable === 'no' && f.dimmable) return false
-        
-        // Voltage filter
-        if (filters.voltage.length > 0 && f.voltage && !filters.voltage.includes(f.voltage)) return false
-        
-        // Spectrum types filter
-        if (filters.spectrumTypes.length > 0 && !filters.spectrumTypes.includes(f.spectrum)) return false
-        
-        return true
-      })
-
-      // Sorting
-      filtered.sort((a, b) => {
-        const aVal = a[sortBy.key]
-        const bVal = b[sortBy.key]
-        
-        if (typeof aVal === 'number' && typeof bVal === 'number') {
-          return sortBy.direction === 'asc' ? aVal - bVal : bVal - aVal
-        }
-        
-        if (typeof aVal === 'string' && typeof bVal === 'string') {
-          return sortBy.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
-        }
-        
-        return 0
-      })
+    } finally {
+      setIsLoadingDLC(false);
     }
+  };
 
-    setFilteredFixtures(filtered)
-  }, [searchTerm, selectedCategory, fixtures, filters, sortBy, customFilter])
+  const allFixtures = [...fixtureDatabase, ...customFixtures, ...dlcFixtures]
+  const categories = ['all', ...Array.from(new Set(allFixtures.map(f => f.category)))]
 
-  const categories = ['all', ...Array.from(new Set(fixtures.map(f => f.category)))]
-  const spectrumTypes = Array.from(new Set(fixtures.map(f => f.spectrum)))
-  const voltageTypes = Array.from(new Set(fixtures.map(f => f.voltage).filter(Boolean)))
-  
-  const sortOptions: SortOption[] = [
-    { key: 'efficacy', label: 'Efficacy (PPE)', direction: 'desc' },
-    { key: 'wattage', label: 'Wattage', direction: 'asc' },
-    { key: 'ppf', label: 'PPF', direction: 'desc' },
-    { key: 'price', label: 'Price', direction: 'asc' },
-    { key: 'brand', label: 'Brand', direction: 'asc' }
-  ]
-  
-  const clearAllFilters = () => {
-    setSearchTerm('')
-    setSelectedCategory('all')
-    setFilters({
-      wattageRange: filterRanges.wattageRange as [number, number],
-      ppfRange: filterRanges.ppfRange as [number, number],
-      efficacyRange: filterRanges.efficacyRange as [number, number],
-      priceRange: filterRanges.priceRange as [number, number],
-      dimmable: 'all',
-      voltage: [],
-      spectrumTypes: []
-    })
-  }
-  
-  const hasActiveFilters = () => {
-    return searchTerm !== '' ||
-           selectedCategory !== 'all' ||
-           filters.wattageRange[0] !== filterRanges.wattageRange[0] ||
-           filters.wattageRange[1] !== filterRanges.wattageRange[1] ||
-           filters.ppfRange[0] !== filterRanges.ppfRange[0] ||
-           filters.ppfRange[1] !== filterRanges.ppfRange[1] ||
-           filters.efficacyRange[0] !== filterRanges.efficacyRange[0] ||
-           filters.efficacyRange[1] !== filterRanges.efficacyRange[1] ||
-           filters.dimmable !== 'all' ||
-           filters.voltage.length > 0 ||
-           filters.spectrumTypes.length > 0
-  }
+  const filteredFixtures = allFixtures.filter(fixture => {
+    const matchesSearch = fixture.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         fixture.model.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategory = selectedCategory === 'all' || fixture.category === selectedCategory
+    
+    return matchesSearch && matchesCategory
+  })
 
-  if (isLoading) {
-    return (
-      <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-        <div className="text-center py-8">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
-          <p className="text-gray-400 mt-2">Loading DLC fixtures...</p>
-        </div>
-      </div>
-    )
-  }
+  // Show fixtures if expanded or if there's a search term
+  const shouldShowFixtures = isExpanded || searchTerm.length > 0
 
   return (
-    <div className={customFilter ? "" : "bg-gray-800/50 rounded-xl p-4 border border-gray-700"}>
-      {/* Header - only show if not using custom filter */}
-      {!customFilter && (
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-white font-semibold flex items-center gap-2">
-            <FileText className="w-4 h-4 text-purple-400" />
-            DLC Fixture Library
-          </h3>
+    <div className="bg-gray-900 rounded-xl border border-gray-700 overflow-hidden">
+      <div className="p-3 border-b border-gray-700" style={{ backgroundColor: '#1f2937' }}>
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
-              className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-            >
-              {viewMode === 'list' ? <Grid3X3 className="w-4 h-4 text-gray-300" /> : <List className="w-4 h-4 text-gray-300" />}
-            </button>
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`p-2 rounded-lg transition-colors flex items-center gap-1 ${
-                showFilters ? 'bg-purple-600 text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-              }`}
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-              {hasActiveFilters() && <div className="w-2 h-2 bg-orange-500 rounded-full" />}
-            </button>
+            <h3 className="text-white font-semibold">Fixture Library</h3>
+            {dlcFixtures.length > 0 && (
+              <span className="text-xs text-green-400 bg-green-400/10 px-2 py-0.5 rounded">
+                {dlcFixtures.length} DLC
+              </span>
+            )}
           </div>
-        </div>
-      )}
-
-      {error && (
-        <div className="mb-3 p-2 bg-yellow-900/20 border border-yellow-700 rounded-lg">
-          <p className="text-yellow-400 text-xs">{error}</p>
-        </div>
-      )}
-      
-      {/* Search and Sort - only show if not using custom filter */}
-      {!customFilter && (
-        <div className="flex gap-2 mb-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search fixtures, brands, models..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
-            />
-          </div>
-          <select
-            value={`${sortBy.key}-${sortBy.direction}`}
-            onChange={(e) => {
-              const [key, direction] = e.target.value.split('-')
-              const option = sortOptions.find(opt => opt.key === key && opt.direction === direction)
-              if (option) setSortBy(option)
-            }}
-            className="px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white text-sm focus:border-purple-500 focus:outline-none"
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-gray-400 hover:text-white transition-colors"
           >
-            {sortOptions.map(option => (
-              <option key={`${option.key}-${option.direction}`} value={`${option.key}-${option.direction}`}>
-                {option.label} {option.direction === 'asc' ? '↑' : '↓'}
-              </option>
-            ))}
-          </select>
+            <ChevronRight className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+          </button>
         </div>
-      )}
-
-      {/* Quick Category Filter - only show if not using custom filter */}
-      {!customFilter && (
-        <div className="flex flex-wrap gap-1 mb-3">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1 rounded-full text-xs transition-colors ${
-                selectedCategory === cat
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
-            >
-              {cat === 'all' ? 'All' : cat}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Advanced Filters Panel - only show if not using custom filter */}
-      {showFilters && !customFilter && (
-        <div className="mb-4 p-3 bg-gray-900/50 rounded-lg border border-gray-700">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-white font-medium text-sm">Advanced Filters</h4>
-            {hasActiveFilters() && (
+        
+        {/* DLC Loading Status */}
+        {isLoadingDLC && (
+          <div className="mb-3 p-2 bg-blue-900/20 border border-blue-700/50 rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-blue-400">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-400 border-t-transparent"></div>
+              Loading DLC qualified fixtures...
+            </div>
+          </div>
+        )}
+        
+        {dlcLoadError && (
+          <div className="mb-3 p-2 bg-red-900/20 border border-red-700/50 rounded-lg">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-red-400">{dlcLoadError}</p>
               <button
-                onClick={clearAllFilters}
-                className="px-2 py-1 text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1"
+                onClick={loadDLCFixtures}
+                className="text-xs text-red-300 hover:text-red-200"
               >
-                <RotateCcw className="w-3 h-3" />
-                Clear All
+                Retry
               </button>
-            )}
+            </div>
           </div>
+        )}
 
-          <div className="grid grid-cols-1 gap-3">
-            {/* Wattage Range */}
-            <div>
-              <label className="text-xs text-gray-400 mb-1 block">Wattage: {filters.wattageRange[0]}W - {filters.wattageRange[1]}W</label>
-              <div className="flex gap-2">
-                <input
-                  type="range"
-                  min={filterRanges.wattageRange[0]}
-                  max={filterRanges.wattageRange[1]}
-                  value={filters.wattageRange[0]}
-                  onChange={(e) => setFilters({...filters, wattageRange: [Number(e.target.value), filters.wattageRange[1]]})}
-                  className="flex-1"
-                />
-                <input
-                  type="range"
-                  min={filterRanges.wattageRange[0]}
-                  max={filterRanges.wattageRange[1]}
-                  value={filters.wattageRange[1]}
-                  onChange={(e) => setFilters({...filters, wattageRange: [filters.wattageRange[0], Number(e.target.value)]})}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-
-            {/* PPF Range */}
-            <div>
-              <label className="text-xs text-gray-400 mb-1 block">PPF: {filters.ppfRange[0]} - {filters.ppfRange[1]} μmol/s</label>
-              <div className="flex gap-2">
-                <input
-                  type="range"
-                  min={filterRanges.ppfRange[0]}
-                  max={filterRanges.ppfRange[1]}
-                  value={filters.ppfRange[0]}
-                  onChange={(e) => setFilters({...filters, ppfRange: [Number(e.target.value), filters.ppfRange[1]]})}
-                  className="flex-1"
-                />
-                <input
-                  type="range"
-                  min={filterRanges.ppfRange[0]}
-                  max={filterRanges.ppfRange[1]}
-                  value={filters.ppfRange[1]}
-                  onChange={(e) => setFilters({...filters, ppfRange: [filters.ppfRange[0], Number(e.target.value)]})}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-
-            {/* Efficacy Range */}
-            <div>
-              <label className="text-xs text-gray-400 mb-1 block">Efficacy: {filters.efficacyRange[0].toFixed(1)} - {filters.efficacyRange[1].toFixed(1)} μmol/J</label>
-              <div className="flex gap-2">
-                <input
-                  type="range"
-                  min={filterRanges.efficacyRange[0]}
-                  max={filterRanges.efficacyRange[1]}
-                  step="0.1"
-                  value={filters.efficacyRange[0]}
-                  onChange={(e) => setFilters({...filters, efficacyRange: [Number(e.target.value), filters.efficacyRange[1]]})}
-                  className="flex-1"
-                />
-                <input
-                  type="range"
-                  min={filterRanges.efficacyRange[0]}
-                  max={filterRanges.efficacyRange[1]}
-                  step="0.1"
-                  value={filters.efficacyRange[1]}
-                  onChange={(e) => setFilters({...filters, efficacyRange: [filters.efficacyRange[0], Number(e.target.value)]})}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-
-            {/* Dimmable Filter */}
-            <div>
-              <label className="text-xs text-gray-400 mb-1 block">Dimmable</label>
-              <select
-                value={filters.dimmable}
-                onChange={(e) => setFilters({...filters, dimmable: e.target.value as 'all' | 'yes' | 'no'})}
-                className="w-full px-2 py-1 bg-gray-800 border border-gray-600 rounded text-white text-xs"
-              >
-                <option value="all">All</option>
-                <option value="yes">Dimmable Only</option>
-                <option value="no">Non-Dimmable Only</option>
-              </select>
-            </div>
-
-            {/* Spectrum Types */}
-            {spectrumTypes.length > 0 && (
-              <div>
-                <label className="text-xs text-gray-400 mb-1 block">Spectrum Types</label>
-                <div className="flex flex-wrap gap-1">
-                  {spectrumTypes.map(spectrum => (
-                    <button
-                      key={spectrum}
-                      onClick={() => {
-                        const newTypes = filters.spectrumTypes.includes(spectrum)
-                          ? filters.spectrumTypes.filter(s => s !== spectrum)
-                          : [...filters.spectrumTypes, spectrum]
-                        setFilters({...filters, spectrumTypes: newTypes})
-                      }}
-                      className={`px-2 py-1 rounded text-xs transition-colors ${
-                        filters.spectrumTypes.includes(spectrum)
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                      }`}
-                    >
-                      {spectrum}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Search */}
+        <div className="relative mb-3">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Type to search luminaires..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-600 rounded-lg text-white placeholder-gray-400 text-sm focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500/20" style={{ backgroundColor: '#111827' }}
+          />
         </div>
-      )}
 
-      {/* Results Summary */}
-      <div className="flex items-center justify-between mb-3 text-xs">
-        <span className="text-gray-400">
-          {filteredFixtures.length} of {fixtures.length} fixtures
-        </span>
-        {hasActiveFilters() && (
-          <span className="text-orange-400 flex items-center gap-1">
-            <Filter className="w-3 h-3" />
-            Filtered
-          </span>
+        {/* Show expanded state hint when collapsed */}
+        {!shouldShowFixtures && (
+          <div className="text-center text-gray-500 text-xs">
+            Type to search or click arrow to browse all fixtures
+          </div>
+        )}
+
+        {/* Filters - only show when expanded or searching */}
+        {shouldShowFixtures && (
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            <Filter className="w-4 h-4" />
+            Filters
+            <ChevronRight className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-90' : ''}`} />
+          </button>
+        )}
+
+        {shouldShowFixtures && showFilters && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {categories.map(category => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-3 py-1 rounded-lg text-xs transition-all ${
+                  selectedCategory === category
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                {category.charAt(0).toUpperCase() + category.slice(1)}
+              </button>
+            ))}
+          </div>
         )}
       </div>
 
-      {/* Fixture List/Grid */}
-      <div className={`max-h-96 overflow-y-auto ${
-        viewMode === 'grid' 
-          ? 'grid grid-cols-2 gap-2' 
-          : 'space-y-2'
-      }`}>
-        {filteredFixtures.map((fixture) => (
-          <div
-            key={fixture.id}
-            onClick={() => onSelectFixture?.(fixture)}
-            className={`p-3 bg-gray-900/50 rounded-lg border transition-all cursor-pointer ${
-              selectedFixtureId === fixture.id
-                ? 'border-purple-500 shadow-lg shadow-purple-500/20'
-                : 'border-gray-700 hover:border-gray-600'
-            }`}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h4 className="text-white font-medium text-sm">{fixture.brand}</h4>
-                <p className="text-gray-400 text-xs">{fixture.model}</p>
-                <p className="text-gray-500 text-xs">{fixture.spectrum}</p>
-                {showDetails && (
-                  <div className={`mt-2 text-xs ${viewMode === 'grid' ? 'space-y-1' : 'grid grid-cols-3 gap-2'}`}>
-                    <div className="flex items-center gap-1">
-                      <Zap className="w-3 h-3 text-yellow-500" />
-                      <span className="text-gray-300">{fixture.wattage}W</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Target className="w-3 h-3 text-green-500" />
-                      <span className="text-gray-300">{fixture.ppf} PPF</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-3 h-3 text-blue-500" />
-                      <span className="text-gray-300">{fixture.efficacy.toFixed(1)} PPE</span>
-                    </div>
-                    {/* Display fixture dimensions if available */}
-                    {(fixture.dlcData?.width || fixture.dlcData?.length || fixture.dimensions) && (
-                      <div className="flex items-center gap-1">
-                        <svg className="w-3 h-3 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <rect x="3" y="3" width="18" height="18" />
-                          <path d="M9 9h6v6h-6z"/>
-                        </svg>
-                        <span className="text-gray-300">
-                          {fixture.dlcData?.width ? `${Math.round(fixture.dlcData.width)}"` : 
-                           fixture.dimensions?.width ? `${Math.round(fixture.dimensions.width * 12)}"` : '24"'} ×{' '}
-                          {fixture.dlcData?.length ? `${Math.round(fixture.dlcData.length)}"` :
-                           fixture.dimensions?.length ? `${Math.round(fixture.dimensions.length * 12)}"` : '48"'}
-                        </span>
-                      </div>
-                    )}
-                    {fixture.price && (
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="w-3 h-3 text-purple-500" />
-                        <span className="text-gray-300">${fixture.price}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-              <ChevronRight className={`w-4 h-4 transition-transform ${
-                selectedFixtureId === fixture.id ? 'rotate-90 text-purple-400' : 'text-gray-600'
-              }`} />
+      {/* Only show fixture list when expanded or searching */}
+      {shouldShowFixtures && (
+        <>
+          {/* Selected Fixture Indicator */}
+          {selectedFixtureId && (
+            <div className="px-4 py-2 bg-purple-900/30 border-b border-purple-700/50">
+              <p className="text-xs text-purple-300">
+                ✓ Selected - Click on canvas to place fixture
+              </p>
             </div>
-          </div>
-        ))}
-      </div>
+          )}
 
-      {filteredFixtures.length === 0 && (
-        <div className="text-center py-8 text-gray-400">
-          <Filter className="w-8 h-8 mx-auto mb-2 opacity-50" />
-          <p>No fixtures match your criteria</p>
+          {/* Fixture List */}
+          <div className="max-h-80 overflow-y-auto custom-scrollbar" style={{ backgroundColor: '#030712' }}>
+            {filteredFixtures.map(fixture => (
           <button
-            onClick={clearAllFilters}
-            className="mt-2 px-3 py-1 text-purple-400 hover:text-purple-300 text-sm"
+            key={fixture.id}
+            onClick={() => onSelectFixture(fixture)}
+            className={`w-full px-3 py-2 border-b transition-all text-left ${
+              selectedFixtureId === fixture.id ? 'border-l-4 border-l-purple-500' : ''
+            }`}
+            style={{
+              backgroundColor: selectedFixtureId === fixture.id ? 'rgba(88, 28, 135, 0.4)' : '#111827',
+              borderBottomColor: '#374151'
+            }}
+            onMouseEnter={(e) => {
+              if (selectedFixtureId !== fixture.id) {
+                e.currentTarget.style.backgroundColor = '#1f2937'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (selectedFixtureId !== fixture.id) {
+                e.currentTarget.style.backgroundColor = '#111827'
+              }
+            }}
           >
-            Clear filters
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium truncate" style={{ color: '#f3f4f6' }}>{fixture.brand} {fixture.model}</span>
+                  {fixture.customIES && (
+                    <span className="text-xs text-blue-400">IES</span>
+                  )}
+                  {fixture.dlcData && (
+                    <span className="text-xs text-green-400 bg-green-400/10 px-1.5 py-0.5 rounded">DLC</span>
+                  )}
+                </div>
+                <div className="flex gap-4 text-xs mt-0.5" style={{ color: '#9ca3af' }}>
+                  <span>{fixture.wattage}W</span>
+                  <span>{fixture.ppf} PPF</span>
+                  <span>{fixture.efficacy} μmol/J</span>
+                </div>
+              </div>
+              <ChevronRight className="w-3 h-3 flex-shrink-0" style={{ color: '#6b7280' }} />
+            </div>
           </button>
-        </div>
-      )}
+        ))}
 
-      {!customFilter && (
-        <div className="mt-3 pt-3 border-t border-gray-700">
-          <p className="text-xs text-gray-500">
-            DLC Qualified Products • {filteredFixtures.length} results
-          </p>
-        </div>
+            {filteredFixtures.length === 0 && (
+              <div className="p-8 text-center text-gray-400">
+                <p>No fixtures found matching your criteria.</p>
+              </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   )
-}
-
-// Sample fixtures as fallback
-function getSampleFixtures(): FixtureModel[] {
-  return [
-    {
-      id: 'sample-1',
-      brand: 'Fluence',
-      model: 'SPYDR 2p',
-      category: 'LED Bar',
-      wattage: 645,
-      ppf: 1700,
-      efficacy: 2.64,
-      spectrum: 'Full Spectrum',
-      spectrumData: {
-        blue: 18,
-        green: 8,
-        red: 66,
-        farRed: 8
-      },
-      coverage: 16
-    },
-    {
-      id: 'sample-2',
-      brand: 'Gavita',
-      model: 'Pro 1700e LED',
-      category: 'LED Panel',
-      wattage: 645,
-      ppf: 1700,
-      efficacy: 2.64,
-      spectrum: 'Full Spectrum',
-      spectrumData: {
-        blue: 15,
-        green: 10,
-        red: 65,
-        farRed: 10
-      },
-      coverage: 16
-    },
-    {
-      id: 'sample-3',
-      brand: 'Growers Choice',
-      model: 'ROI-E680',
-      category: 'LED Bar',
-      wattage: 680,
-      ppf: 1836,
-      efficacy: 2.7,
-      spectrum: 'Full Spectrum',
-      spectrumData: {
-        blue: 20,
-        green: 12,
-        red: 62,
-        farRed: 6
-      },
-      coverage: 16
-    }
-  ]
 }
