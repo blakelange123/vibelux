@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ClaudeChatAssistant, PlantDoctor } from '@/components/ai';
+import { ClaudeChatAssistant } from '@/components/ai/claude-chat-assistant';
+import { PlantDoctor } from '@/components/ai/plant-doctor';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
