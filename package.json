@@ -37,7 +37,6 @@
     "security:check": "npx snyk test",
     "analyze": "cross-env ANALYZE=true next build",
     "lighthouse": "lhci autorun",
-    "prepare": "husky install",
     "validate:env": "tsx scripts/validate-environment.ts",
     "start:cron": "tsx -e \"import { getCronRunner } from './src/services/cron-runner'; getCronRunner().start()\"",
     "stop:cron": "tsx -e \"import { getCronRunner } from './src/services/cron-runner'; getCronRunner().stop()\"",
