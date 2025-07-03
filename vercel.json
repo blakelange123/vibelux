@@ -1,12 +1,13 @@
 {
-  "buildCommand": "npx prisma generate && next build",
+  "buildCommand": "next build",
   "framework": "nextjs",
   "outputDirectory": ".next",
   "installCommand": "npm install --legacy-peer-deps",
   "build": {
     "env": {
       "NEXT_TELEMETRY_DISABLED": "1",
-      "NODE_OPTIONS": "--max-old-space-size=4096"
+      "NODE_OPTIONS": "--max-old-space-size=4096",
+      "SKIP_ENV_VALIDATION": "true"
     }
   }
 }
