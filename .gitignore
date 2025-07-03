@@ -54,3 +54,30 @@ next-env.d.ts
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Documentation and backup files
+*.md
+*.log
+*.backup
+*.gz
+*.jpg
+*.png
+temp-disabled/
+temp_disabled/
+prisma.backup/
+influxdb-data/
+monitoring/
+k8s/
+contracts/
+docs/
+scripts/
+*.py
+*.html
+*.js.backup
+*.tsx.backup
+*.ts.backup
+*.json.backup
+*.css.backup
+build.log
+dev*.log
+vercel-build.log
