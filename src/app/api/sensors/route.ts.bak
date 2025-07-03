@@ -1,0 +1,208 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@clerk/nextjs/server'
+import { prisma } from '@/lib/prisma'
+
+export async function POST(request: NextRequest) {
+  try {
+    const { userId } = await auth()
+    
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const body = await request.json()
+    const { 
+      type, // 'virtual' or 'physical'
+      sensorType, // 'aranet', 'apogee', 'licor', 'generic'
+      designId,
+      readings
+    } = body
+
+    // Store sensor readings
+    const sensorData = await prisma.sensorData.create({
+      data: {
+        userId,
+        type,
+        sensorType,
+        designId,
+        readings: readings,
+        metadata: {
+          timestamp: new Date().toISOString(),
+          version: '1.0'
+        }
+      }
+    })
+
+    // If it's physical sensor data, calculate validation metrics
+    if (type === 'physical' && designId) {
+      const design = await prisma.design.findUnique({
+        where: { id: designId }
+      })
+
+      if (design) {
+        const validation = calculateValidation(design.data, readings)
+        
+        // Store validation results
+        await prisma.sensorValidation.create({
+          data: {
+            userId,
+            designId,
+            sensorDataId: sensorData.id,
+            accuracy: validation.accuracy,
+            uniformityMatch: validation.uniformityMatch,
+            ppfdDeviation: validation.ppfdDeviation,
+            recommendations: validation.recommendations
+          }
+        })
+
+        return NextResponse.json({
+          sensorData,
+          validation
+        })
+      }
+    }
+
+    return NextResponse.json({ sensorData })
+
+  } catch (error) {
+    console.error('Sensor data error:', error)
+    return NextResponse.json(
+      { error: 'Failed to save sensor data' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const { userId } = await auth()
+    
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const { searchParams } = new URL(request.url)
+    const designId = searchParams.get('designId')
+    const type = searchParams.get('type')
+    const limit = parseInt(searchParams.get('limit') || '10')
+
+    const where = {
+      userId,
+      ...(designId && { designId }),
+      ...(type && { type })
+    }
+
+    const sensorData = await prisma.sensorData.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      include: {
+        validations: true
+      }
+    })
+
+    // Calculate aggregated metrics
+    const metrics = calculateAggregateMetrics(sensorData)
+
+    return NextResponse.json({
+      data: sensorData,
+      metrics
+    })
+
+  } catch (error) {
+    console.error('Sensor data retrieval error:', error)
+    return NextResponse.json(
+      { error: 'Failed to retrieve sensor data' },
+      { status: 500 }
+    )
+  }
+}
+
+function calculateValidation(designData: any, sensorReadings: any[]) {
+  // Extract design predictions
+  const designPPFD = designData.summary?.expectedPPFD || 600
+  const designUniformity = parseFloat(designData.summary?.uniformityEstimate?.replace('>', '') || '0.8')
+  
+  // Calculate actual metrics from sensor readings
+  const ppfdValues = sensorReadings.map(r => r.ppfd)
+  const avgPPFD = ppfdValues.reduce((sum, val) => sum + val, 0) / ppfdValues.length
+  const minPPFD = Math.min(...ppfdValues)
+  const maxPPFD = Math.max(...ppfdValues)
+  const actualUniformity = minPPFD / avgPPFD
+
+  // Calculate accuracy
+  const ppfdDeviation = avgPPFD - designPPFD
+  const accuracy = 100 - Math.abs(ppfdDeviation / designPPFD * 100)
+  const uniformityMatch = 100 - Math.abs((actualUniformity - designUniformity) / designUniformity * 100)
+
+  // Generate recommendations
+  const recommendations = []
+  
+  if (accuracy < 90) {
+    recommendations.push("Consider recalibrating fixture heights")
+  }
+  
+  if (avgPPFD < designPPFD * 0.9) {
+    recommendations.push("Check for fixture dimming or degradation")
+    recommendations.push("Verify all fixtures are operating at full power")
+  }
+  
+  if (actualUniformity < designUniformity * 0.9) {
+    recommendations.push("Adjust fixture spacing for better uniformity")
+  }
+  
+  if (maxPPFD > designPPFD * 1.3) {
+    recommendations.push("Some areas may be receiving excessive light")
+  }
+
+  return {
+    accuracy,
+    uniformityMatch,
+    ppfdDeviation,
+    actualPPFD: avgPPFD,
+    actualUniformity,
+    minPPFD,
+    maxPPFD,
+    recommendations
+  }
+}
+
+function calculateAggregateMetrics(sensorData: any[]) {
+  if (sensorData.length === 0) return null
+
+  // Aggregate all readings
+  const allReadings = sensorData.flatMap(d => d.readings)
+  
+  // Calculate overall metrics
+  const avgPPFD = allReadings.reduce((sum, r) => sum + r.ppfd, 0) / allReadings.length
+  const dataPoints = allReadings.length
+  
+  // Calculate trends over time
+  const latestReadings = sensorData[0]?.readings || []
+  const previousReadings = sensorData[1]?.readings || []
+  
+  let trend = 'stable'
+  if (latestReadings.length > 0 && previousReadings.length > 0) {
+    const latestAvg = latestReadings.reduce((sum, r) => sum + r.ppfd, 0) / latestReadings.length
+    const previousAvg = previousReadings.reduce((sum, r) => sum + r.ppfd, 0) / previousReadings.length
+    
+    if (latestAvg > previousAvg * 1.05) trend = 'increasing'
+    else if (latestAvg < previousAvg * 0.95) trend = 'decreasing'
+  }
+
+  return {
+    averagePPFD: avgPPFD,
+    totalDataPoints: dataPoints,
+    trend,
+    latestReading: sensorData[0]?.createdAt,
+    validationScores: sensorData
+      .filter(d => d.validations?.length > 0)
+      .map(d => d.validations[0].accuracy)
+  }
+}
