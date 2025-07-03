@@ -1,4 +1,6 @@
-import * as tf from '@tensorflow/tfjs';
+// TensorFlow will be loaded dynamically to prevent build-time issues
+import type * as tfType from '@tensorflow/tfjs';
+import { getTensorFlow } from './dynamic-tensorflow';
 
 export interface YieldFeatures {
   temperature: number;
