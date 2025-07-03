@@ -47,20 +47,16 @@ export const SUBSCRIPTION_TIERS_15: SubscriptionTier15[] = [
       dataRetention: 7
     },
     features: [
-      'PPFD Calculator with instant μmol/m²/s calculations',
-      'DLI Calculator for daily light integral planning',
-      'VPD Calculator with temperature/humidity optimization',
-      'Basic energy cost estimator (kWh usage)',
-      'Fertilizer calculator with basic nutrient targets',
-      'Access to 50 popular DLC-certified fixtures',
-      'Simple 2D room layout designer',
-      'Single point PPFD measurements',
-      'Basic spectrum viewer (RGB ratios)',
-      '1 saved project with 7-day cloud storage',
-      'PDF export for basic reports',
-      'Access to educational videos and guides',
-      'Community forum participation',
-      'Email support (48-hour response)'
+      'Basic PPFD Calculator',
+      'Basic DLI Calculator',
+      'Basic VPD Calculator',
+      'Simple Energy Cost Calculator',
+      '50 fixture library access',
+      '1 saved project (7-day retention)',
+      'PDF export only',
+      'Community forum access',
+      'Basic 2D designer',
+      'Learning resources'
     ]
   },
 
@@ -84,23 +80,17 @@ export const SUBSCRIPTION_TIERS_15: SubscriptionTier15[] = [
       dataRetention: 30
     },
     features: [
-      'Everything in Free Explorer',
-      'Advanced DLI Calculator with crop-specific targets',
-      'Heat Load Calculator (BTU/hr from lighting)',
-      'Simple ROI Calculator with energy savings',
-      'Advanced fertilizer formulation calculator',
-      'Nutrient dosing calculator with tank mixing',
-      'Access to 500 DLC-certified fixtures',
-      'Side-by-side fixture comparison (up to 3)',
-      'Basic heat map visualization in 2D',
-      'Multi-point PPFD grid calculations',
-      'Canopy height adjustment tools',
-      'Basic uniformity calculations',
-      'Environmental alerts for temp/humidity',
-      'Mobile app access (view-only)',
-      '5 saved projects with 30-day storage',
-      'CSV and PDF export options',
-      'Priority email support'
+      'Everything in Free',
+      'Advanced DLI Calculator',
+      'Heat Load Calculator',
+      'ROI Calculator',
+      '500 DLC fixtures',
+      'Fixture comparison tool',
+      'Basic heat map visualization',
+      '5 projects (30-day retention)',
+      'CSV export',
+      'Email support',
+      'Basic environmental alerts'
     ]
   },
 
@@ -114,7 +104,7 @@ export const SUBSCRIPTION_TIERS_15: SubscriptionTier15[] = [
     description: 'Enhanced tools for dedicated growers managing multiple spaces',
     targetAudience: 'Serious hobbyists, small greenhouse owners, consultants starting out',
     color: 'blue',
-    icon: 'Flower2',
+    icon: 'Plant',
     limits: {
       projects: 10,
       teamMembers: 1,
@@ -125,22 +115,16 @@ export const SUBSCRIPTION_TIERS_15: SubscriptionTier15[] = [
     },
     features: [
       'Everything in Hobbyist',
-      'Full DLC database access (2,437 DLC-certified fixtures)',
-      'Basic 3D room visualization with multiple viewing angles',
-      'Production planning system with crop templates',
-      'Psychrometric calculator for greenhouse conditions',
-      'Uniformity analyzer with CV% and min/max ratios',
-      'Electrical estimator for basic load calculations',
-      'Spectrum analysis with PAR breakdown by wavelength',
-      'Basic nutrient calculator with N-P-K ratios',
-      'Photoperiod scheduling for vegetative/flowering cycles',
-      'Environmental monitoring dashboard',
-      'Heat map generation with color gradients',
-      'Fixture aging predictions and replacement alerts',
-      'Custom fixture comparison tool',
-      'CSV, PDF, and JSON export options',
-      '10 saved projects with 60-day cloud storage',
-      'Basic ROI calculator with payback period'
+      'Full DLC database (5000+ fixtures)',
+      'Basic 3D visualization',
+      'Uniformity analyzer',
+      'Basic electrical estimator',
+      'Spectrum analysis',
+      'Basic nutrient calculator',
+      '10 projects (60-day retention)',
+      'JSON export',
+      'Fixture aging analyzer',
+      'Basic scheduling tools'
     ],
     newTier: true
   },
@@ -167,22 +151,17 @@ export const SUBSCRIPTION_TIERS_15: SubscriptionTier15[] = [
     },
     features: [
       'Everything in Enthusiast',
-      'Professional 3D design studio with ray tracing',
-      'Advanced shadow mapping and overlap analysis',
-      'Electrical load balancing across circuits',
-      'Wire gauge calculator with voltage drop',
-      'Detailed energy cost analysis with time-of-use rates',
-      'Advanced photoperiod scheduler with dimming curves',
-      'Maintenance scheduler with email reminders',
-      'AI-powered spectrum recommendations (10/month)',
-      'Multi-tier/vertical farming support',
-      'Reflectance modeling for walls/surfaces',
-      'Custom fixture creation and import',
-      'CAD export (DWG/DXF formats)',
-      'API access (1000 calls/month)',
-      '25 projects with 90-day storage',
-      '2 team member seats',
-      'Priority email and chat support'
+      'Advanced 3D design studio',
+      'Shadow mapping',
+      'Electrical load balancing',
+      'Wire gauge calculator',
+      'Advanced energy cost analysis',
+      'Photoperiod scheduler',
+      'Maintenance scheduler',
+      'AI spectrum recommendations (10/mo)',
+      'CAD export (DWG)',
+      'Custom fixtures',
+      'Priority email support'
     ]
   },
 
@@ -211,24 +190,19 @@ export const SUBSCRIPTION_TIERS_15: SubscriptionTier15[] = [
     },
     features: [
       'Everything in Starter Pro',
-      'AI-powered auto-arrangement optimization',
-      'Advanced object properties with custom parameters',
-      'Multi-layer design for vertical farms',
-      'Professional circuit planning with panel schedules',
-      'Peak demand analysis and load shedding',
-      'AI SOP Generator with intelligent automation (10/mo)',
-      'Professional nutrient calculator with 20+ elements',
-      'Cross-section analyzer for light penetration',
-      'IES file import/export for manufacturer data',
-      'Photosynthetic photon flux density (PPFD) animations',
-      'Time-lapse growth simulations',
-      'Custom report templates and branding',
-      'Batch project operations',
-      'Advanced API access (1000 calls/month)',
-      'Team collaboration for 3 users',
-      'Version control with rollback',
-      'Priority phone and chat support',
-      'Monthly webinar access'
+      'Auto-arrangement AI',
+      'Object properties panel',
+      'Multi-layer design',
+      'Circuit planning tools',
+      'Peak demand analysis',
+      'SOP Generator (10/mo)',
+      'Enhanced nutrient calculator',
+      'Cross-section analyzer',
+      'IES file import/export',
+      'API access (1000 calls)',
+      'Team sharing (3 users)',
+      'Version control',
+      'Priority chat support'
     ],
     popular: true,
     highlighted: true
@@ -259,24 +233,19 @@ export const SUBSCRIPTION_TIERS_15: SubscriptionTier15[] = [
     },
     features: [
       'Everything in Professional',
-      'Advanced photosynthetic modeling with quantum yield',
-      'Carbon footprint tracking and offset calculations',
-      'Weather-adaptive lighting with real-time adjustments',
-      'Professional uniformity analyzer with statistical tools',
-      'Intelligent crop rotation planner with yield optimization',
-      'Complete compliance audit trail for certifications',
-      'Automated document generation for permits/reports',
-      'Custom spectrum designer with photomorphogenic targets',
-      'Phytochrome photostationary state (PSS) calculations',
-      'McCree action spectrum integration',
-      'Solar radiation and DLI supplementation analysis',
-      'Greenhouse supplemental lighting optimization',
-      'Water use efficiency calculations',
-      'Integrated pest management (IPM) lighting protocols',
-      'Research-grade data export',
-      'Unlimited projects and team members (5)',
-      'Dedicated phone support line',
-      'Quarterly business reviews'
+      'Photosynthetic modeling',
+      'Carbon footprint tracking',
+      'Weather adaptive lighting',
+      'Advanced uniformity analyzer',
+      'Crop rotation planner',
+      'Compliance audit trail',
+      'Document generation',
+      'Custom spectrum designer',
+      'Phytochrome calculations',
+      'McCree action spectrum',
+      'Solar radiation analysis',
+      'Unlimited projects',
+      'Phone support'
     ]
   },
 
@@ -305,24 +274,19 @@ export const SUBSCRIPTION_TIERS_15: SubscriptionTier15[] = [
     },
     features: [
       'Everything in Advanced',
-      'Machine learning yield prediction models',
-      'AI-driven growth optimization algorithms',
-      'Predictive maintenance with failure alerts',
-      'AI crop advisor with real-time recommendations',
-      'Complete IoT device management platform',
-      'Sensor integration (temperature, humidity, CO2, light)',
-      'Custom dashboard configurations',
-      'Blockchain-verified carbon credit generation',
-      'Multi-crop optimization and scheduling',
-      'Advanced data export with SQL access',
-      'Webhook integrations for automation',
-      'RESTful API with unlimited calls',
-      'Team workspace for up to 10 members',
-      'White-label report generation',
-      'Priority feature development input',
-      'Priority customer support',
-      'Priority email support with SLA',
-      'SLA guarantee (99.9% uptime)'
+      'ML yield prediction',
+      'Enhanced ML predictions',
+      'Predictive maintenance',
+      'AI crop advisor',
+      'IoT device management',
+      'Sensor integration',
+      'Custom dashboards',
+      'Blockchain carbon credits',
+      'Multi-crop balancer',
+      'Advanced export center',
+      'Webhooks',
+      'Unlimited API access',
+      '24/7 phone support'
     ]
   },
 
@@ -394,7 +358,7 @@ export const SUBSCRIPTION_TIERS_15: SubscriptionTier15[] = [
       'Everything in Enterprise Plus',
       'Multi-site management',
       'White-label options',
-      'Enterprise authentication (coming soon)',
+      'SSO integration',
       'Custom integrations',
       'Batch operations',
       'Advanced version control',
@@ -434,13 +398,13 @@ export const SUBSCRIPTION_TIERS_15: SubscriptionTier15[] = [
       'Everything in Corporate',
       'Unlimited team members',
       'Private cloud deployment',
-      'Advanced ML predictions',
+      'Custom ML model training',
       'Priority feature development',
       'Executive dashboard',
       'Compliance certifications',
-      'Enterprise SLA agreement',
-      'Dedicated cloud deployment',
-      'Priority feature requests',
+      'Source code escrow',
+      'On-premise option',
+      'Direct engineering support',
       'Custom API endpoints',
       'Guaranteed uptime 99.99%'
     ],
@@ -594,7 +558,7 @@ export const SUBSCRIPTION_TIERS_15: SubscriptionTier15[] = [
       'All Enterprise features',
       'FedRAMP compliance ready',
       'FISMA compliance tools',
-      'Secure cloud deployment',
+      'Air-gapped deployment',
       'Enhanced security features',
       'Audit logging',
       'Data sovereignty options',
@@ -643,100 +607,6 @@ export const SUBSCRIPTION_TIERS_15: SubscriptionTier15[] = [
       'Equity participation possible',
       'Define your own SLA'
     ]
-  },
-
-  // TIER 16: VIBELUX CAPITAL - Investment Platform
-  {
-    id: 'capital',
-    name: 'VibeLux Capital',
-    tagline: 'Investment platform for GaaS/YEP programs',
-    price: 2999,
-    priceAnnual: 29999,
-    description: 'Complete investment management platform for Growing as a Service and Yield Enhancement Programs',
-    targetAudience: 'Private equity, family offices, impact investors, infrastructure funds',
-    color: 'emerald',
-    icon: 'TrendingUp',
-    limits: {
-      projects: -1, // Unlimited facilities
-      teamMembers: -1, // Unlimited team
-      fixtures: -1, // Unlimited
-      apiCalls: -1, // Unlimited
-      aiCredits: -1, // Unlimited
-      exportFormats: ['pdf', 'excel', 'csv', 'api', 'custom'],
-      supportLevel: 'Priority 24/7 + Investment Advisory',
-      dataRetention: -1, // Forever
-      monthlySOPs: -1,
-      monthlyAIRecommendations: -1
-    },
-    features: [
-      // Everything from Enterprise tier
-      'Everything in Enterprise tier',
-      
-      // Investment Platform Core
-      'GaaS (Growing as a Service) platform',
-      'YEP (Yield Enhancement Program) management',
-      'Hybrid investment models',
-      'Multi-facility portfolio management',
-      'Investor portal with real-time dashboards',
-      
-      // Deal Flow Management
-      'Deal pipeline CRM',
-      'Investment proposal generator',
-      'AI-powered opportunity scoring',
-      'Risk assessment automation',
-      'Due diligence workflow',
-      'Contract template library',
-      
-      // Performance Tracking
-      'Automated baseline establishment',
-      'Real-time yield tracking across portfolio',
-      'Performance-based billing engine',
-      'Revenue sharing calculations',
-      'Statistical confidence intervals',
-      'Anomaly detection & alerts',
-      
-      // Financial Features
-      'IRR & ROI calculations',
-      'Cash flow projections',
-      'Portfolio risk analytics',
-      'Payment automation via ACH/wire',
-      'Multi-party payment distribution',
-      'Blockchain verification option',
-      
-      // Compliance & Reporting
-      'Investment compliance tracking',
-      'Automated investor reporting',
-      'Audit trail for all transactions',
-      'SEC-compliant documentation',
-      'Tax reporting integration',
-      'Legal document management',
-      
-      // Advanced Analytics
-      'Portfolio optimization AI',
-      'Predictive default modeling',
-      'Market opportunity analysis',
-      'Competitive benchmarking',
-      'Environmental impact reporting',
-      'ESG scoring & tracking',
-      
-      // Integration & Automation
-      'Smart contract integration',
-      'Banking API connections',
-      'ERP system integration',
-      'Automated KYC/AML checks',
-      'DocuSign integration',
-      'Quickbooks/Xero sync',
-      
-      // Exclusive Features
-      'White-glove onboarding',
-      'Quarterly strategy sessions',
-      'Access to deal flow network',
-      'Co-marketing opportunities',
-      'Industry conference passes',
-      'Executive briefings & reports'
-    ],
-    highlighted: true,
-    newTier: true
   }
 ];
 
@@ -836,15 +706,5 @@ export const FEATURE_CATEGORIES_15 = {
     'SSO Integration',
     'Custom Integrations',
     'Unlimited Team Members'
-  ],
-  'Investment Platform': [
-    'GaaS Platform',
-    'YEP Management',
-    'Portfolio Management',
-    'Deal Flow CRM',
-    'Performance Tracking',
-    'Automated Billing',
-    'Investment Analytics',
-    'Compliance Tracking'
   ]
 };
