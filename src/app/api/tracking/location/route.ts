@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     // Verify user has access to facility
     const facilityAccess = await prisma.facilityUser.findFirst({
       where: {
-        userId: userId,
+        userId: requestUserId || userId,
         facilityId: facilityId,
         role: { in: ['OWNER', 'MANAGER', 'OPERATOR', 'VIEWER'] }
       }
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const facilityId = searchParams.get('facilityId');
-    const userId = searchParams.get('userId');
+    const requestUserId = searchParams.get('userId');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     const limit = parseInt(searchParams.get('limit') || '100');
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
     // Verify user has access to facility
     const facilityAccess = await prisma.facilityUser.findFirst({
       where: {
-        userId: userId,
+        userId: requestUserId || userId,
         facilityId: facilityId,
         role: { in: ['OWNER', 'MANAGER', 'OPERATOR', 'VIEWER'] }
       }
