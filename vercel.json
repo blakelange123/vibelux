@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node --version && npm --version && rm -rf .next && npx prisma generate && npm run build",
+  "buildCommand": "npx prisma generate && next build",
   "framework": "nextjs",
   "outputDirectory": ".next",
   "installCommand": "npm install --legacy-peer-deps",
@@ -7,11 +7,6 @@
     "env": {
       "NEXT_TELEMETRY_DISABLED": "1",
       "NODE_OPTIONS": "--max-old-space-size=4096"
-    }
-  },
-  "functions": {
-    "src/app/api/**/*.ts": {
-      "maxDuration": 30
     }
   }
 }
