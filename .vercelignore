@@ -12,7 +12,7 @@ e2e
 
 # Ignore heavy ML files temporarily
 src/lib/ml/yield-model-training.ts
-src/lib/spectral-regression-engine.ts
+# src/lib/spectral-regression-engine.ts  # Now using stub version
 src/lib/spectrum-ml-engine.ts
 src/services/advanced-optimization-engine.ts
 
@@ -29,15 +29,15 @@ src/components/designer/canvas/Canvas3D.tsx
 src/components/designer/canvas/Room3D.tsx
 src/components/designer/canvas/Objects3D.tsx
 src/components/designer/3d/**
-src/components/designer/visualization/ThreeJS3DVisualization.tsx
+# src/components/designer/visualization/ThreeJS3DVisualization.tsx  # Needed for build
 src/components/ThreeDPPFDViewer.tsx
 src/components/BiomassGain3DVisualizer.tsx
 src/components/WebGLRayTracingVisualization.tsx
 
 # Ignore PDF generation
-src/lib/professional-pdf-generator.ts
+# src/lib/professional-pdf-generator.ts  # Needed for build
 src/lib/enhanced-pdf-report-generator.ts
-src/components/ProfessionalPDFExport.tsx
+# src/components/ProfessionalPDFExport.tsx  # Needed for build
 
 # Ignore heavy analytics
 src/lib/digital-twin-engine.ts
