@@ -6,5 +6,10 @@
     "env": {
       "VERCEL_DEBUG": "1"
     }
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
   }
 }
