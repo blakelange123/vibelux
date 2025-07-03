@@ -23,3 +23,22 @@ docs/
 # Ignore scripts
 scripts/
 test-*.ts
+
+# Ignore 3D visualization temporarily
+src/components/designer/canvas/Canvas3D.tsx
+src/components/designer/canvas/Room3D.tsx
+src/components/designer/canvas/Objects3D.tsx
+src/components/designer/3d/**
+src/components/designer/visualization/ThreeJS3DVisualization.tsx
+src/components/ThreeDPPFDViewer.tsx
+src/components/BiomassGain3DVisualizer.tsx
+src/components/WebGLRayTracingVisualization.tsx
+
+# Ignore PDF generation
+src/lib/professional-pdf-generator.ts
+src/lib/enhanced-pdf-report-generator.ts
+src/components/ProfessionalPDFExport.tsx
+
+# Ignore heavy analytics
+src/lib/digital-twin-engine.ts
+src/components/designer/cfd/**
