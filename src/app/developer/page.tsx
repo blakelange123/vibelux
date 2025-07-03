@@ -1,7 +1,7 @@
-import APIDocumentationPortal from '@/components/APIDocumentationPortal'
+import { APIDocumentation } from '@/components/APIDocumentation'
 
 export default function DeveloperPage() {
-  return <APIDocumentationPortal />
+  return <APIDocumentation />
 }
 
 export const metadata = {
