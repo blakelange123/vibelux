@@ -4,7 +4,5 @@
     "src/app/api/**/*.ts": {
       "maxDuration": 60
     }
-  },
-  "buildCommand": "npm install --legacy-peer-deps && npm run build",
-  "installCommand": "npm install --legacy-peer-deps"
+  }
 }
