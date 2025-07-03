@@ -1,3 +1,13 @@
+import './globals.css'
+import { Inter } from 'next/font/google'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata = {
+  title: 'VibeLux - Advanced Horticultural Lighting Platform',
+  description: 'Professional lighting design and optimization for controlled environment agriculture',
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -5,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }

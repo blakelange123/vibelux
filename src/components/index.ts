@@ -1,2 +1,2 @@
-// Minimal components export for build testing
+// Essential components export
 export const PlaceholderComponent = () => null;
