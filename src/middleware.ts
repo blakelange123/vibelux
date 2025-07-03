@@ -1,6 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import affiliateTrackingMiddleware from './middleware/affiliate-tracking';
+import affiliateTrackingMiddleware from './middleware/affiliate-tracking-simple';
 import { enforceSessionLimits } from './middleware/session-enforcement';
 
 const isPublicRoute = createRouteMatcher([

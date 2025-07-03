@@ -42,3 +42,24 @@ src/components/ProfessionalPDFExport.tsx
 # Ignore heavy analytics
 src/lib/digital-twin-engine.ts
 src/components/designer/cfd/**
+
+# Ignore build artifacts
+.next
+tsconfig.tsbuildinfo
+*.pack
+*.pack.gz
+*.pack.old
+
+# Ignore large image files
+vibelux_system_architecture*.jpg
+*.png
+*.jpeg
+
+# Ignore temporary directories
+temp-disabled
+src/app-full-disabled
+
+# Ignore backup and log files
+*.tar.gz
+*.log
+local-build.log
