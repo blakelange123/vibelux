@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build --no-lint",
+    "build:vercel": "prisma generate && NODE_ENV=production next build --no-lint",
     "build:production": "NODE_ENV=production next build",
     "start": "next start",
     "optimize": "./optimize-build.sh",

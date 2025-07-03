@@ -1,0 +1,25 @@
+# Ignore test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+__tests__
+e2e
+
+# Ignore backup files
+**/*.backup.tsx
+**/*.old.tsx
+
+# Ignore heavy ML files temporarily
+src/lib/ml/yield-model-training.ts
+src/lib/spectral-regression-engine.ts
+src/lib/spectrum-ml-engine.ts
+src/services/advanced-optimization-engine.ts
+
+# Ignore documentation
+*.md
+docs/
+
+# Ignore scripts
+scripts/
+test-*.ts
