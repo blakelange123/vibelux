@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "SKIP_ENV_VALIDATION=1 next build --no-lint",
+    "vercel-build": "next build",
     "build:vercel": "next build",
     "build:production": "NODE_ENV=production next build",
     "start": "next start",
