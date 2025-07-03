@@ -325,14 +325,30 @@ export class DocumentDatabase {
   }
 }
 
-// Singleton instance
-export const documentDB = new DocumentDatabase({
-  uri: process.env.MONGODB_URI || 'mongodb://localhost:27017',
-  dbName: process.env.MONGODB_DB_NAME || 'vibelux_docs'
+// Create a lazy-loaded singleton instance
+let documentDBInstance: DocumentDatabase | null = null;
+
+export function getDocumentDB(): DocumentDatabase {
+  if (!documentDBInstance) {
+    documentDBInstance = new DocumentDatabase({
+      uri: process.env.MONGODB_URI || 'mongodb://localhost:27017',
+      dbName: process.env.MONGODB_DB_NAME || 'vibelux_docs'
+    });
+  }
+  return documentDBInstance;
+}
+
+// For backward compatibility - lazy proxy
+export const documentDB = new Proxy({} as DocumentDatabase, {
+  get(target, prop) {
+    const db = getDocumentDB();
+    return (db as any)[prop];
+  }
 });
 
 // Initialize connection and indexes
 export async function initializeDocumentDB(): Promise<void> {
-  await documentDB.connect();
-  await documentDB.createIndexes();
+  const db = getDocumentDB();
+  await db.connect();
+  await db.createIndexes();
 }

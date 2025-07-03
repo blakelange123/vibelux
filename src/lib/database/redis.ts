@@ -61,262 +61,163 @@ export class CacheDatabase {
     await this.client.del(key);
   }
 
-  async refreshUserSession(userId: string, ttlSeconds: number = 86400): Promise<void> {
-    const key = this.getKey(`session:${userId}`);
-    await this.client.expire(key, ttlSeconds);
-  }
-
-  // Real-time location tracking
-  async setUserLocation(userId: string, location: {
-    latitude: number;
-    longitude: number;
-    accuracy: number;
-    timestamp: Date;
-    facilityId: string;
-    zoneId?: string;
-  }): Promise<void> {
-    const key = this.getKey(`location:${userId}`);
-    await this.client.setex(key, 300, JSON.stringify(location)); // 5 minute expiry
-  }
-
-  async getUserLocation(userId: string): Promise<any | null> {
-    const key = this.getKey(`location:${userId}`);
-    const data = await this.client.get(key);
-    return data ? JSON.parse(data) : null;
-  }
-
-  async getFacilityUserLocations(facilityId: string): Promise<Array<{ userId: string; location: any }>> {
-    const pattern = this.getKey('location:*');
-    const keys = await this.client.keys(pattern);
-    const locations = [];
-
-    for (const key of keys) {
-      const userId = key.replace(this.getKey('location:'), '');
-      const locationData = await this.client.get(key);
-      if (locationData) {
-        const location = JSON.parse(locationData);
-        if (location.facilityId === facilityId) {
-          locations.push({ userId, location });
-        }
-      }
+  // Cache management
+  async set(key: string, value: any, ttlSeconds?: number): Promise<void> {
+    const fullKey = this.getKey(key);
+    const data = JSON.stringify(value);
+    if (ttlSeconds) {
+      await this.client.setex(fullKey, ttlSeconds, data);
+    } else {
+      await this.client.set(fullKey, data);
     }
-
-    return locations;
   }
 
-  // Environmental data caching
-  async setEnvironmentalData(zoneId: string, data: {
-    temperature: number;
-    humidity: number;
-    co2: number;
-    vpd: number;
-    lightLevel: number;
-    timestamp: Date;
-  }): Promise<void> {
-    const key = this.getKey(`env:${zoneId}`);
-    await this.client.setex(key, 600, JSON.stringify(data)); // 10 minute expiry
-  }
-
-  async getEnvironmentalData(zoneId: string): Promise<any | null> {
-    const key = this.getKey(`env:${zoneId}`);
-    const data = await this.client.get(key);
+  async get<T = any>(key: string): Promise<T | null> {
+    const fullKey = this.getKey(key);
+    const data = await this.client.get(fullKey);
     return data ? JSON.parse(data) : null;
   }
 
-  // Report caching
-  async cachePhotoReport(reportId: string, reportData: any, ttlSeconds: number = 3600): Promise<void> {
-    const key = this.getKey(`report:${reportId}`);
-    await this.client.setex(key, ttlSeconds, JSON.stringify(reportData));
+  async delete(key: string): Promise<void> {
+    const fullKey = this.getKey(key);
+    await this.client.del(fullKey);
   }
 
-  async getCachedPhotoReport(reportId: string): Promise<any | null> {
-    const key = this.getKey(`report:${reportId}`);
-    const data = await this.client.get(key);
+  async exists(key: string): Promise<boolean> {
+    const fullKey = this.getKey(key);
+    return (await this.client.exists(fullKey)) === 1;
+  }
+
+  // Pattern deletion
+  async deletePattern(pattern: string): Promise<void> {
+    const fullPattern = this.getKey(pattern);
+    const keys = await this.client.keys(fullPattern);
+    if (keys.length > 0) {
+      await this.client.del(...keys);
+    }
+  }
+
+  // List operations
+  async pushToList(key: string, values: any[], ttlSeconds?: number): Promise<void> {
+    const fullKey = this.getKey(key);
+    const stringValues = values.map(v => JSON.stringify(v));
+    await this.client.rpush(fullKey, ...stringValues);
+    if (ttlSeconds) {
+      await this.client.expire(fullKey, ttlSeconds);
+    }
+  }
+
+  async getList<T = any>(key: string, start: number = 0, stop: number = -1): Promise<T[]> {
+    const fullKey = this.getKey(key);
+    const data = await this.client.lrange(fullKey, start, stop);
+    return data.map(item => JSON.parse(item));
+  }
+
+  // Set operations
+  async addToSet(key: string, members: string[], ttlSeconds?: number): Promise<void> {
+    const fullKey = this.getKey(key);
+    await this.client.sadd(fullKey, ...members);
+    if (ttlSeconds) {
+      await this.client.expire(fullKey, ttlSeconds);
+    }
+  }
+
+  async getSetMembers(key: string): Promise<string[]> {
+    const fullKey = this.getKey(key);
+    return await this.client.smembers(fullKey);
+  }
+
+  async isSetMember(key: string, member: string): Promise<boolean> {
+    const fullKey = this.getKey(key);
+    return (await this.client.sismember(fullKey, member)) === 1;
+  }
+
+  // Hash operations
+  async setHash(key: string, field: string, value: any, ttlSeconds?: number): Promise<void> {
+    const fullKey = this.getKey(key);
+    await this.client.hset(fullKey, field, JSON.stringify(value));
+    if (ttlSeconds) {
+      await this.client.expire(fullKey, ttlSeconds);
+    }
+  }
+
+  async getHash<T = any>(key: string, field: string): Promise<T | null> {
+    const fullKey = this.getKey(key);
+    const data = await this.client.hget(fullKey, field);
     return data ? JSON.parse(data) : null;
   }
 
-  // AI analysis result caching
-  async cacheAIAnalysis(photoHash: string, analysis: any, ttlSeconds: number = 86400): Promise<void> {
-    const key = this.getKey(`ai:${photoHash}`);
-    await this.client.setex(key, ttlSeconds, JSON.stringify(analysis));
-  }
-
-  async getCachedAIAnalysis(photoHash: string): Promise<any | null> {
-    const key = this.getKey(`ai:${photoHash}`);
-    const data = await this.client.get(key);
-    return data ? JSON.parse(data) : null;
-  }
-
-  // Notification queuing
-  async queueNotification(notification: {
-    userId: string;
-    type: 'email' | 'push' | 'sms';
-    title: string;
-    message: string;
-    data?: any;
-    priority: 'low' | 'normal' | 'high' | 'urgent';
-  }): Promise<void> {
-    const queue = this.getKey('notifications:queue');
-    await this.client.lpush(queue, JSON.stringify({
-      ...notification,
-      timestamp: new Date().toISOString()
-    }));
-  }
-
-  async dequeueNotification(): Promise<any | null> {
-    const queue = this.getKey('notifications:queue');
-    const data = await this.client.rpop(queue);
-    return data ? JSON.parse(data) : null;
-  }
-
-  async getNotificationQueueLength(): Promise<number> {
-    const queue = this.getKey('notifications:queue');
-    return await this.client.llen(queue);
+  async getAllHash<T = any>(key: string): Promise<Record<string, T>> {
+    const fullKey = this.getKey(key);
+    const data = await this.client.hgetall(fullKey);
+    const result: Record<string, T> = {};
+    for (const [field, value] of Object.entries(data)) {
+      result[field] = JSON.parse(value);
+    }
+    return result;
   }
 
   // Rate limiting
   async checkRateLimit(key: string, limit: number, windowSeconds: number): Promise<{
     allowed: boolean;
-    remaining: number;
-    resetTime: Date;
+    count: number;
+    resetIn: number;
   }> {
-    const redisKey = this.getKey(`rate:${key}`);
-    const current = await this.client.incr(redisKey);
-    
-    if (current === 1) {
-      await this.client.expire(redisKey, windowSeconds);
+    const fullKey = this.getKey(`ratelimit:${key}`);
+    const now = Date.now();
+    const windowStart = now - (windowSeconds * 1000);
+
+    // Remove old entries
+    await this.client.zremrangebyscore(fullKey, '-inf', windowStart);
+
+    // Count current entries
+    const count = await this.client.zcard(fullKey);
+
+    if (count < limit) {
+      // Add new entry
+      await this.client.zadd(fullKey, now, `${now}-${Math.random()}`);
+      await this.client.expire(fullKey, windowSeconds);
+      return { allowed: true, count: count + 1, resetIn: windowSeconds };
     }
-    
-    const ttl = await this.client.ttl(redisKey);
-    const resetTime = new Date(Date.now() + (ttl * 1000));
-    
-    return {
-      allowed: current <= limit,
-      remaining: Math.max(0, limit - current),
-      resetTime
-    };
+
+    // Get oldest entry to calculate reset time
+    const oldest = await this.client.zrange(fullKey, 0, 0, 'WITHSCORES');
+    const resetIn = oldest.length > 1 
+      ? Math.ceil((parseInt(oldest[1]) + windowSeconds * 1000 - now) / 1000)
+      : windowSeconds;
+
+    return { allowed: false, count, resetIn };
   }
 
-  // Task locking (for background jobs)
-  async acquireLock(lockKey: string, ttlSeconds: number = 300): Promise<boolean> {
-    const key = this.getKey(`lock:${lockKey}`);
-    const result = await this.client.set(key, Date.now().toString(), 'EX', ttlSeconds, 'NX');
-    return result === 'OK';
+  // Pub/Sub
+  async publish(channel: string, message: any): Promise<void> {
+    const fullChannel = this.getKey(channel);
+    await this.client.publish(fullChannel, JSON.stringify(message));
   }
 
-  async releaseLock(lockKey: string): Promise<void> {
-    const key = this.getKey(`lock:${lockKey}`);
-    await this.client.del(key);
-  }
-
-  async isLocked(lockKey: string): Promise<boolean> {
-    const key = this.getKey(`lock:${lockKey}`);
-    const exists = await this.client.exists(key);
-    return exists === 1;
-  }
-
-  // Metrics aggregation
-  async incrementMetric(metric: string, value: number = 1): Promise<void> {
-    const key = this.getKey(`metric:${metric}`);
-    await this.client.incrby(key, value);
-  }
-
-  async getMetric(metric: string): Promise<number> {
-    const key = this.getKey(`metric:${metric}`);
-    const value = await this.client.get(key);
-    return value ? parseInt(value) : 0;
-  }
-
-  async setMetricExpiry(metric: string, ttlSeconds: number): Promise<void> {
-    const key = this.getKey(`metric:${metric}`);
-    await this.client.expire(key, ttlSeconds);
-  }
-
-  // Real-time messaging
-  async publishMessage(channel: string, message: any): Promise<void> {
-    await this.client.publish(this.getKey(channel), JSON.stringify(message));
-  }
-
-  async subscribeToChannel(channel: string, callback: (message: any) => void): Promise<void> {
+  subscribe(channel: string, callback: (message: any) => void): void {
+    const fullChannel = this.getKey(channel);
     const subscriber = this.client.duplicate();
-    await subscriber.subscribe(this.getKey(channel));
-    
-    subscriber.on('message', (receivedChannel, message) => {
-      if (receivedChannel === this.getKey(channel)) {
-        try {
-          const data = JSON.parse(message);
-          callback(data);
-        } catch (error) {
-          console.error('Error parsing Redis message:', error);
-        }
+    subscriber.subscribe(fullChannel);
+    subscriber.on('message', (ch, msg) => {
+      if (ch === fullChannel) {
+        callback(JSON.parse(msg));
       }
     });
   }
 
-  // Geospatial operations for facility mapping
-  async addUserToFacilityMap(facilityId: string, userId: string, longitude: number, latitude: number): Promise<void> {
-    const key = this.getKey(`geo:${facilityId}`);
-    await this.client.geoadd(key, longitude, latitude, userId);
-    await this.client.expire(key, 3600); // 1 hour expiry
-  }
-
-  async getUsersNearLocation(facilityId: string, longitude: number, latitude: number, radiusMeters: number): Promise<Array<{
-    userId: string;
-    distance: number;
-    coordinates: [number, number];
-  }>> {
-    const key = this.getKey(`geo:${facilityId}`);
-    const results = await this.client.georadius(
-      key, longitude, latitude, radiusMeters, 'm', 'WITHDIST', 'WITHCOORD'
-    );
-
-    return results.map((result: any) => ({
-      userId: result[0],
-      distance: parseFloat(result[1]),
-      coordinates: [parseFloat(result[2][0]), parseFloat(result[2][1])]
-    }));
-  }
-
-  // System health monitoring
-  async setSystemHealth(component: string, status: 'healthy' | 'degraded' | 'error', details?: any): Promise<void> {
-    const key = this.getKey(`health:${component}`);
-    await this.client.setex(key, 300, JSON.stringify({
-      status,
-      details,
-      timestamp: new Date().toISOString()
-    }));
-  }
-
-  async getSystemHealth(): Promise<Record<string, any>> {
-    const pattern = this.getKey('health:*');
-    const keys = await this.client.keys(pattern);
-    const health: Record<string, any> = {};
-
-    for (const key of keys) {
-      const component = key.replace(this.getKey('health:'), '');
-      const data = await this.client.get(key);
-      if (data) {
-        health[component] = JSON.parse(data);
-      }
-    }
-
-    return health;
-  }
-
-  // Cleanup utilities
-  async cleanupExpiredKeys(): Promise<number> {
-    const pattern = this.getKey('*');
-    const keys = await this.client.keys(pattern);
+  // Cleanup
+  async cleanup(daysOld: number = 30): Promise<number> {
+    const cutoff = Date.now() - (daysOld * 24 * 60 * 60 * 1000);
     let cleaned = 0;
 
-    for (const key of keys) {
+    // Clean up old sessions
+    const sessionKeys = await this.client.keys(this.getKey('session:*'));
+    for (const key of sessionKeys) {
       const ttl = await this.client.ttl(key);
       if (ttl === -1) { // No expiry set
-        // Set default expiry for certain key types
-        if (key.includes(':location:') || key.includes(':env:')) {
-          await this.client.expire(key, 3600);
-          cleaned++;
-        }
+        await this.client.del(key);
+        cleaned++;
       }
     }
 
@@ -324,16 +225,49 @@ export class CacheDatabase {
   }
 }
 
-// Singleton instance
-export const cacheDB = new CacheDatabase({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD,
-  db: parseInt(process.env.REDIS_DB || '0'),
-  keyPrefix: process.env.REDIS_KEY_PREFIX || 'vibelux:'
-});
+// Create a lazy-loaded singleton instance
+let cacheDBInstance: CacheDatabase | null = null;
+
+export function getCacheDB(): CacheDatabase {
+  if (!cacheDBInstance) {
+    cacheDBInstance = new CacheDatabase({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+      password: process.env.REDIS_PASSWORD,
+      db: parseInt(process.env.REDIS_DB || '0'),
+      keyPrefix: process.env.REDIS_KEY_PREFIX || 'vibelux:'
+    });
+  }
+  return cacheDBInstance;
+}
+
+// For backward compatibility
+export const cacheDB = {
+  connect: () => getCacheDB().connect(),
+  disconnect: () => getCacheDB().disconnect(),
+  setUserSession: (...args: Parameters<CacheDatabase['setUserSession']>) => getCacheDB().setUserSession(...args),
+  getUserSession: (...args: Parameters<CacheDatabase['getUserSession']>) => getCacheDB().getUserSession(...args),
+  deleteUserSession: (...args: Parameters<CacheDatabase['deleteUserSession']>) => getCacheDB().deleteUserSession(...args),
+  set: (...args: Parameters<CacheDatabase['set']>) => getCacheDB().set(...args),
+  get: (...args: Parameters<CacheDatabase['get']>) => getCacheDB().get(...args),
+  delete: (...args: Parameters<CacheDatabase['delete']>) => getCacheDB().delete(...args),
+  exists: (...args: Parameters<CacheDatabase['exists']>) => getCacheDB().exists(...args),
+  deletePattern: (...args: Parameters<CacheDatabase['deletePattern']>) => getCacheDB().deletePattern(...args),
+  pushToList: (...args: Parameters<CacheDatabase['pushToList']>) => getCacheDB().pushToList(...args),
+  getList: (...args: Parameters<CacheDatabase['getList']>) => getCacheDB().getList(...args),
+  addToSet: (...args: Parameters<CacheDatabase['addToSet']>) => getCacheDB().addToSet(...args),
+  getSetMembers: (...args: Parameters<CacheDatabase['getSetMembers']>) => getCacheDB().getSetMembers(...args),
+  isSetMember: (...args: Parameters<CacheDatabase['isSetMember']>) => getCacheDB().isSetMember(...args),
+  setHash: (...args: Parameters<CacheDatabase['setHash']>) => getCacheDB().setHash(...args),
+  getHash: (...args: Parameters<CacheDatabase['getHash']>) => getCacheDB().getHash(...args),
+  getAllHash: (...args: Parameters<CacheDatabase['getAllHash']>) => getCacheDB().getAllHash(...args),
+  checkRateLimit: (...args: Parameters<CacheDatabase['checkRateLimit']>) => getCacheDB().checkRateLimit(...args),
+  publish: (...args: Parameters<CacheDatabase['publish']>) => getCacheDB().publish(...args),
+  subscribe: (...args: Parameters<CacheDatabase['subscribe']>) => getCacheDB().subscribe(...args),
+  cleanup: (...args: Parameters<CacheDatabase['cleanup']>) => getCacheDB().cleanup(...args),
+};
 
 // Initialize connection
 export async function initializeCacheDB(): Promise<void> {
-  await cacheDB.connect();
+  await getCacheDB().connect();
 }

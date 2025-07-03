@@ -240,12 +240,27 @@ export class TimeseriesDatabase {
   }
 }
 
-// Singleton instance
-export const timeseriesDB = new TimeseriesDatabase({
-  url: process.env.INFLUXDB_URL || 'http://localhost:8086',
-  token: process.env.INFLUXDB_TOKEN || '',
-  org: process.env.INFLUXDB_ORG || 'vibelux',
-  bucket: process.env.INFLUXDB_BUCKET || 'greenhouse_data'
+// Create a lazy-loaded singleton instance
+let timeseriesDBInstance: TimeseriesDatabase | null = null;
+
+export function getTimeseriesDB(): TimeseriesDatabase {
+  if (!timeseriesDBInstance) {
+    timeseriesDBInstance = new TimeseriesDatabase({
+      url: process.env.INFLUXDB_URL || 'http://localhost:8086',
+      token: process.env.INFLUXDB_TOKEN || '',
+      org: process.env.INFLUXDB_ORG || 'vibelux',
+      bucket: process.env.INFLUXDB_BUCKET || 'greenhouse_data'
+    });
+  }
+  return timeseriesDBInstance;
+}
+
+// For backward compatibility - lazy proxy
+export const timeseriesDB = new Proxy({} as TimeseriesDatabase, {
+  get(target, prop) {
+    const db = getTimeseriesDB();
+    return (db as any)[prop];
+  }
 });
 
 // Helper function to write metrics from various components
