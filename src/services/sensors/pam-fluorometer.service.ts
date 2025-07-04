@@ -221,4 +221,6 @@ export class PAMFluorometerService {
   }
 }
 
-export default PAMFluorometerService.getInstance();
+// Export both named and default exports
+export const pamFluorometer = PAMFluorometerService.getInstance();
+export default pamFluorometer;

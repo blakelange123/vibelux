@@ -22,4 +22,6 @@ export class FluorescenceDataService {
   }
 }
 
-export default FluorescenceDataService.getInstance();
+// Export both named and default exports
+export const fluorescenceDataService = FluorescenceDataService.getInstance();
+export default fluorescenceDataService;

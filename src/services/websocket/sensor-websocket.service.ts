@@ -22,4 +22,6 @@ export class SensorWebsocketService {
   }
 }
 
-export default SensorWebsocketService.getInstance();
+// Export both named and default exports
+export const sensorWebSocket = SensorWebsocketService.getInstance();
+export default sensorWebSocket;

@@ -376,4 +376,23 @@ export class SmartCommissionCalculator {
   }
 }
 
+// Helper function to get commission rate for a tier and customer type
+export function getSmartCommissionRate(
+  tierId: string, 
+  customerType: 'subscription' | 'revenueSharing',
+  monthsActive: number
+): number {
+  const tier = SMART_COMMISSION_TIERS.find(t => t.id === tierId);
+  if (!tier) return 0;
+  
+  const schedule = customerType === 'subscription' 
+    ? tier.subscriptionCustomers 
+    : tier.revenueSharingCustomers;
+  
+  if (monthsActive <= 6) return schedule.months1to6;
+  if (monthsActive <= 18) return schedule.months7to18;
+  if (monthsActive <= 36) return schedule.months19to36;
+  return schedule.months37plus;
+}
+
 export default SmartCommissionCalculator;
