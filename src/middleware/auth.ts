@@ -22,3 +22,18 @@ export async function authMiddleware(req: NextRequest) {
     return NextResponse.json({ error: 'Authentication failed' }, { status: 401 });
   }
 }
+
+// Higher-order function for route handlers that require authentication
+export function requireAuth(handler: (req: NextRequest) => Promise<NextResponse>) {
+  return async (req: NextRequest) => {
+    const authResponse = await authMiddleware(req);
+    
+    // If auth middleware returned an error response, return it
+    if (authResponse.status !== 200) {
+      return authResponse;
+    }
+    
+    // Otherwise, call the handler with the authenticated request
+    return handler(req);
+  };
+}
