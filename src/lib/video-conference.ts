@@ -274,13 +274,10 @@ export class VideoConferenceManager {
     console.log(`Processing refund of $${refundAmount} for payment ${paymentIntentId}`);
     
     // In production, implement Stripe refund:
-// Initialize Stripe lazily to avoid build-time errors
-let stripe: Stripe | null = null;
-
-function getStripe(): Stripe {
-  if (!stripe && process.env.STRIPE_SECRET_KEY) {
-    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    // await getStripe().refunds.create({
+    // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    //   apiVersion: '2024-06-20',
+    // });
+    // await stripe.refunds.create({
     //   payment_intent: paymentIntentId,
     //   amount: Math.round(refundAmount * 100), // Convert to cents
     //   reason: 'requested_by_customer',
