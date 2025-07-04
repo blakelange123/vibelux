@@ -6,9 +6,20 @@
 import Stripe from 'stripe';
 import { AffiliateUser, AffiliateCommission } from '@/lib/affiliates/affiliate-system';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+// Initialize Stripe lazily to avoid build-time errors
+let stripe: Stripe | null = null;
+
+function getStripe(): Stripe {
+  if (!stripe && process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
-});
+    });
+  }
+  if (!stripe) {
+    throw new Error('Stripe is not configured');
+  }
+  return stripe;
+}
 
 export interface StripeAffiliateAccount {
   id: string;
@@ -79,7 +90,7 @@ export class StripeAffiliatePayouts {
   ): Promise<StripeAffiliateAccount> {
     try {
       // Create Stripe Express account
-      const account = await stripe.accounts.create({
+      const account = await getStripe().accounts.create({
         type: 'express',
         country: accountInfo.country,
         email: accountInfo.email,
@@ -143,7 +154,7 @@ export class StripeAffiliatePayouts {
     refreshUrl: string
   ): Promise<string> {
     try {
-      const accountLink = await stripe.accountLinks.create({
+      const accountLink = await getStripe().accountLinks.create({
         account: stripeAccountId,
         refresh_url: refreshUrl,
         return_url: returnUrl,
@@ -162,7 +173,7 @@ export class StripeAffiliatePayouts {
    */
   static async updateAccountStatus(stripeAccountId: string): Promise<Partial<StripeAffiliateAccount>> {
     try {
-      const account = await stripe.accounts.retrieve(stripeAccountId);
+      const account = await getStripe().accounts.retrieve(stripeAccountId);
       
       return {
         onboardingComplete: account.details_submitted && account.charges_enabled,
@@ -211,7 +222,7 @@ export class StripeAffiliatePayouts {
       }
 
       // Create transfer to affiliate account
-      const transfer = await stripe.transfers.create({
+      const transfer = await getStripe().transfers.create({
         amount: amountInCents,
         currency: options.currency || 'usd',
         destination: affiliate.stripeAccountId,

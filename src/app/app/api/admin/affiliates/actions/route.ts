@@ -2,9 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+// Initialize Stripe lazily to avoid build-time errors
+let stripe: Stripe | null = null;
+
+function getStripe(): Stripe {
+  if (!stripe && process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-11-20.acacia',
-});
+    });
+  }
+  if (!stripe) {
+    throw new Error('Stripe is not configured');
+  }
+  return stripe;
+}
 
 // Admin check middleware
 async function isAdmin(userId: string): Promise<boolean> {
@@ -78,7 +89,7 @@ export async function POST(request: NextRequest) {
         for (const affiliate of affiliatesWithCommissions) {
           try {
             if (affiliate.stripeAccountId) {
-              const transfer = await stripe.transfers.create({
+              const transfer = await getStripe().transfers.create({
                 amount: Math.floor(affiliate.pendingCommissions * 100), // Convert to cents
                 currency: 'usd',
                 destination: affiliate.stripeAccountId
@@ -116,7 +127,7 @@ export async function POST(request: NextRequest) {
         for (const affiliate of affiliatesWithStripe) {
           try {
             if (affiliate.stripeAccountId) {
-              const account = await stripe.accounts.retrieve(affiliate.stripeAccountId);
+              const account = await getStripe().accounts.retrieve(affiliate.stripeAccountId);
               await prisma.affiliate.update({
                 where: { id: affiliate.id },
                 data: {

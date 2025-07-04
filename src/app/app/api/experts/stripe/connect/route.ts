@@ -3,9 +3,20 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+// Initialize Stripe lazily to avoid build-time errors
+let stripe: Stripe | null = null;
+
+function getStripe(): Stripe {
+  if (!stripe && process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
-});
+    });
+  }
+  if (!stripe) {
+    throw new Error('Stripe is not configured');
+  }
+  return stripe;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,10 +57,10 @@ export async function POST(request: NextRequest) {
 
     try {
       // Create Stripe Connect account if not exists
-      let stripeAccount = await stripe.accounts.retrieve(stripeAccountId).catch(() => null);
+      let stripeAccount = await getStripe().accounts.retrieve(stripeAccountId).catch(() => null);
       
       if (!stripeAccount) {
-        stripeAccount = await stripe.accounts.create({
+        stripeAccount = await getStripe().accounts.create({
           type: 'express',
           country: 'US', // Should be dynamic based on expert location
           email: expert.user.email,
@@ -75,7 +86,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Create account link for onboarding
-      const accountLink = await stripe.accountLinks.create({
+      const accountLink = await getStripe().accountLinks.create({
         account: stripeAccount.id,
         refresh_url: `${process.env.NEXTAUTH_URL}/expert-dashboard?setup=refresh`,
         return_url: `${process.env.NEXTAUTH_URL}/expert-dashboard?setup=complete`,

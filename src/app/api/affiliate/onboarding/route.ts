@@ -2,9 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+// Initialize Stripe lazily to avoid build-time errors
+let stripe: Stripe | null = null;
+
+function getStripe(): Stripe {
+  if (!stripe && process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-11-20.acacia',
-});
+    });
+  }
+  if (!stripe) {
+    throw new Error('Stripe is not configured');
+  }
+  return stripe;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,7 +31,7 @@ export async function POST(request: NextRequest) {
     const { affiliateId, email, country = 'US' } = await request.json();
     
     // Create Stripe Connect Express account
-    const account = await stripe.accounts.create({
+    const account = await getStripe().accounts.create({
       type: 'express',
       country,
       email,
@@ -35,7 +46,7 @@ export async function POST(request: NextRequest) {
     });
     
     // Create account link for onboarding
-    const accountLink = await stripe.accountLinks.create({
+    const accountLink = await getStripe().accountLinks.create({
       account: account.id,
       refresh_url: `${process.env.NEXT_PUBLIC_APP_URL}/affiliate/dashboard?onboarding=refresh`,
       return_url: `${process.env.NEXT_PUBLIC_APP_URL}/affiliate/dashboard?onboarding=complete`,
@@ -87,7 +98,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Get account status
-    const account = await stripe.accounts.retrieve(accountId);
+    const account = await getStripe().accounts.retrieve(accountId);
     
     const status = {
       detailsSubmitted: account.details_submitted,
@@ -99,7 +110,7 @@ export async function GET(request: NextRequest) {
     // If onboarding is incomplete, generate new link
     let onboardingUrl = null;
     if (!account.details_submitted) {
-      const accountLink = await stripe.accountLinks.create({
+      const accountLink = await getStripe().accountLinks.create({
         account: accountId,
         refresh_url: `${process.env.NEXT_PUBLIC_APP_URL}/affiliate/dashboard?onboarding=refresh`,
         return_url: `${process.env.NEXT_PUBLIC_APP_URL}/affiliate/dashboard?onboarding=complete`,

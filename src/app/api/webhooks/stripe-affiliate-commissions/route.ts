@@ -4,9 +4,20 @@ import Stripe from 'stripe';
 import { trackAffiliateConversion } from '@/middleware/affiliate-tracking';
 import { getSmartCommissionRate } from '@/lib/affiliates/smart-commission-structure';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+// Initialize Stripe lazily to avoid build-time errors
+let stripe: Stripe | null = null;
+
+function getStripe(): Stripe {
+  if (!stripe && process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-11-20.acacia',
-});
+    });
+  }
+  if (!stripe) {
+    throw new Error('Stripe is not configured');
+  }
+  return stripe;
+}
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -25,7 +36,7 @@ export async function POST(request: NextRequest) {
     let event: Stripe.Event;
 
     try {
-      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      event = getStripe().webhooks.constructEvent(body, signature, webhookSecret);
     } catch (err) {
       console.error('Webhook signature verification failed:', err);
       return NextResponse.json(
@@ -84,7 +95,7 @@ async function handleNewSubscription(subscription: Stripe.Subscription) {
   const subscriptionAmount = subscription.items.data[0].price.unit_amount! / 100;
   
   // Get customer metadata to check for affiliate attribution
-  const customer = await stripe.customers.retrieve(customerId) as Stripe.Customer;
+  const customer = await getStripe().customers.retrieve(customerId) as Stripe.Customer;
   const affiliateId = customer.metadata?.affiliate_id;
   
   if (!affiliateId) {
@@ -131,13 +142,13 @@ async function handleSuccessfulPayment(invoice: Stripe.Invoice) {
   if (!invoice.subscription) return; // One-time payment, not recurring
   
   const customerId = invoice.customer as string;
-  const customer = await stripe.customers.retrieve(customerId) as Stripe.Customer;
+  const customer = await getStripe().customers.retrieve(customerId) as Stripe.Customer;
   const affiliateId = customer.metadata?.affiliate_id;
   
   if (!affiliateId) return;
   
   // Calculate how long customer has been active
-  const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+  const subscription = await getStripe().subscriptions.retrieve(invoice.subscription as string);
   const monthsActive = Math.floor(
     (Date.now() - subscription.created * 1000) / (30 * 24 * 60 * 60 * 1000)
   );
@@ -173,7 +184,7 @@ async function handleSubscriptionUpgrade(
   previousAttributes: any
 ) {
   const customerId = subscription.customer as string;
-  const customer = await stripe.customers.retrieve(customerId) as Stripe.Customer;
+  const customer = await getStripe().customers.retrieve(customerId) as Stripe.Customer;
   const affiliateId = customer.metadata?.affiliate_id;
   
   if (!affiliateId) return;
