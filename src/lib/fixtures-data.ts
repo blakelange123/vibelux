@@ -20,6 +20,7 @@ export interface DLCFixture {
   maxVoltage: number
   powerType: string // AC or DC
   powerFactor: number
+  thd: number // Total Harmonic Distortion (%)
   dimmable: boolean
   spectrallyTunable: boolean
   
@@ -54,6 +55,23 @@ export function getFixtureCategory(fixture: DLCFixture): string {
 
 // Mock data generator from CSV row
 export function parseCSVRow(row: any, index: number): DLCFixture {
+  // Parse numeric values
+  const reportedPPF = parseFloat(row['Reported Photosynthetic Photon Flux (µmol/s)']) || parseFloat(row['Reported Photosynthetic Photon Flux (400-700nm)']) || 0;
+  const reportedWattage = parseFloat(row['Reported Input Wattage (W)']) || parseFloat(row['Reported Input Wattage']) || 0;
+  const testedPPF = parseFloat(row['Tested Photosynthetic Photon Flux (µmol/s)']) || parseFloat(row['Tested Photosynthetic Photon Flux (400-700nm)']) || 0;
+  const testedWattage = parseFloat(row['Tested Input Wattage (W)']) || parseFloat(row['Tested Input Wattage']) || 0;
+  
+  // Parse PPE values, calculate if missing but PPF and wattage are available
+  let reportedPPE = parseFloat(row['Reported Photosynthetic Photon Efficacy (µmol/J)']) || parseFloat(row['Reported Photosynthetic Photon Efficacy (400-700nm)']) || 0;
+  if (reportedPPE === 0 && reportedPPF > 0 && reportedWattage > 0) {
+    reportedPPE = reportedPPF / reportedWattage;
+  }
+  
+  let testedPPE = parseFloat(row['Tested Photosynthetic Photon Efficacy (µmol/J)']) || parseFloat(row['Tested Photosynthetic Photon Efficacy (400-700nm)']) || 0;
+  if (testedPPE === 0 && testedPPF > 0 && testedWattage > 0) {
+    testedPPE = testedPPF / testedWattage;
+  }
+  
   return {
     id: index + 1,
     manufacturer: row['Manufacturer'] || '',
@@ -62,17 +80,18 @@ export function parseCSVRow(row: any, index: number): DLCFixture {
     modelNumber: row['Model Number'] || '',
     dateQualified: row['Date Qualified'] || new Date().toISOString(),
     
-    reportedPPE: parseFloat(row['Reported Photosynthetic Photon Efficacy (µmol/J)']) || parseFloat(row['Reported Photosynthetic Photon Efficacy (400-700nm)']) || 0,
-    reportedPPF: parseFloat(row['Reported Photosynthetic Photon Flux (µmol/s)']) || parseFloat(row['Reported Photosynthetic Photon Flux (400-700nm)']) || 0,
-    reportedWattage: parseFloat(row['Reported Input Wattage (W)']) || parseFloat(row['Reported Input Wattage']) || 0,
-    testedPPE: parseFloat(row['Tested Photosynthetic Photon Efficacy (µmol/J)']) || parseFloat(row['Tested Photosynthetic Photon Efficacy (400-700nm)']) || 0,
-    testedPPF: parseFloat(row['Tested Photosynthetic Photon Flux (µmol/s)']) || parseFloat(row['Tested Photosynthetic Photon Flux (400-700nm)']) || 0,
-    testedWattage: parseFloat(row['Tested Input Wattage (W)']) || parseFloat(row['Tested Input Wattage']) || 0,
+    reportedPPE,
+    reportedPPF,
+    reportedWattage,
+    testedPPE,
+    testedPPF,
+    testedWattage,
     
     minVoltage: parseFloat(row['Reported Minimum Input Voltage (V)']) || parseFloat(row['Reported Minimum Input Voltage']) || 0,
     maxVoltage: parseFloat(row['Reported Maximum Input Voltage (V)']) || parseFloat(row['Reported Maximum Input Voltage']) || 0,
     powerType: row['Input Power Type'] || 'AC',
     powerFactor: parseFloat(row['Reported Power Factor']) || 0,
+    thd: parseFloat(row['Reported Total Harmonic Distortion (%)']) || parseFloat(row['Total Harmonic Distortion']) || parseFloat(row['THD']) || 0,
     dimmable: row['Dimmable'] === 'true' || row['Dimmable'] === 'True' || row['Dimmable'] === 'Yes',
     spectrallyTunable: row['Spectrally Tunable'] === 'Yes' || row['Spectrally Tunable'] === 'true',
     

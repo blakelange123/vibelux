@@ -158,7 +158,7 @@ function generateCandelaDistribution(
       const horizAngle = horizontalAngles[h]
       
       // Calculate intensity based on angle and fixture type
-      let intensity = calculateIntensity(
+      const intensity = calculateIntensity(
         vertAngle,
         horizAngle,
         beamAngle,

@@ -7,8 +7,8 @@ export function exportToCSV(data: any[], filename: string = 'export.csv') {
   // Create CSV content
   const csvContent = [
     headers.join(','),
-    ...data.map(row => 
-      headers.map(header => {
+    ...data.map((row: any) => 
+      headers.map((header: string) => {
         const value = row[header]
         // Escape commas and quotes
         if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
@@ -134,7 +134,7 @@ export function generateLeasingReportHTML(data: {
         </tr>
       </thead>
       <tbody>
-        ${data.leaseOptions.map(option => `
+        ${data.leaseOptions.map((option: any) => `
           <tr ${option.term === selectedLease.term ? 'style="background-color: #f0f0ff;"' : ''}>
             <td>${option.term} months</td>
             <td>${option.rate}%</td>
@@ -198,7 +198,7 @@ export function generateForumReportHTML(data: {
     </div>
     
     <h2>Posts</h2>
-    ${data.posts.map(post => `
+    ${data.posts.map((post: any) => `
       <div style="margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
         <h3>${post.title}</h3>
         <p style="color: #666; font-size: 0.9em;">
@@ -213,7 +213,7 @@ export function generateForumReportHTML(data: {
         </div>
         <div style="margin-top: 10px;">
           <span style="font-size: 0.9em; color: #666;">Tags: </span>
-          ${post.tags.map(tag => `<span style="background: #f0f0f0; padding: 2px 8px; margin: 0 4px; border-radius: 4px; font-size: 0.85em;">#${tag}</span>`).join('')}
+          ${post.tags.map((tag: string) => `<span style="background: #f0f0f0; padding: 2px 8px; margin: 0 4px; border-radius: 4px; font-size: 0.85em;">#${tag}</span>`).join('')}
         </div>
       </div>
     `).join('')}

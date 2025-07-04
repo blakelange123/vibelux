@@ -33,10 +33,7 @@ export interface ParsedIESFile {
  * Parse an IES file from text content
  */
 export function parseIESFile(content: string): ParsedIESFile {
-  console.log('Parsing IES file, content length:', content.length)
   const lines = content.split('\n').map(line => line.trim()).filter(line => line.length > 0)
-  console.log('Total lines:', lines.length)
-  console.log('First 5 lines:', lines.slice(0, 5))
   
   let currentIndex = 0
   const header: ParsedIESFile['header'] = { filename: '' }
@@ -74,7 +71,7 @@ export function parseIESFile(content: string): ParsedIESFile {
   }
   
   // Parse the main photometric line - handle multiple lines if needed
-  let photometricData: number[] = []
+  const photometricData: number[] = []
   
   // Keep reading lines until we have at least 10 numbers
   while (currentIndex < lines.length && photometricData.length < 10) {
@@ -85,7 +82,6 @@ export function parseIESFile(content: string): ParsedIESFile {
     photometricData.push(...numbers)
   }
   
-  console.log('Photometric data:', photometricData.length, 'numbers found')
   
   if (photometricData.length < 10) {
     throw new Error(`Invalid IES file: Incomplete photometric data (found ${photometricData.length} values, need at least 10)`)
@@ -157,9 +153,8 @@ export function parseIESFile(content: string): ParsedIESFile {
   // Parse candela values
   const candela: number[][] = []
   const totalCandelaValues = numberOfVerticalAngles * numberOfHorizontalAngles
-  let allCandelaValues: number[] = []
+  const allCandelaValues: number[] = []
   
-  console.log(`Expecting ${totalCandelaValues} candela values (${numberOfVerticalAngles} vertical x ${numberOfHorizontalAngles} horizontal)`)
   
   // Read all remaining lines for candela data
   while (currentIndex < lines.length && allCandelaValues.length < totalCandelaValues) {
@@ -173,7 +168,6 @@ export function parseIESFile(content: string): ParsedIESFile {
     allCandelaValues.push(...values)
   }
   
-  console.log(`Found ${allCandelaValues.length} candela values`)
   
   // Fill in missing values with zeros if needed
   while (allCandelaValues.length < totalCandelaValues) {

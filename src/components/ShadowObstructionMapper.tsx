@@ -244,7 +244,7 @@ export default function ShadowObstructionMapper({
   }
 
   // Use ref to track previous shadow map
-  const prevShadowMapRef = useRef<typeof shadowMap>()
+  const prevShadowMapRef = useRef<typeof shadowMap | undefined>(undefined)
   
   // Update shadow map only when it actually changes
   useEffect(() => {

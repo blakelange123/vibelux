@@ -18,7 +18,8 @@ import {
   Info,
   Shield,
   RefreshCw,
-  Zap
+  Zap,
+  X
 } from 'lucide-react'
 
 interface MaintenanceTask {
@@ -545,6 +546,121 @@ export function MaintenanceTracker() {
           )}
         </div>
       </div>
+
+      {/* Add Task Modal */}
+      {showAddTask && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-900 rounded-xl p-6 max-w-lg w-full mx-4 border border-gray-800">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-white">Add Maintenance Task</h3>
+              <button
+                onClick={() => setShowAddTask(false)}
+                className="p-1 hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Fixture</label>
+                <select className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                  {fixtures.map(fixture => (
+                    <option key={fixture.id} value={fixture.id}>
+                      {fixture.name} - {fixture.model}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Task Type</label>
+                <select className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                  <option value="cleaning">Cleaning</option>
+                  <option value="inspection">Inspection</option>
+                  <option value="replacement">Replacement</option>
+                  <option value="calibration">Calibration</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                <textarea
+                  placeholder="Enter task description..."
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 resize-none"
+                  rows={3}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Due Date</label>
+                  <input
+                    type="date"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Frequency (days)</label>
+                  <input
+                    type="number"
+                    placeholder="90"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Priority</label>
+                  <select className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Est. Time (min)</label>
+                  <input
+                    type="number"
+                    placeholder="30"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Cost (optional)</label>
+                <input
+                  type="number"
+                  placeholder="0"
+                  step="0.01"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500"
+                />
+              </div>
+              
+              <div className="flex gap-3 justify-end pt-4">
+                <button
+                  onClick={() => setShowAddTask(false)}
+                  className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    // Add logic to create task
+                    alert('Task added successfully!');
+                    setShowAddTask(false);
+                  }}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                >
+                  Add Task
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

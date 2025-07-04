@@ -319,7 +319,7 @@ export class SpectrumAI {
     }
     
     // Adjust based on environmental factors
-    let recommendation = { ...profile.spectrum }
+    const recommendation = { ...profile.spectrum }
     
     if (environmental) {
       // High temperature adjustment

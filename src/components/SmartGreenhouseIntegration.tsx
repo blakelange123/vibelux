@@ -215,7 +215,7 @@ export function SmartGreenhouseIntegration() {
       setSensorData(prevData =>
         prevData.map(sensor => ({
           ...sensor,
-          value: sensor.value + (Math.random() - 0.5) * 2,
+          value: sensor.value + (crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF - 0.5) * 2,
           timestamp: new Date()
         }))
       )

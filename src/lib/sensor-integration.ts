@@ -27,7 +27,6 @@ export class SensorIntegrationService {
   async connectSensor(sensor: SensorDevice): Promise<boolean> {
     try {
       // In production, this would establish actual connection
-      console.log(`Connecting to ${sensor.type} sensor: ${sensor.name}`)
       
       // Store sensor
       this.sensors.set(sensor.id, sensor)
@@ -114,7 +113,7 @@ export class SensorIntegrationService {
     
     // Simulate weight reading with some variation
     const baseWeight = 25.5 // kg
-    const variation = (Math.random() - 0.5) * 0.1
+    const variation = (crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF - 0.5) * 0.1
     const weight = baseWeight + variation
 
     return {
@@ -132,7 +131,7 @@ export class SensorIntegrationService {
     // Simulate CO2 with daily variation
     const hour = new Date().getHours()
     const baseCO2 = 800
-    const variation = Math.sin((hour / 24) * Math.PI * 2) * 200 + (Math.random() - 0.5) * 50
+    const variation = Math.sin((hour / 24) * Math.PI * 2) * 200 + (crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF - 0.5) * 50
     const co2 = Math.round(baseCO2 + variation)
 
     return {
@@ -140,15 +139,15 @@ export class SensorIntegrationService {
       value: co2,
       unit: 'ppm',
       quality: co2 > 1500 ? 'warning' : 'good',
-      temperature: 22 + (Math.random() - 0.5) * 2,
-      pressure: 1013 + (Math.random() - 0.5) * 5
+      temperature: 22 + (crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF - 0.5) * 2,
+      pressure: 1013 + (crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF - 0.5) * 5
     }
   }
 
   // ENS210 Temperature/Humidity Reading
   private async readENS210(sensor: SensorDevice): Promise<TempHumidityReading> {
-    const temp = 23 + (Math.random() - 0.5) * 4
-    const humidity = 60 + (Math.random() - 0.5) * 10
+    const temp = 23 + (crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF - 0.5) * 4
+    const humidity = 60 + (crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF - 0.5) * 10
     
     // Calculate dew point
     const a = 17.27
@@ -229,7 +228,7 @@ export class SensorIntegrationService {
       for (let x = 0; x < width; x++) {
         // Create temperature gradient with hot spots
         const distFromCenter = Math.sqrt(Math.pow(x - width/2, 2) + Math.pow(y - height/2, 2))
-        const temp = baseTemp + (Math.random() - 0.5) * 2 - distFromCenter * 0.05
+        const temp = baseTemp + (crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF - 0.5) * 2 - distFromCenter * 0.05
         matrix[y][x] = Math.round(temp * 10) / 10
       }
     }

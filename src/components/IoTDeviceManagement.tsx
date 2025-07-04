@@ -41,6 +41,9 @@ interface IoTDevice {
   firmware: string
   battery?: number
   signalStrength?: number
+  ipAddress?: string
+  macAddress?: string
+  connectionType?: string
 }
 
 export function IoTDeviceManagement() {
@@ -135,7 +138,7 @@ export function IoTDeviceManagement() {
           metrics: device.metrics.map(metric => {
             // Simulate value changes
             if (typeof metric.value === 'number') {
-              const variation = (Math.random() - 0.5) * 2 // ±1
+              const variation = (crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF - 0.5) * 2 // ±1
               let newValue = metric.value + variation
               
               // Keep values in reasonable ranges
@@ -303,6 +306,147 @@ export function IoTDeviceManagement() {
         </select>
       </div>
 
+      {/* Add Device Modal - Moved to top of device grid */}
+      {showAddDevice && (
+        <div className="bg-gray-800 border-2 border-purple-500 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-100">Setup New Hardware</h2>
+            <button
+              onClick={() => setShowAddDevice(false)}
+              className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <XCircle className="w-5 h-5" />
+            </button>
+          </div>
+          
+          <form onSubmit={(e) => {
+            e.preventDefault()
+            const formData = new FormData(e.currentTarget)
+            const newDevice: IoTDevice = {
+              id: `iot-${Date.now()}`,
+              name: formData.get('name') as string,
+              type: formData.get('type') as IoTDevice['type'],
+              status: 'offline',
+              location: formData.get('location') as string,
+              lastSeen: new Date(),
+              metrics: [],
+              firmware: 'v1.0.0',
+              signalStrength: -70,
+              ipAddress: formData.get('ipAddress') as string,
+              macAddress: formData.get('macAddress') as string,
+              connectionType: formData.get('connectionType') as string
+            }
+            setDevices([...devices, newDevice])
+            setShowAddDevice(false)
+          }}>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Device Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-purple-500 text-gray-100"
+                  placeholder="Enter device name"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Device Type
+                </label>
+                <select
+                  name="type"
+                  required
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-purple-500 text-gray-100"
+                >
+                  <option value="">Select type</option>
+                  <option value="sensor">Environmental Sensor</option>
+                  <option value="controller">Controller</option>
+                  <option value="light">Lighting</option>
+                  <option value="hvac">HVAC</option>
+                  <option value="irrigation">Irrigation</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Location
+                </label>
+                <input
+                  type="text"
+                  name="location"
+                  required
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-purple-500 text-gray-100"
+                  placeholder="e.g., Greenhouse Zone 1"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Connection Type
+                </label>
+                <select
+                  name="connectionType"
+                  required
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-purple-500 text-gray-100"
+                >
+                  <option value="wifi">WiFi</option>
+                  <option value="ethernet">Ethernet</option>
+                  <option value="zigbee">Zigbee</option>
+                  <option value="lora">LoRa</option>
+                  <option value="modbus">Modbus</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  IP Address
+                </label>
+                <input
+                  type="text"
+                  name="ipAddress"
+                  pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-purple-500 text-gray-100 font-mono"
+                  placeholder="192.168.1.100"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  MAC Address
+                </label>
+                <input
+                  type="text"
+                  name="macAddress"
+                  pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-purple-500 text-gray-100 font-mono uppercase"
+                  placeholder="00:1B:44:11:3A:B7"
+                />
+              </div>
+            </div>
+            
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => setShowAddDevice(false)}
+                className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors font-medium"
+              >
+                Add Device
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {/* Device Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {filteredDevices.map(device => {
@@ -407,105 +551,6 @@ export function IoTDeviceManagement() {
         })}
       </div>
 
-      {/* Add Device Modal */}
-      {showAddDevice && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 rounded-lg w-full max-w-md">
-            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-100">Add New Device</h2>
-              <button
-                onClick={() => setShowAddDevice(false)}
-                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-              >
-                <XCircle className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <div className="p-6">
-              <form onSubmit={(e) => {
-                e.preventDefault()
-                // Handle form submission
-                const formData = new FormData(e.currentTarget)
-                const newDevice: IoTDevice = {
-                  id: `iot-${Date.now()}`,
-                  name: formData.get('name') as string,
-                  type: formData.get('type') as IoTDevice['type'],
-                  status: 'offline',
-                  location: formData.get('location') as string,
-                  lastSeen: new Date(),
-                  metrics: [],
-                  firmware: 'v1.0.0',
-                  signalStrength: -70
-                }
-                setDevices([...devices, newDevice])
-                setShowAddDevice(false)
-              }}>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">
-                      Device Name
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      required
-                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500 text-gray-100"
-                      placeholder="Enter device name"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">
-                      Device Type
-                    </label>
-                    <select
-                      name="type"
-                      required
-                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500 text-gray-100"
-                    >
-                      <option value="">Select type</option>
-                      <option value="sensor">Environmental Sensor</option>
-                      <option value="controller">Controller</option>
-                      <option value="light">Lighting</option>
-                      <option value="hvac">HVAC</option>
-                      <option value="irrigation">Irrigation</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">
-                      Location
-                    </label>
-                    <input
-                      type="text"
-                      name="location"
-                      required
-                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-purple-500 text-gray-100"
-                      placeholder="e.g., Greenhouse Zone 1"
-                    />
-                  </div>
-                  
-                  <div className="flex gap-3 pt-4">
-                    <button
-                      type="button"
-                      onClick={() => setShowAddDevice(false)}
-                      className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
-                    >
-                      Add Device
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Device Detail Modal */}
       {selectedDevice && (
@@ -542,9 +587,30 @@ export function IoTDeviceManagement() {
                 </div>
               </div>
 
+              {/* Network Configuration */}
+              <h3 className="font-medium text-gray-100 mb-3">Network Configuration</h3>
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                  <p className="text-sm text-gray-400">Connection Type</p>
+                  <p className="text-gray-100 capitalize">{selectedDevice.connectionType || 'Not configured'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">IP Address</p>
+                  <p className="text-gray-100 font-mono">{selectedDevice.ipAddress || 'DHCP'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">MAC Address</p>
+                  <p className="text-gray-100 font-mono text-sm uppercase">{selectedDevice.macAddress || 'Unknown'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">Signal Strength</p>
+                  <p className="text-gray-100">{selectedDevice.signalStrength ? `${selectedDevice.signalStrength} dBm` : 'N/A'}</p>
+                </div>
+              </div>
+
               {/* Real-time Metrics */}
               <h3 className="font-medium text-gray-100 mb-3">Real-time Metrics</h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 mb-6">
                 {selectedDevice.metrics.map((metric, index) => (
                   <div key={index} className="bg-gray-800 rounded-lg p-4">
                     <p className="text-sm text-gray-400 mb-1">{metric.name}</p>
@@ -556,6 +622,18 @@ export function IoTDeviceManagement() {
                     </p>
                   </div>
                 ))}
+              </div>
+
+              {/* Device Actions */}
+              <div className="flex gap-3">
+                <button className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex items-center justify-center gap-2">
+                  <Settings className="w-4 h-4" />
+                  Configure
+                </button>
+                <button className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors flex items-center justify-center gap-2">
+                  <Activity className="w-4 h-4" />
+                  View History
+                </button>
               </div>
             </div>
           </div>

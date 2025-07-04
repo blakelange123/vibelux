@@ -26,6 +26,7 @@ import {
   Filter,
   X
 } from 'lucide-react'
+import { MultiSiteMap } from './MultiSiteMap'
 
 interface Site {
   id: string
@@ -485,14 +486,15 @@ export function MultiSiteManager() {
       )}
 
       {viewMode === 'map' && (
-        <div className="bg-gray-800 rounded-lg p-6 h-96 flex items-center justify-center">
-          <div className="text-center">
-            <Globe className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400">Interactive map view coming soon</p>
-            <p className="text-sm text-gray-500 mt-2">
-              Will show geographic distribution of sites
-            </p>
-          </div>
+        <div className="bg-gray-800 rounded-lg h-96 overflow-hidden">
+          <MultiSiteMap 
+            sites={sites}
+            selectedSiteId={selectedSite?.id}
+            onSiteClick={(siteId) => {
+              const site = sites.find(s => s.id === siteId);
+              if (site) setSelectedSite(site);
+            }}
+          />
         </div>
       )}
 

@@ -200,10 +200,10 @@ export default function FixtureAgingAnalyzer() {
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>Operating Conditions</AlertTitle>
                     <AlertDescription>
-                      {temperature > 35 && 'High temperature accelerates LED degradation. '}
-                      {humidity > 70 && 'High humidity may cause premature failure. '}
-                      {operatingHours > 18 && 'Extended operation reduces fixture lifetime. '}
-                      {(temperature <= 35 && humidity <= 70 && operatingHours <= 18) && 
+                      {parseFloat(temperature) > 35 && 'High temperature accelerates LED degradation. '}
+                      {parseFloat(humidity) > 70 && 'High humidity may cause premature failure. '}
+                      {parseFloat(operatingHours) > 18 && 'Extended operation reduces fixture lifetime. '}
+                      {(parseFloat(temperature) <= 35 && parseFloat(humidity) <= 70 && parseFloat(operatingHours) <= 18) && 
                         'Operating conditions are within recommended range.'}
                     </AlertDescription>
                   </Alert>

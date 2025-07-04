@@ -327,7 +327,7 @@ export function calculateWaterRequirement(
     throw new Error(`Crop profile not found for ${cropType}`)
   }
 
-  let baseRequirement = profile.waterRequirement.optimal
+  const baseRequirement = profile.waterRequirement.optimal
 
   // Adjustment factors
   const tempFactor = environmentalConditions.temperature > 25 

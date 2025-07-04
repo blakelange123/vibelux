@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { Globe, Check, ChevronDown, Languages, Download, Upload, Translate, Settings } from 'lucide-react'
+import { Globe, Check, ChevronDown, Languages, Download, Upload, Type, Settings } from 'lucide-react'
 
 interface Language {
   code: string
@@ -78,7 +78,6 @@ export function MultiLanguageSupport() {
     setShowLanguageMenu(false)
     
     // In a real app, this would update the UI language
-    console.log('Changing language to:', langCode)
   }
 
   const calculateOverallProgress = () => {
@@ -247,7 +246,7 @@ export function MultiLanguageSupport() {
 
           <div className="p-3 border rounded-lg">
             <div className="flex items-center gap-3 mb-2">
-              <Translate className="w-5 h-5 text-gray-600" />
+              <Type className="w-5 h-5 text-gray-600" />
               <p className="font-medium">Units & Formatting</p>
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">

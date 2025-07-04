@@ -1,0 +1,367 @@
+// Production Database Schema for VibeLux Multi-Tenant Platform
+// Supports 100+ growers with proper isolation and scalability
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Multi-tenant Organization/Farm Management
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  type        String   @default("farm") // farm, research, commercial
+  address     String?
+  phone       String?
+  email       String?
+  timezone    String   @default("UTC")
+  subscription String  @default("basic") // basic, professional, enterprise
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  users       User[]
+  facilities  Facility[]
+  crops       Crop[]
+  sensors     Sensor[]
+  alerts      Alert[]
+  reports     Report[]
+  plantHealth PlantHealthReading[]
+  waterUsage  WaterUsageRecord[]
+
+  @@map("organizations")
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String
+  role           String   @default("grower") // admin, grower, viewer, technician
+  organizationId String
+  isActive       Boolean  @default(true)
+  lastLoginAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relationships
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plantHealthReadings PlantHealthReading[]
+  waterUsageRecords   WaterUsageRecord[]
+  reports            Report[]
+
+  @@map("users")
+}
+
+// Facility/Greenhouse Management
+model Facility {
+  id             String   @id @default(cuid())
+  name           String
+  type           String   @default("greenhouse") // greenhouse, indoor, outdoor, tunnel
+  area           Float?   // square meters
+  volume         Float?   // cubic meters
+  organizationId String
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Environmental parameters
+  optimalTemp    Float?   @default(22.0)
+  optimalHumidity Float?  @default(65.0)
+  optimalCO2     Int?     @default(400)
+  optimalVPD     Float?   @default(0.8)
+
+  // Relationships
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  growingZones   GrowingZone[]
+  sensors        Sensor[]
+  crops          Crop[]
+  plantHealth    PlantHealthReading[]
+  waterUsage     WaterUsageRecord[]
+
+  @@map("facilities")
+}
+
+model GrowingZone {
+  id         String   @id @default(cuid())
+  name       String
+  facilityId String
+  area       Float?   // square meters
+  capacity   Int?     // number of plants
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relationships
+  facility    Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  crops       Crop[]
+  sensors     Sensor[]
+  plantHealth PlantHealthReading[]
+
+  @@map("growing_zones")
+}
+
+// Crop Management
+model Crop {
+  id             String    @id @default(cuid())
+  name           String
+  variety        String?
+  species        String    // tomato, lettuce, cannabis, etc.
+  plantingDate   DateTime
+  expectedHarvest DateTime?
+  actualHarvest  DateTime?
+  plantCount     Int       @default(1)
+  status         String    @default("growing") // seedling, vegetative, flowering, harvest, completed
+  organizationId String
+  facilityId     String
+  growingZoneId  String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Crop-specific parameters
+  targetYield    Float?    // kg
+  waterBudget    Float?    // liters
+  fertilizers    Json?     // fertilizer schedule
+  notes          String?
+
+  // Relationships
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  facility       Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  growingZone    GrowingZone? @relation(fields: [growingZoneId], references: [id])
+  plantHealth    PlantHealthReading[]
+  waterUsage     WaterUsageRecord[]
+  yieldRecords   YieldRecord[]
+
+  @@map("crops")
+}
+
+// Sensor Management
+model Sensor {
+  id             String   @id @default(cuid())
+  name           String
+  type           String   // temperature, humidity, light, ph, ec, co2, soil_moisture
+  brand          String?
+  model          String?
+  serialNumber   String?
+  organizationId String
+  facilityId     String
+  growingZoneId  String?
+  isActive       Boolean  @default(true)
+  lastReading    DateTime?
+  batteryLevel   Float?
+  calibrationDate DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Sensor configuration
+  minValue       Float?
+  maxValue       Float?
+  alertThreshold Float?
+  units          String?
+
+  // Relationships
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  facility       Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  growingZone    GrowingZone? @relation(fields: [growingZoneId], references: [id])
+  readings       SensorReading[]
+
+  @@map("sensors")
+}
+
+model SensorReading {
+  id        String   @id @default(cuid())
+  sensorId  String
+  value     Float
+  timestamp DateTime @default(now())
+  quality   String   @default("good") // good, questionable, bad
+  
+  // Relationships
+  sensor    Sensor   @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+
+  @@map("sensor_readings")
+  @@index([sensorId, timestamp])
+}
+
+// Plant Health Monitoring (Simplified Production Version)
+model PlantHealthReading {
+  id             String   @id @default(cuid())
+  organizationId String
+  facilityId     String
+  growingZoneId  String?
+  cropId         String?
+  userId         String
+  timestamp      DateTime @default(now())
+
+  // Simplified health metrics (traffic light system)
+  overallHealth  String   @default("unknown") // excellent, good, fair, poor, critical
+  stressLevel    Int      @default(0) // 0-100 scale
+  
+  // Key measurements
+  fvFm           Float?   // Chlorophyll fluorescence ratio
+  leafColor      String?  // green, yellow-green, yellow, brown
+  leafWilting    String?  // none, slight, moderate, severe
+  growthRate     String?  // excellent, good, slow, stunted
+  
+  // Environmental context
+  temperature    Float?
+  humidity       Float?
+  lightLevel     String?  // low, adequate, high, excessive
+  soilMoisture   String?  // dry, moist, wet, waterlogged
+  
+  // Issues detected
+  pestsDetected  Boolean  @default(false)
+  diseaseSymptoms Boolean @default(false)
+  nutrientDeficiency Boolean @default(false)
+  waterStress    Boolean  @default(false)
+  lightStress    Boolean  @default(false)
+  
+  // Recommendations
+  actionRequired String?  // immediate, within_24h, within_week, routine_monitoring
+  recommendations Json?   // Array of specific actions
+  
+  // Photo documentation
+  photoUrl       String?
+  notes          String?
+
+  // Relationships
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  facility       Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  growingZone    GrowingZone? @relation(fields: [growingZoneId], references: [id])
+  crop           Crop? @relation(fields: [cropId], references: [id])
+  user           User @relation(fields: [userId], references: [id])
+
+  @@map("plant_health_readings")
+  @@index([organizationId, timestamp])
+  @@index([facilityId, timestamp])
+}
+
+// Water Usage Tracking
+model WaterUsageRecord {
+  id             String   @id @default(cuid())
+  organizationId String
+  facilityId     String
+  cropId         String?
+  userId         String
+  date           DateTime @default(now())
+  
+  // Water measurements
+  volumeUsed     Float    // liters
+  irrigationTime Float?   // minutes
+  efficiency     Float?   // calculated WUE
+  source         String?  // municipal, well, rainwater, recycled
+  
+  // Context
+  temperature    Float?
+  humidity       Float?
+  plantCount     Int?
+  growthStage    String?  // seedling, vegetative, flowering, fruiting
+  
+  // Cost tracking
+  costPerLiter   Float?
+  totalCost      Float?
+  
+  notes          String?
+
+  // Relationships
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  facility       Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  crop           Crop? @relation(fields: [cropId], references: [id])
+  user           User @relation(fields: [userId], references: [id])
+
+  @@map("water_usage_records")
+  @@index([organizationId, date])
+  @@index([facilityId, date])
+}
+
+// Yield Tracking
+model YieldRecord {
+  id             String   @id @default(cuid())
+  cropId         String
+  harvestDate    DateTime
+  weight         Float    // kg
+  quality        String   @default("good") // excellent, good, fair, poor
+  notes          String?
+  createdAt      DateTime @default(now())
+
+  // Relationships
+  crop           Crop @relation(fields: [cropId], references: [id], onDelete: Cascade)
+
+  @@map("yield_records")
+}
+
+// Alert System
+model Alert {
+  id             String   @id @default(cuid())
+  organizationId String
+  type           String   // plant_health, water_usage, sensor_offline, harvest_ready
+  severity       String   @default("medium") // low, medium, high, critical
+  title          String
+  message        String
+  isRead         Boolean  @default(false)
+  isResolved     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  resolvedAt     DateTime?
+  
+  // Context data
+  facilityId     String?
+  cropId         String?
+  sensorId       String?
+  metadata       Json?    // Additional alert-specific data
+
+  // Relationships
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("alerts")
+  @@index([organizationId, isRead, createdAt])
+}
+
+// Reporting System
+model Report {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  name           String
+  type           String   // daily, weekly, monthly, custom, audit
+  format         String   @default("pdf") // pdf, csv, excel
+  parameters     Json     // Report configuration
+  generatedAt    DateTime @default(now())
+  fileUrl        String?  // S3 or file storage URL
+  
+  // Relationships
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User @relation(fields: [userId], references: [id])
+
+  @@map("reports")
+  @@index([organizationId, generatedAt])
+}
+
+// System Configuration
+model SystemConfig {
+  id             String   @id @default(cuid())
+  organizationId String?  // null for global config
+  key            String
+  value          Json
+  description    String?
+  updatedAt      DateTime @updatedAt
+
+  @@unique([organizationId, key])
+  @@map("system_config")
+}
+
+// Data retention and cleanup
+model DataRetentionPolicy {
+  id             String   @id @default(cuid())
+  organizationId String
+  dataType       String   // sensor_readings, plant_health, water_usage, etc.
+  retentionDays  Int      @default(365)
+  compressionDays Int?    @default(90) // Compress detailed data after X days
+  isActive       Boolean  @default(true)
+
+  @@unique([organizationId, dataType])
+  @@map("data_retention_policies")
+}

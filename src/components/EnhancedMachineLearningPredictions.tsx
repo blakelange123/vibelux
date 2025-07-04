@@ -225,11 +225,9 @@ export function EnhancedMachineLearningPredictions() {
   const startTraining = (modelId: string) => {
     setIsTraining(true)
     setTrainingProgress(0)
-    console.log('Starting training for model:', modelId, 'with settings:', modelSettings)
   }
 
   const saveModelSettings = () => {
-    console.log('Saving model settings:', modelSettings)
     setShowSettings(false)
     // In a real app, this would save to backend
   }
@@ -359,7 +357,7 @@ export function EnhancedMachineLearningPredictions() {
           pdf.setFontSize(10)
           pdf.setTextColor(60)
           const lines = pdf.splitTextToSize(`• ${rec}`, pageWidth - 40)
-          lines.forEach(line => {
+          lines.forEach((line: string) => {
             pdf.text(line, 25, yPosition)
             yPosition += 6
           })

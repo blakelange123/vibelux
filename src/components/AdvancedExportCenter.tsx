@@ -207,7 +207,7 @@ export function AdvancedExportCenter() {
       const row: number[] = []
       for (let h = 0; h < 360; h += 15) {
         // Lambertian distribution with some variation
-        const intensity = 1000 * Math.cos((v * Math.PI) / 180) * (1 + Math.random() * 0.1)
+        const intensity = 1000 * Math.cos((v * Math.PI) / 180) * (1 + crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * 0.1)
         row.push(Math.max(0, intensity))
       }
       data.push(row)

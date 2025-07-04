@@ -1,5 +1,6 @@
-"use client"
-import { useState, useCallback } from 'react'
+"use client";
+
+import { useState, useCallback } from 'react';
 import { 
   Camera, 
   Upload, 
@@ -12,21 +13,21 @@ import {
   Info,
   Search,
   Lightbulb
-} from 'lucide-react'
-import { plantNetAPI, PlantNetResult, VibeluxPlantData } from '@/lib/plantnet-api'
+} from 'lucide-react';
+import { plantNetAPI, PlantNetResult, VibeluxPlantData } from '@/lib/plantnet-api';
 
 interface PlantIdentifierProps {
-  onPlantIdentified?: (plant: VibeluxPlantData) => void
-  onLightingRecommendation?: (params: any) => void
+  onPlantIdentified?: (plant: VibeluxPlantData) => void;
+  onLightingRecommendation?: (params: any) => void;
 }
 
 export function PlantIdentifier({ onPlantIdentified, onLightingRecommendation }: PlantIdentifierProps) {
-  const [images, setImages] = useState<{ file: File; preview: string; organ?: string }[]>([])
-  const [identifying, setIdentifying] = useState(false)
-  const [results, setResults] = useState<PlantNetResult[]>([])
-  const [selectedResult, setSelectedResult] = useState<PlantNetResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [remainingRequests, setRemainingRequests] = useState<number | null>(null)
+  const [images, setImages] = useState<{ file: File; preview: string; organ?: string }[]>([]);
+  const [identifying, setIdentifying] = useState(false);
+  const [results, setResults] = useState<PlantNetResult[]>([]);
+  const [selectedResult, setSelectedResult] = useState<PlantNetResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [remainingRequests, setRemainingRequests] = useState<number | null>(null);
 
   // Handle file selection
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {

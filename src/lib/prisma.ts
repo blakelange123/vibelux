@@ -1,24 +1,15 @@
-// Temporary Prisma client stub
-export const prisma = {
-  user: {
-    findUnique: async () => null,
-    findMany: async () => [],
-    create: async () => ({}),
-    update: async () => ({}),
-    delete: async () => ({})
-  },
-  sensorReading: {
-    create: async () => ({}),
-    findMany: async () => [],
-    groupBy: async () => []
-  },
-  webhook: {
-    findUnique: async () => null,
-    findMany: async () => [],
-    create: async () => ({}),
-    update: async () => ({}),
-    delete: async () => ({})
-  }
+import { PrismaClient } from '@prisma/client'
+
+const globalForPrisma = global as unknown as { 
+  prisma: PrismaClient
 }
 
-export default prisma
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  })
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma
+}

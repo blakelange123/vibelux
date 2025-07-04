@@ -41,7 +41,7 @@ export function EnergyMonitoringDashboard() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentPower(prev => {
-        const change = (Math.random() - 0.5) * 200
+        const change = (crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF - 0.5) * 200
         return Math.max(0, prev + change)
       })
     }, 5000)
@@ -71,7 +71,7 @@ export function EnergyMonitoringDashboard() {
 
   const mockHourlyData = Array.from({ length: 24 }, (_, i) => ({
     hour: i,
-    power: Math.max(0, 3000 + Math.sin(i / 3) * 1500 + (Math.random() - 0.5) * 500),
+    power: Math.max(0, 3000 + Math.sin(i / 3) * 1500 + (crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF - 0.5) * 500),
     cost: 0
   })).map(d => ({ ...d, cost: (d.power / 1000) * energyCostPerKWh }))
 

@@ -184,6 +184,16 @@ export function WeatherAdaptiveLighting({
           </div>
         )}
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent mb-4 mx-auto"></div>
+              <p className="text-gray-400">Fetching weather data...</p>
+            </div>
+          </div>
+        )}
+
         {/* Demo Mode Notice */}
         {weatherData && !process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY && (
           <div className="mb-4 p-3 bg-blue-900/30 border border-blue-600/50 rounded-lg">
@@ -194,7 +204,7 @@ export function WeatherAdaptiveLighting({
         )}
 
         {/* Current Weather Conditions */}
-        {weatherData && (
+        {weatherData && !loading && (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-gray-900/50 rounded-lg p-3">
@@ -320,6 +330,22 @@ export function WeatherAdaptiveLighting({
             <p className="text-purple-200 text-sm">
               {spectrumRecommendation.recommendationText}
             </p>
+            
+            {/* Additional Actions */}
+            <div className="mt-3 pt-3 border-t border-purple-600/30">
+              <p className="text-purple-300 text-xs mb-2">Apply these settings to:</p>
+              <div className="flex gap-2">
+                <button className="px-3 py-1 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-xs rounded-lg transition-colors">
+                  Current Zone
+                </button>
+                <button className="px-3 py-1 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-xs rounded-lg transition-colors">
+                  All Zones
+                </button>
+                <button className="px-3 py-1 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-xs rounded-lg transition-colors">
+                  Schedule
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

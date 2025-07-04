@@ -1,160 +1,215 @@
-'use client'
+"use client"
 
-import { useRef, useEffect, useState } from 'react'
-import { Room, Fixture, analyzeDesign } from '@/lib/design-utils'
+import { Zap, Grid as GridIcon } from 'lucide-react'
+import { HeatMapCanvas } from '@/components/HeatMapCanvas'
+import ShadowMapVisualization from '@/components/ShadowMapVisualization'
+import { Simple3DView } from '@/components/Simple3DView'
+import type { Fixture } from '@/types/lighting'
 
 interface DesignCanvasProps {
-  room: Room
+  room: {
+    width: number
+    height: number
+    mountingHeight: number
+    targetPPFD: number
+  }
   fixtures: Fixture[]
-  onFixtureMove?: (fixtureId: string, x: number, y: number) => void
+  ppfdGrid: any[]
+  showPARMap: boolean
+  showShadowMapper?: boolean
+  shadowMap?: any[]
+  obstructions?: any[]
+  view3DMode?: boolean
+  gridEnabled: boolean
+  colorScale: 'viridis' | 'heat' | 'grayscale'
+  selectedFixture: string | null
+  designMode: 'place' | 'move' | 'rotate'
+  canopyLayers?: any[]
+  showMultiLayer?: boolean
+  onClick: (e: React.MouseEvent<HTMLDivElement>) => void
+  onFixtureClick: (fixtureId: string) => void
 }
 
-export default function DesignCanvas({ room, fixtures, onFixtureMove }: DesignCanvasProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [draggedFixture, setDraggedFixture] = useState<string | null>(null)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-
-  const scale = Math.min(600 / room.width, 400 / room.length)
-  const canvasWidth = room.width * scale
-  const canvasHeight = room.length * scale
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    // Clear canvas
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight)
-
-    // Draw room outline
-    ctx.strokeStyle = '#374151'
-    ctx.lineWidth = 2
-    ctx.strokeRect(0, 0, canvasWidth, canvasHeight)
-
-    // Draw grid
-    ctx.strokeStyle = '#E5E7EB'
-    ctx.lineWidth = 1
-    const gridSize = 1 * scale // 1m grid
-    
-    for (let x = gridSize; x < canvasWidth; x += gridSize) {
-      ctx.beginPath()
-      ctx.moveTo(x, 0)
-      ctx.lineTo(x, canvasHeight)
-      ctx.stroke()
-    }
-    
-    for (let y = gridSize; y < canvasHeight; y += gridSize) {
-      ctx.beginPath()
-      ctx.moveTo(0, y)
-      ctx.lineTo(canvasWidth, y)
-      ctx.stroke()
-    }
-
-    // Draw PPFD heatmap (simplified)
-    const analysis = analyzeDesign(room, fixtures)
-    
-    // Draw fixtures
-    fixtures.forEach(fixture => {
-      const x = fixture.x * scale
-      const y = fixture.y * scale
-      const width = fixture.width * scale
-      const height = fixture.length * scale
-
-      // Fixture body
-      ctx.fillStyle = draggedFixture === fixture.id ? '#3B82F6' : '#1F2937'
-      ctx.fillRect(x - width/2, y - height/2, width, height)
-
-      // Light coverage circle
-      ctx.beginPath()
-      ctx.arc(x, y, 30, 0, 2 * Math.PI)
-      ctx.fillStyle = 'rgba(59, 130, 246, 0.1)'
-      ctx.fill()
-      ctx.strokeStyle = 'rgba(59, 130, 246, 0.3)'
-      ctx.stroke()
-
-      // Fixture label
-      ctx.fillStyle = '#FFFFFF'
-      ctx.font = '10px Arial'
-      ctx.textAlign = 'center'
-      ctx.fillText(`${fixture.wattage}W`, x, y + 3)
-    })
-
-    // Draw dimensions
-    ctx.fillStyle = '#6B7280'
-    ctx.font = '12px Arial'
-    ctx.textAlign = 'center'
-    ctx.fillText(`${room.width}m`, canvasWidth / 2, canvasHeight + 20)
-    
-    ctx.save()
-    ctx.translate(15, canvasHeight / 2)
-    ctx.rotate(-Math.PI / 2)
-    ctx.fillText(`${room.length}m`, 0, 0)
-    ctx.restore()
-
-  }, [room, fixtures, draggedFixture, canvasWidth, canvasHeight, scale])
-
-  const getMousePosition = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current
-    if (!canvas) return { x: 0, y: 0 }
-
-    const rect = canvas.getBoundingClientRect()
-    return {
-      x: (e.clientX - rect.left) / scale,
-      y: (e.clientY - rect.top) / scale
-    }
+export function DesignCanvas({
+  room,
+  fixtures,
+  ppfdGrid,
+  showPARMap,
+  showShadowMapper = false,
+  shadowMap = [],
+  obstructions = [],
+  view3DMode = false,
+  gridEnabled,
+  colorScale,
+  selectedFixture,
+  designMode,
+  canopyLayers = [],
+  showMultiLayer = false,
+  onClick,
+  onFixtureClick
+}: DesignCanvasProps) {
+  if (!room?.width || !room?.height) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-gray-400">Please configure room dimensions</div>
+      </div>
+    );
   }
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const pos = getMousePosition(e)
-    
-    // Find clicked fixture
-    const clickedFixture = fixtures.find(fixture => {
-      const dx = Math.abs(pos.x - fixture.x)
-      const dy = Math.abs(pos.y - fixture.y)
-      return dx < fixture.width/2 && dy < fixture.length/2
-    })
-
-    if (clickedFixture) {
-      setDraggedFixture(clickedFixture.id)
-      setMousePos(pos)
-    }
-  }
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const pos = getMousePosition(e)
-    setMousePos(pos)
-
-    if (draggedFixture && onFixtureMove) {
-      onFixtureMove(draggedFixture, pos.x, pos.y)
-    }
-  }
-
-  const handleMouseUp = () => {
-    setDraggedFixture(null)
+  
+  const canvasSize = {
+    width: room.width * 50,
+    height: room.height * 50
   }
 
   return (
-    <div className="relative">
-      <canvas
-        ref={canvasRef}
-        width={canvasWidth}
-        height={canvasHeight}
-        className="border border-gray-300 rounded cursor-crosshair"
-        style={{ width: canvasWidth, height: canvasHeight }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-      />
-      
-      <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-        <div>
-          <span className="font-medium">Fixtures:</span> {fixtures.length}
-        </div>
-        <div>
-          <span className="font-medium">Total Power:</span> {fixtures.reduce((sum, f) => sum + f.wattage, 0)}W
+    <div className="h-full flex items-center justify-center">
+      <div 
+        className="relative bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden cursor-crosshair"
+        style={{
+          width: `${canvasSize.width}px`,
+          height: `${canvasSize.height}px`,
+          maxWidth: '90%',
+          maxHeight: '90%'
+        }}
+        onClick={onClick}
+      >
+        {/* Heat Map */}
+        {showPARMap && ppfdGrid.length > 0 && !showShadowMapper && !view3DMode && (
+          <HeatMapCanvas
+            grid={ppfdGrid}
+            width={canvasSize.width}
+            height={canvasSize.height}
+            minPPFD={0}
+            maxPPFD={room.targetPPFD * 1.5}
+            colorScale={colorScale}
+          />
+        )}
+
+        {/* Shadow Map Visualization */}
+        {showShadowMapper && shadowMap.length > 0 && !view3DMode && (
+          <div className="absolute inset-0">
+            <ShadowMapVisualization
+              width={canvasSize.width}
+              height={canvasSize.height}
+              shadowMap={shadowMap}
+              obstructions={obstructions}
+              showObstructions={true}
+              highlightSevere={true}
+              viewMode="top"
+              roomDimensions={{ 
+                width: room.width, 
+                height: room.height,
+                depth: room.mountingHeight 
+              }}
+            />
+          </div>
+        )}
+
+        {/* 3D View */}
+        {view3DMode && (
+          <div className="absolute inset-0 bg-gray-900">
+            <Simple3DView
+              fixtures={fixtures.map(f => ({
+                id: f.id,
+                x: f.x,
+                y: f.y,
+                z: room.mountingHeight,
+                enabled: f.enabled
+              }))}
+              roomDimensions={{
+                width: room.width,
+                height: room.height,
+                depth: room.mountingHeight
+              }}
+            />
+          </div>
+        )}
+
+        {/* Grid */}
+        {gridEnabled && !view3DMode && (
+          <div className="absolute inset-0 opacity-20 pointer-events-none">
+            {Array.from({ length: Math.ceil(room.width) }, (_, i) => (
+              <div
+                key={`v-${i}`}
+                className="absolute top-0 bottom-0 w-px bg-gray-600"
+                style={{ left: `${(i / room.width) * 100}%` }}
+              />
+            ))}
+            {Array.from({ length: Math.ceil(room.height) }, (_, i) => (
+              <div
+                key={`h-${i}`}
+                className="absolute left-0 right-0 h-px bg-gray-600"
+                style={{ top: `${(i / room.height) * 100}%` }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Canopy Layers Visualization */}
+        {showMultiLayer && canopyLayers.length > 0 && !view3DMode && (
+          <div className="absolute inset-0 pointer-events-none">
+            {canopyLayers
+              .filter(layer => layer.visible)
+              .map((layer) => (
+                <div
+                  key={layer.id}
+                  className="absolute inset-x-4 opacity-20 border-2 border-dashed rounded"
+                  style={{
+                    borderColor: layer.color,
+                    backgroundColor: `${layer.color}20`,
+                    height: '20px',
+                    bottom: `${(layer.height / room.mountingHeight) * 100}%`,
+                  }}
+                >
+                  <div 
+                    className="absolute -left-2 -top-6 text-xs font-medium px-2 py-1 rounded text-white"
+                    style={{ backgroundColor: layer.color }}
+                  >
+                    {layer.name}
+                  </div>
+                </div>
+              ))}
+          </div>
+        )}
+
+        {/* Fixtures */}
+        {!view3DMode && fixtures.map((fixture) => (
+          <div
+            key={fixture.id}
+            className={`absolute w-14 h-14 transform -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all ${
+              selectedFixture === fixture.id ? 'scale-110 z-10' : ''
+            }`}
+            style={{
+              left: `${fixture.x}%`,
+              top: `${fixture.y}%`,
+              transform: `translate(-50%, -50%) rotate(${fixture.rotation}deg)`
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onFixtureClick(fixture.id)
+            }}
+          >
+            <div className={`relative w-full h-full rounded-lg ${
+              fixture.enabled 
+                ? 'bg-gradient-to-br from-yellow-500 to-orange-500 shadow-lg shadow-yellow-500/50' 
+                : 'bg-gray-600'
+            }`}>
+              <Zap className="w-6 h-6 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-white bg-black/50 px-2 py-1 rounded whitespace-nowrap">
+                {fixture.model.model}
+              </div>
+            </div>
+            {selectedFixture === fixture.id && (
+              <div className="absolute inset-0 border-2 border-purple-500 rounded-lg animate-pulse" />
+            )}
+          </div>
+        ))}
+
+        {/* Room dimensions overlay */}
+        <div className="absolute top-4 left-4 bg-gray-900/80 backdrop-blur px-3 py-1 rounded-lg border border-gray-700">
+          <p className="text-white text-sm font-medium">
+            {room.width} × {room.height} ft
+          </p>
         </div>
       </div>
     </div>

@@ -62,6 +62,10 @@ export function CustomReportingBuilder() {
   const [showDataPanel, setShowDataPanel] = useState(true)
   const [draggedWidget, setDraggedWidget] = useState<string | null>(null)
   const [showSalesforce, setShowSalesforce] = useState(false)
+  const [showScheduler, setShowScheduler] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
+  const [showShareMenu, setShowShareMenu] = useState(false)
+  const [selectedChartType, setSelectedChartType] = useState<'line' | 'bar' | 'pie'>('line')
 
   const reportTemplates: ReportTemplate[] = [
     {
@@ -178,15 +182,11 @@ export function CustomReportingBuilder() {
   }
 
   const exportReport = (format: 'pdf' | 'excel' | 'csv') => {
-    console.log(`Exporting report as ${format}`)
     // In a real app, this would generate and download the report
   }
 
   const saveReport = () => {
-    console.log('Saving report:', {
-      name: reportName,
-      widgets: widgets
-    })
+    // Report configuration would be saved here
     // In a real app, this would save the report configuration
   }
 
@@ -216,8 +216,8 @@ export function CustomReportingBuilder() {
                 {[1, 2, 3].map(i => (
                   <tr key={i} className="border-b">
                     <td className="p-2">2024-01-{String(i).padStart(2, '0')}</td>
-                    <td className="p-2">{(Math.random() * 100).toFixed(1)}</td>
-                    <td className="p-2 text-green-400">+{(Math.random() * 10).toFixed(1)}%</td>
+                    <td className="p-2">{(crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * 100).toFixed(1)}</td>
+                    <td className="p-2 text-green-400">+{(crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * 10).toFixed(1)}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -227,7 +227,7 @@ export function CustomReportingBuilder() {
       case 'metric':
         return (
           <div className="h-full flex flex-col items-center justify-center">
-            <p className="text-4xl font-bold text-indigo-400">{(Math.random() * 1000).toFixed(0)}</p>
+            <p className="text-4xl font-bold text-indigo-400">{(crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * 1000).toFixed(0)}</p>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{widget.title}</p>
           </div>
         )
@@ -256,7 +256,15 @@ export function CustomReportingBuilder() {
           />
         </div>
         <div className="flex items-center gap-3">
-          <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+          <button 
+            onClick={() => setShowScheduler(!showScheduler)}
+            className={`p-2 rounded transition-colors ${
+              showScheduler 
+                ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
+            title="Schedule Report"
+          >
             <Clock className="w-5 h-5" />
           </button>
           <button
@@ -292,9 +300,51 @@ export function CustomReportingBuilder() {
               </button>
             </div>
           </div>
-          <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
-            <Share2 className="w-5 h-5" />
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => setShowShareMenu(!showShareMenu)}
+              className={`p-2 rounded transition-colors ${
+                showShareMenu 
+                  ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                  : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
+              title="Share Report"
+            >
+              <Share2 className="w-5 h-5" />
+            </button>
+            {showShareMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border rounded-lg shadow-lg z-10">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href)
+                    setShowShareMenu(false)
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Copy Link
+                </button>
+                <button
+                  onClick={() => {
+                    const subject = encodeURIComponent(`VibeLux Report: ${reportName}`)
+                    const body = encodeURIComponent(`Check out this VibeLux report: ${window.location.href}`)
+                    window.open(`mailto:?subject=${subject}&body=${body}`)
+                    setShowShareMenu(false)
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Email Report
+                </button>
+                <button
+                  onClick={() => {
+                    setShowShareMenu(false)
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Create Public Link
+                </button>
+              </div>
+            )}
+          </div>
           <button
             onClick={() => setShowSalesforce(!showSalesforce)}
             className={`p-2 rounded transition-colors ${
@@ -523,13 +573,34 @@ export function CustomReportingBuilder() {
                     <div>
                       <label className="block text-sm font-medium mb-2">Chart Type</label>
                       <div className="grid grid-cols-3 gap-2">
-                        <button className="p-2 border rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <button 
+                          onClick={() => setSelectedChartType('line')}
+                          className={`p-2 border rounded transition-colors ${
+                            selectedChartType === 'line' 
+                              ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900' 
+                              : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
+                        >
                           <LineChart className="w-4 h-4 mx-auto" />
                         </button>
-                        <button className="p-2 border rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <button 
+                          onClick={() => setSelectedChartType('bar')}
+                          className={`p-2 border rounded transition-colors ${
+                            selectedChartType === 'bar' 
+                              ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900' 
+                              : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
+                        >
                           <BarChart3 className="w-4 h-4 mx-auto" />
                         </button>
-                        <button className="p-2 border rounded hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <button 
+                          onClick={() => setSelectedChartType('pie')}
+                          className={`p-2 border rounded transition-colors ${
+                            selectedChartType === 'pie' 
+                              ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900' 
+                              : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
+                        >
                           <PieChart className="w-4 h-4 mx-auto" />
                         </button>
                       </div>
@@ -538,7 +609,14 @@ export function CustomReportingBuilder() {
 
                   <div>
                     <label className="block text-sm font-medium mb-2">Filters</label>
-                    <button className="w-full flex items-center justify-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <button 
+                      onClick={() => setShowFilters(!showFilters)}
+                      className={`w-full flex items-center justify-center gap-2 px-3 py-2 border rounded-lg transition-colors ${
+                        showFilters 
+                          ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900' 
+                          : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                      }`}
+                    >
                       <Filter className="w-4 h-4" />
                       Add Filter
                     </button>
@@ -557,8 +635,8 @@ export function CustomReportingBuilder() {
             data={{
               reportName,
               projectStatus: 'In Progress',
-              energySavings: Math.round(Math.random() * 30 + 20),
-              roiPercentage: Math.round(Math.random() * 40 + 60),
+              energySavings: Math.round(crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * 30 + 20),
+              roiPercentage: Math.round(crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * 40 + 60),
               fixtureCount: widgets.filter(w => w.dataSource === 'energy').length * 50 || 100,
               totalPPFD: 650,
               coverageArea: 10000,
@@ -573,6 +651,130 @@ export function CustomReportingBuilder() {
             reportId={activeReport?.id || Date.now().toString()}
             onClose={() => setShowSalesforce(false)}
           />
+        </div>
+      )}
+
+      {/* Schedule Report Modal */}
+      {showScheduler && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full border">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Schedule Report</h2>
+              <button
+                onClick={() => setShowScheduler(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Frequency</label>
+                <select className="w-full px-3 py-2 border rounded-lg">
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="quarterly">Quarterly</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Email Recipients</label>
+                <input
+                  type="email"
+                  placeholder="Enter email addresses (comma-separated)"
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  onClick={() => setShowScheduler(false)}
+                  className="px-4 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowScheduler(false);
+                  }}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                >
+                  Schedule
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filters Panel */}
+      {showFilters && (
+        <div className="fixed right-4 top-20 w-80 bg-white dark:bg-gray-800 rounded-xl border shadow-2xl z-50 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Report Filters</h3>
+            <button
+              onClick={() => setShowFilters(false)}
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Date Range</label>
+              <select className="w-full px-3 py-2 border rounded-lg">
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+                <option value="90">Last 90 days</option>
+                <option value="custom">Custom Range</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium mb-2 block">Facility</label>
+              <select className="w-full px-3 py-2 border rounded-lg">
+                <option value="all">All Facilities</option>
+                <option value="greenhouse-a">Greenhouse A</option>
+                <option value="indoor-farm-1">Indoor Farm 1</option>
+                <option value="vertical-farm-b">Vertical Farm B</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium mb-2 block">Metrics</label>
+              <div className="space-y-2">
+                <label className="flex items-center">
+                  <input type="checkbox" defaultChecked className="mr-2" />
+                  <span className="text-sm">Revenue</span>
+                </label>
+                <label className="flex items-center">
+                  <input type="checkbox" defaultChecked className="mr-2" />
+                  <span className="text-sm">Energy Usage</span>
+                </label>
+                <label className="flex items-center">
+                  <input type="checkbox" className="mr-2" />
+                  <span className="text-sm">Yield Data</span>
+                </label>
+              </div>
+            </div>
+            
+            <div className="pt-4 flex gap-2">
+              <button 
+                onClick={() => setShowFilters(false)}
+                className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                Clear
+              </button>
+              <button 
+                onClick={() => {
+                  setShowFilters(false);
+                }}
+                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

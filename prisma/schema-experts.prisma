@@ -1,0 +1,321 @@
+// Expert Consultation System Schema
+
+model Expert {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id])
+  
+  // Profile Information
+  displayName       String
+  title             String
+  bio               String   @db.Text
+  photoUrl          String?
+  linkedinUrl       String?
+  websiteUrl        String?
+  
+  // Expertise Areas
+  specialties       String[] // growing, packaging, engineering, IPM, sales, compliance, etc.
+  certifications    String[]
+  yearsExperience   Int
+  
+  // Pricing
+  hourlyRate        Float    @default(200) // in USD
+  minimumHours      Float    @default(1)   // minimum booking duration
+  currency          String   @default("USD")
+  
+  // Availability
+  timezone          String   @default("America/Los_Angeles")
+  availableDays     Int[]    // 0-6 (Sunday to Saturday)
+  availableHours    Json     // { start: "09:00", end: "17:00" }
+  bufferTime        Int      @default(15) // minutes between sessions
+  
+  // Settings
+  autoApprove       Boolean  @default(false) // auto-approve bookings
+  videoPreference   String   @default("platform") // platform, zoom, google_meet
+  cancellationHours Int      @default(24) // hours notice required
+  
+  // Stats
+  totalSessions     Int      @default(0)
+  totalEarnings     Float    @default(0)
+  averageRating     Float?
+  responseTime      Int?     // average response time in hours
+  
+  // Status
+  status            ExpertStatus @default(PENDING)
+  verifiedAt        DateTime?
+  suspendedAt       DateTime?
+  suspensionReason  String?
+  
+  // Relationships
+  consultations     Consultation[]
+  reviews           ExpertReview[]
+  availability      ExpertAvailability[]
+  payouts           ExpertPayout[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([status])
+  @@index([specialties])
+}
+
+enum ExpertStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+model Consultation {
+  id                String   @id @default(cuid())
+  
+  // Participants
+  expertId          String
+  expert            Expert   @relation(fields: [expertId], references: [id])
+  clientId          String
+  client            User     @relation("ClientConsultations", fields: [clientId], references: [id])
+  
+  // Scheduling
+  scheduledStart    DateTime
+  scheduledEnd      DateTime
+  duration          Int      // in minutes
+  timezone          String
+  
+  // Meeting Details
+  title             String
+  description       String?  @db.Text
+  objectives        String[] // what client wants to achieve
+  preparationNotes  String?  @db.Text
+  
+  // Status
+  status            ConsultationStatus @default(REQUESTED)
+  
+  // Meeting Info
+  meetingUrl        String?  // platform video call URL
+  meetingId         String?  // internal meeting ID
+  recordingUrl      String?  // if recording enabled
+  
+  // Financial
+  hourlyRate        Float
+  totalAmount       Float
+  platformFee       Float    // 10% of total
+  expertEarnings    Float    // 90% of total
+  currency          String   @default("USD")
+  
+  // Payment
+  paymentStatus     PaymentStatus @default(PENDING)
+  paymentIntentId   String?  // Stripe payment intent
+  paidAt            DateTime?
+  refundedAt        DateTime?
+  refundReason      String?
+  
+  // Post-session
+  actualStart       DateTime?
+  actualEnd         DateTime?
+  notes             String?  @db.Text // expert's notes
+  followUpItems     String[] // action items
+  attachments       ConsultationAttachment[]
+  
+  // Cancellation
+  cancelledAt       DateTime?
+  cancelledBy       String?  // userId who cancelled
+  cancellationReason String?
+  
+  // Anti-disintermediation
+  platformCallUsed  Boolean  @default(false)
+  externalContact   Boolean  @default(false) // flag if external contact detected
+  warningsSent      Int      @default(0)
+  
+  // Relationships
+  messages          ConsultationMessage[]
+  review            ExpertReview?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([expertId, scheduledStart])
+  @@index([clientId, scheduledStart])
+  @@index([status])
+  @@index([paymentStatus])
+}
+
+enum ConsultationStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  REFUNDED
+  FAILED
+}
+
+model ConsultationMessage {
+  id              String   @id @default(cuid())
+  consultationId  String
+  consultation    Consultation @relation(fields: [consultationId], references: [id])
+  
+  senderId        String
+  sender          User     @relation(fields: [senderId], references: [id])
+  
+  content         String   @db.Text
+  
+  // Anti-disintermediation monitoring
+  flaggedContent  Boolean  @default(false)
+  flagReason      String?  // "phone_number", "email", "external_link", etc.
+  
+  attachments     MessageAttachment[]
+  
+  createdAt       DateTime @default(now())
+  
+  @@index([consultationId])
+}
+
+model ExpertReview {
+  id              String   @id @default(cuid())
+  consultationId  String   @unique
+  consultation    Consultation @relation(fields: [consultationId], references: [id])
+  expertId        String
+  expert          Expert   @relation(fields: [expertId], references: [id])
+  clientId        String
+  client          User     @relation(fields: [clientId], references: [id])
+  
+  rating          Int      // 1-5 stars
+  comment         String?  @db.Text
+  
+  // Specific ratings
+  knowledge       Int?     // 1-5
+  communication   Int?     // 1-5
+  professionalism Int?     // 1-5
+  value           Int?     // 1-5
+  
+  // Expert response
+  expertResponse  String?  @db.Text
+  respondedAt     DateTime?
+  
+  isPublic        Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([expertId])
+  @@index([rating])
+}
+
+model ExpertAvailability {
+  id          String   @id @default(cuid())
+  expertId    String
+  expert      Expert   @relation(fields: [expertId], references: [id])
+  
+  date        DateTime @db.Date
+  startTime   String   // "09:00"
+  endTime     String   // "17:00"
+  
+  isAvailable Boolean  @default(true)
+  reason      String?  // if not available
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([expertId, date])
+  @@index([expertId, date])
+}
+
+model ExpertPayout {
+  id              String   @id @default(cuid())
+  expertId        String
+  expert          Expert   @relation(fields: [expertId], references: [id])
+  
+  amount          Float
+  currency        String   @default("USD")
+  
+  // Stripe Connect
+  transferId      String?
+  destinationId   String?  // Stripe Connect account
+  
+  status          PayoutStatus @default(PENDING)
+  
+  // Period
+  periodStart     DateTime
+  periodEnd       DateTime
+  consultationIds String[]
+  
+  processedAt     DateTime?
+  failedAt        DateTime?
+  failureReason   String?
+  
+  createdAt       DateTime @default(now())
+  
+  @@index([expertId])
+  @@index([status])
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model ConsultationAttachment {
+  id              String   @id @default(cuid())
+  consultationId  String
+  consultation    Consultation @relation(fields: [consultationId], references: [id])
+  
+  fileName        String
+  fileUrl         String
+  fileSize        Int
+  mimeType        String
+  
+  uploadedBy      String
+  uploader        User     @relation(fields: [uploadedBy], references: [id])
+  
+  createdAt       DateTime @default(now())
+}
+
+model MessageAttachment {
+  id          String   @id @default(cuid())
+  messageId   String
+  message     ConsultationMessage @relation(fields: [messageId], references: [id])
+  
+  fileName    String
+  fileUrl     String
+  fileSize   Int
+  mimeType   String
+  
+  createdAt   DateTime @default(now())
+}
+
+// Platform Features to Prevent Disintermediation
+model PlatformFeature {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  
+  // Features that add value to keep users on platform
+  features    String[] // ["video_recording", "automated_scheduling", "invoicing", "contracts", "compliance_tracking"]
+}
+
+// Terms violation tracking
+model TermsViolation {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  type        String   // "contact_sharing", "off_platform_solicitation", etc.
+  description String
+  severity    String   // "warning", "suspension", "ban"
+  
+  actionTaken String?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([userId])
+}

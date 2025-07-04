@@ -307,17 +307,17 @@ export class EnhancedWeatherAPI {
 
   private getDemoWeatherData(city: string): WeatherData {
     // Return realistic demo data for testing
-    const temperature = 22 + Math.random() * 8 - 4 // 18-26°C
-    const humidity = 60 + Math.random() * 20 - 10 // 50-70%
-    const cloudCover = Math.random() * 100
+    const temperature = 22 + crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * 8 - 4 // 18-26°C
+    const humidity = 60 + crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * 20 - 10 // 50-70%
+    const cloudCover = crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * 100
     
     return {
       temperature,
       humidity,
-      pressure: 1013 + Math.random() * 20 - 10,
+      pressure: 1013 + crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * 20 - 10,
       cloudCover,
       visibility: 10,
-      windSpeed: Math.random() * 10,
+      windSpeed: crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * 10,
       weatherMain: cloudCover > 70 ? 'Clouds' : cloudCover > 30 ? 'Partly Cloudy' : 'Clear',
       weatherDescription: cloudCover > 70 ? 'overcast clouds' : cloudCover > 30 ? 'scattered clouds' : 'clear sky',
       lightTransmission: this.calculateLightTransmission(cloudCover, 10000),

@@ -151,14 +151,72 @@ export class DLCFixturesParser {
           };
         }
 
-        // Estimate coverage area from dimensions or PPF
+        // Estimate dimensions and coverage area
         let coverage = 16; // Default 4x4 ft
+        let estimatedWidth = dlc.width;
+        let estimatedLength = dlc.length;
+        let estimatedHeight = dlc.height;
+
         if (dlc.width && dlc.length) {
           // Convert inches to feet and calculate area
           coverage = (dlc.width / 12) * (dlc.length / 12);
         } else {
-          // Estimate based on PPF (rough approximation)
-          coverage = Math.round(dlc.reportedPPF / 125); // Assuming ~125 PPF per sq ft for typical coverage
+          // Estimate dimensions based on wattage/PPF when missing
+          const wattage = dlc.testedWattage || dlc.reportedWattage || 0;
+          const ppf = dlc.reportedPPF || 0;
+          
+          
+          if (wattage > 0) {
+            // Estimate dimensions based on wattage patterns
+            if (wattage < 100) {
+              // Small fixtures: 12" x 24"
+              estimatedWidth = estimatedWidth || 12;
+              estimatedLength = estimatedLength || 24;
+              estimatedHeight = estimatedHeight || 3;
+            } else if (wattage < 300) {
+              // Medium fixtures: 18" x 36" 
+              estimatedWidth = estimatedWidth || 18;
+              estimatedLength = estimatedLength || 36;
+              estimatedHeight = estimatedHeight || 4;
+            } else if (wattage < 600) {
+              // Large fixtures: 24" x 48"
+              estimatedWidth = estimatedWidth || 24;
+              estimatedLength = estimatedLength || 48;
+              estimatedHeight = estimatedHeight || 6;
+            } else {
+              // Extra large fixtures: 36" x 60"
+              estimatedWidth = estimatedWidth || 36;
+              estimatedLength = estimatedLength || 60;
+              estimatedHeight = estimatedHeight || 8;
+            }
+          } else if (ppf > 0) {
+            // Fallback estimation based on PPF
+            if (ppf < 1000) {
+              estimatedWidth = estimatedWidth || 12;
+              estimatedLength = estimatedLength || 24;
+              estimatedHeight = estimatedHeight || 3;
+            } else if (ppf < 2000) {
+              estimatedWidth = estimatedWidth || 18;
+              estimatedLength = estimatedLength || 36;
+              estimatedHeight = estimatedHeight || 4;
+            } else if (ppf < 3000) {
+              estimatedWidth = estimatedWidth || 24;
+              estimatedLength = estimatedLength || 48;
+              estimatedHeight = estimatedHeight || 6;
+            } else {
+              estimatedWidth = estimatedWidth || 36;
+              estimatedLength = estimatedLength || 60;
+              estimatedHeight = estimatedHeight || 8;
+            }
+          }
+          
+          // Calculate coverage from estimated dimensions
+          if (estimatedWidth && estimatedLength) {
+            coverage = (estimatedWidth / 12) * (estimatedLength / 12);
+          } else {
+            // Final fallback based on PPF
+            coverage = Math.round(ppf / 125); // Assuming ~125 PPF per sq ft for typical coverage
+          }
         }
 
         return {
@@ -176,7 +234,13 @@ export class DLCFixturesParser {
           voltage: dlc.maxVoltage ? `${dlc.minVoltage || 120}-${dlc.maxVoltage}V` : '120-277V',
           dimmable: dlc.dimmable,
           warranty: dlc.warranty,
-          dlcData: dlc
+          dlcData: {
+            ...dlc,
+            // Override with estimated dimensions if originals were missing
+            width: estimatedWidth,
+            length: estimatedLength,
+            height: estimatedHeight
+          }
         };
       });
   }

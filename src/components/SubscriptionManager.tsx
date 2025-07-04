@@ -4,48 +4,49 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CreditCard, Loader2, AlertCircle, CheckCircle, ExternalLink } from 'lucide-react';
 import { PRICING_PLANS } from '@/lib/stripe';
+import { UnifiedCustomer, UnifiedPricingManager } from '@/lib/unified-pricing';
 
 interface SubscriptionManagerProps {
-  currentPlan?: string;
-  customerId?: string;
+  customer: UnifiedCustomer;
   subscriptionStatus?: string;
   cancelAtPeriodEnd?: boolean;
   currentPeriodEnd?: string;
+  revenueData?: {
+    monthlyRevenue: number;
+    revenueSharingPayments: number;
+  };
 }
 
 export function SubscriptionManager({
-  currentPlan = 'free',
-  customerId,
+  customer,
   subscriptionStatus,
   cancelAtPeriodEnd,
-  currentPeriodEnd
+  currentPeriodEnd,
+  revenueData
 }: SubscriptionManagerProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const plan = PRICING_PLANS[currentPlan as keyof typeof PRICING_PLANS] || PRICING_PLANS.free;
+  const features = UnifiedPricingManager.getCustomerFeatures(customer);
+  const billingSummary = UnifiedPricingManager.getBillingSummary(customer, revenueData);
 
   const handleManageSubscription = async () => {
-    if (!customerId) {
-      router.push('/pricing');
-      return;
-    }
-
     setLoading(true);
     
     try {
-      const response = await fetch('/api/stripe/portal', {
+      const response = await fetch('/api/stripe/customer-portal', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ customerId }),
+        }
       });
 
       const data = await response.json();
       
       if (data.url) {
         window.location.href = data.url;
+      } else if (data.error) {
+        alert(data.error);
       }
     } catch (error) {
       console.error('Portal error:', error);
@@ -102,18 +103,46 @@ export function SubscriptionManager({
       <div className="space-y-4">
         {/* Current Plan */}
         <div>
-          <p className="text-sm text-gray-500 mb-1">Current Plan</p>
-          <p className="text-2xl font-bold text-gray-900">{plan.name}</p>
-          <p className="text-gray-600">{plan.description}</p>
+          <p className="text-sm text-gray-500 mb-1">
+            Current {customer.paymentModel === 'subscription' ? 'Plan' : 'Model'}
+          </p>
+          <p className="text-2xl font-bold text-gray-900">{features.tier.name}</p>
+          <p className="text-gray-600">{features.tier.description}</p>
+          <div className="mt-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            {customer.paymentModel === 'subscription' ? 'Subscription' : 'Revenue Sharing'}
+          </div>
         </div>
 
         {/* Billing */}
-        {currentPlan !== 'free' && (
+        {customer.effectiveFeatureLevel !== 'free' && (
           <div>
             <p className="text-sm text-gray-500 mb-1">Billing</p>
-            <p className="text-lg font-semibold text-gray-900">
-              ${plan.price}/{plan.interval}
-            </p>
+            {billingSummary.model === 'subscription' ? (
+              <div>
+                <p className="text-lg font-semibold text-gray-900">
+                  ${billingSummary.monthlyAmount}/month
+                </p>
+                {billingSummary.annualAmount && (
+                  <p className="text-sm text-green-600">
+                    Save ${(billingSummary.monthlyAmount * 12) - billingSummary.annualAmount} with annual billing
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div>
+                <p className="text-lg font-semibold text-gray-900">
+                  ${billingSummary.baseAmount}/month base
+                  {billingSummary.variableAmount > 0 && (
+                    <span className="text-sm text-gray-600">
+                      + ${billingSummary.variableAmount} performance
+                    </span>
+                  )}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Total: ${billingSummary.totalAmount} (savings: ${billingSummary.savingsGenerated})
+                </p>
+              </div>
+            )}
             {currentPeriodEnd && (
               <p className="text-sm text-gray-600">
                 {cancelAtPeriodEnd ? 'Expires' : 'Renews'} on{' '}
@@ -127,18 +156,23 @@ export function SubscriptionManager({
         <div>
           <p className="text-sm text-gray-500 mb-3">Features</p>
           <ul className="space-y-2">
-            {plan.features.slice(0, 5).map((feature, index) => (
+            {features.features.slice(0, 5).map((feature, index) => (
               <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
                 <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
                 <span>{feature}</span>
               </li>
             ))}
           </ul>
+          {features.features.length > 5 && (
+            <p className="text-sm text-gray-500 mt-2">
+              +{features.features.length - 5} more features
+            </p>
+          )}
         </div>
 
         {/* Actions */}
         <div className="pt-4 space-y-3">
-          {currentPlan === 'free' ? (
+          {customer.effectiveFeatureLevel === 'free' ? (
             <button
               onClick={() => router.push('/pricing')}
               className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
@@ -146,23 +180,43 @@ export function SubscriptionManager({
               Upgrade Plan
             </button>
           ) : (
-            <button
-              onClick={handleManageSubscription}
-              disabled={loading}
-              className="w-full py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Loading...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="w-4 h-4" />
-                  Manage Subscription
-                </>
+            <div className="space-y-2">
+              <button
+                onClick={handleManageSubscription}
+                disabled={loading}
+                className="w-full py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="w-4 h-4" />
+                    Manage {customer.paymentModel === 'subscription' ? 'Subscription' : 'Billing'}
+                  </>
+                )}
+              </button>
+              
+              {customer.paymentModel === 'subscription' && (
+                <button
+                  onClick={() => router.push('/pricing/revenue-sharing')}
+                  className="w-full py-2 text-purple-600 hover:text-purple-700 transition-colors text-sm"
+                >
+                  Switch to Revenue Sharing →
+                </button>
               )}
-            </button>
+              
+              {customer.paymentModel === 'revenue-sharing' && (
+                <button
+                  onClick={() => router.push('/pricing')}
+                  className="w-full py-2 text-purple-600 hover:text-purple-700 transition-colors text-sm"
+                >
+                  View Subscription Plans →
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -174,13 +228,20 @@ export function SubscriptionManager({
           <UsageBar
             label="Projects"
             current={2}
-            limit={plan.limitations.projects}
+            limit={features.limits.projects}
           />
           <UsageBar
             label="Team Members"
             current={1}
-            limit={plan.limitations.users}
+            limit={features.limits.teamMembers}
           />
+          {features.limits.monthlySOPs && (
+            <UsageBar
+              label="SOPs Generated"
+              current={3}
+              limit={features.limits.monthlySOPs}
+            />
+          )}
         </div>
       </div>
     </div>

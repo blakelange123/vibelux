@@ -257,7 +257,7 @@ export function TCOCalculator() {
         scenario: scenario.name,
         ...analysis
       }
-    }).filter(Boolean)
+    }).filter((item): item is NonNullable<typeof item> => item !== null)
 
     const csv = [
       ['Scenario', 'Initial Investment', 'Annual Operating', '5-Year TCO', '10-Year TCO', 'Payback Period', 'ROI', 'NPV'],

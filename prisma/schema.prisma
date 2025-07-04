@@ -10,262 +10,4426 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum SubscriptionTier {
-  FREE
-  PROFESSIONAL
-  ENTERPRISE
-}
-
-enum UserRole {
-  USER
-  ADMIN
-  SUPER_ADMIN
-}
-
 model User {
-  id               String           @id @default(cuid())
-  clerkId          String           @unique
-  email            String           @unique
+  id               String   @id @default(cuid())
+  email            String   @unique
   name             String?
-  role             UserRole         @default(USER)
-  subscriptionTier SubscriptionTier @default(FREE)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  
-  projects         Project[]
-  savedFixtures    SavedFixture[]
-  lightRecipes     LightRecipe[]
-  reports          Report[]
-  apiKeys          ApiKey[]
-  teamMembers      TeamMember[]
-  usageRecords     UsageRecord[]
+  role             UserRole @default(USER)
+  settings         Json? // User preferences
+  subscriptionTier String?  @default("FREE")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  projects                 Project[]
+  experiments              Experiment[]
+  spectralLearningProfiles SpectralLearningProfile[]
+  facilities               FacilityUser[]
+  investments              Investment[]
+  affiliateProfile         Affiliate?
+  notifications            Notification[]
+  scoutingRecords          ScoutingRecord[]
+  tasks                    Task[]
+  sessions                 UserSession[]
+  mobileSessions           MobileSession[]
+  apiKeys                  ApiKey[]
+  auditLogs                AuditLog[]
+  securityEvents           SecurityEvent[]
+  featureOverrides         UserFeatureOverride[]
+  updateStatuses           UserUpdateStatus[]
+  priceProtections         PriceProtection[]
+  ownedFacilities          Facility[]                @relation("FacilityOwner")
+  serviceRequests          ServiceRequest[]
+  serviceReviews           ServiceReview[]
+  equipmentRequests        EquipmentRequest[]
+  equipmentOffers          EquipmentOffer[]
+  equipmentQuestions       EquipmentQuestion[]
+
+  // Expert consultation relationships
+  expertProfile            Expert?
+  consultationsAsClient    Consultation[]  @relation("ClientConsultations")
+  consultationMessages     ConsultationMessage[]
+  expertReviews            ExpertReview[]
+  consultationAttachments  ConsultationAttachment[]
+  termsViolations          TermsViolation[]
+
+  // Financial automation relationships
+  revenueSharingAgreements RevenueSharingAgreement[]
+  invoices                 Invoice[]
+  payments                 Payment[]
+  paymentMethods           PaymentMethod[]
+  utilityConnections       UtilityConnection[]
+  collectionActivities     CollectionActivity[]
+  collectionCases          CollectionCase[]
+  affiliateCommissions     AffiliateCommission[]
+
+  // Marketplace relationships
+  marketplaceVendor   MarketplaceVendor?
+  marketplaceProducts MarketplaceProduct[]
+  marketplaceOrders   MarketplaceOrder[]    @relation("OrderBuyer")
+  vendorOrders        MarketplaceOrder[]    @relation("OrderVendor")
+  cartItems           MarketplaceCartItem[]
+  geneticsListings    GeneticsListing[]
+  rfqs                RequestForQuote[]
+
+  // Market data & benchmarking relationships
+  marketDataReports      MarketData[]
+  benchmarkSubscriptions BenchmarkSubscription[]
+  quotes                 RFQQuote[]
+
+  utilityBills       UtilityBillData[]
+  clientBaseline     ClientBaseline?
+  vibeluxInvoices    VibeLuxInvoice[]
+  financialDocuments FinancialDocument[]
 }
 
 model Project {
-  id              String   @id @default(cuid())
-  name            String
-  description     String?
-  userId          String
-  user            User     @relation(fields: [userId], references: [id])
-  
-  // Project configuration
-  location        Json?    // { lat, lng, address }
-  roomDimensions  Json?    // { length, width, height }
-  fixtureLayout   Json?    // Complete layout data
-  weatherData     Json?    // Weather integration data
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  fixtures        ProjectFixture[]
-  calculations    Calculation[]
-  reports         Report[]
-  
-  @@index([userId])
-}
-
-model Fixture {
-  id              String   @id @default(cuid())
-  dlcListingId    String?  @unique
-  manufacturer    String
-  model           String
-  
-  // Technical specifications
-  ppf             Float    // μmol/s
-  wattage         Float    // W
-  efficacy        Float    // μmol/J
-  spectrum        Json     // Spectral distribution data
-  dimensions      Json     // { length, width, height }
-  weight          Float?   // kg
-  
-  // Optical properties
-  beamAngle       Float?   // degrees
-  distribution    String?  // batwing, lambertian, etc.
-  
-  // Electrical properties
-  voltage         String   // 120V, 208V, 240V, 277V, 347V, 480V, 600V
-  powerFactor     Float?
-  thd             Float?   // Total Harmonic Distortion
-  
-  // Certifications
-  dlcQualified    Boolean  @default(false)
-  dlcPremium      Boolean  @default(false)
-  
-  // Metadata
-  dataSheet       String?  // URL to PDF
-  iesFile         String?  // URL to IES file
-  images          String[] // Array of image URLs
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  projectFixtures ProjectFixture[]
-  savedBy         SavedFixture[]
-  
-  @@index([manufacturer, model])
-  @@index([dlcQualified])
-  @@index([efficacy])
-}
-
-model ProjectFixture {
-  id         String   @id @default(cuid())
-  projectId  String
-  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  fixtureId  String
-  fixture    Fixture  @relation(fields: [fixtureId], references: [id])
-  
-  // Placement
-  position   Json     // { x, y, z }
-  rotation   Float    @default(0)
-  quantity   Int      @default(1)
-  
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  
-  @@unique([projectId, fixtureId, position])
-  @@index([projectId])
-}
-
-model SavedFixture {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  fixtureId String
-  fixture   Fixture  @relation(fields: [fixtureId], references: [id])
-  
-  notes     String?
-  tags      String[]
-  
-  createdAt DateTime @default(now())
-  
-  @@unique([userId, fixtureId])
-  @@index([userId])
-}
-
-model LightRecipe {
   id          String   @id @default(cuid())
   name        String
   description String?
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  
-  crop        String
-  stages      Json     // Array of growth stages with parameters
-  validated   Boolean  @default(false)
-  public      Boolean  @default(false)
-  
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
-  @@index([userId])
-  @@index([crop])
-  @@index([public])
+
+  spaces      Space[]
+  experiments Experiment[]
 }
 
-model Calculation {
-  id        String   @id @default(cuid())
+model Space {
+  id        String    @id @default(cuid())
+  name      String
+  type      SpaceType
+  area      Float
+  height    Float
   projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
-  type      String   // ppfd, dli, uniformity, roi, etc.
-  input     Json     // Input parameters
-  result    Json     // Calculation results
-  
-  createdAt DateTime @default(now())
-  
-  @@index([projectId])
-  @@index([type])
+  project   Project   @relation(fields: [projectId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  fixtures     Fixture[]
+  spectralData SpectralData[]
 }
 
-model Report {
+model Fixture {
+  id           String   @id @default(cuid())
+  model        String
+  manufacturer String
+  power        Float
+  spaceId      String
+  space        Space    @relation(fields: [spaceId], references: [id])
+  position     Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  spectralOutputs SpectralOutput[]
+}
+
+model Experiment {
+  id          String           @id @default(cuid())
+  name        String
+  description String?
+  projectId   String
+  project     Project          @relation(fields: [projectId], references: [id])
+  userId      String
+  user        User             @relation(fields: [userId], references: [id])
+  startDate   DateTime
+  endDate     DateTime?
+  status      ExperimentStatus @default(ACTIVE)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  measurements Measurement[]
+}
+
+model Measurement {
+  id           String     @id @default(cuid())
+  experimentId String
+  experiment   Experiment @relation(fields: [experimentId], references: [id])
+  timestamp    DateTime
+  metricType   MetricType
+  value        Float
+  unit         String
+  notes        String?
+  createdAt    DateTime   @default(now())
+
+  @@index([experimentId, timestamp])
+}
+
+// Historical data for analysis
+model HistoricalData {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  projectId String?
-  project   Project? @relation(fields: [projectId], references: [id])
-  
-  type      String   // executive, technical, financial, compliance
-  title     String
-  content   Json     // Report data and configuration
-  format    String   // pdf, excel, word
-  url       String?  // Generated report URL
-  
+  source    String
+  dataType  String
+  timestamp DateTime
+  data      Json
+  processed Boolean  @default(false)
   createdAt DateTime @default(now())
-  
-  @@index([userId])
-  @@index([projectId])
-  @@index([type])
+
+  @@index([source, timestamp])
 }
 
-model ApiKey {
+// Advanced ML Models
+model YieldTrainingData {
+  id           String   @id @default(cuid())
+  temperature  Float
+  humidity     Float
+  ppfd         Float
+  co2          Float
+  vpd          Float
+  ec           Float
+  ph           Float
+  dli          Float
+  growthStage  String
+  actualYield  Float
+  qualityScore Float
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model YieldPredictionModel {
+  id        String   @id @default(cuid())
+  version   String
+  modelData Json // Serialized TensorFlow model
+  metrics   Json // Model performance metrics
+  active    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([version])
+}
+
+// Performance tracking
+model PerformanceRecord {
+  id         String   @id @default(cuid())
+  facilityId String
+  date       DateTime
+  metrics    Json
+  createdAt  DateTime @default(now())
+
+  @@index([facilityId, date])
+}
+
+// New Spectral Learning Models
+model SpectralData {
+  id        String   @id @default(cuid())
+  spaceId   String
+  space     Space    @relation(fields: [spaceId], references: [id])
+  timestamp DateTime
+
+  // Environment type
+  environmentType          EnvironmentType
+  naturalLightContribution Float // 0-100% for greenhouses
+
+  // Spectrum measurements (μmol/m²/s for each band)
+  uvb280_315    Float? // UV-B (critical for THC)
+  uva315_340    Float? // UV-A lower
+  uva340_380    Float? // UV-A mid
+  uv380_390     Float? // UV-A upper (cannabinoid trigger)
+  uv390_400     Float? // UV-A/Violet boundary
+  violet400_420 Float? // Deep violet
+  violet420_440 Float? // Violet
+  blue440_460   Float? // Royal blue
+  blue460_480   Float? // Blue
+  blue480_500   Float? // Light blue
+  cyan500_520   Float? // Cyan
+  green520_540  Float? // Green
+  green540_560  Float? // Yellow-green
+  yellow560_580 Float? // Yellow
+  amber580_600  Float? // Amber
+  orange600_620 Float? // Orange
+  red620_640    Float? // Red
+  red640_660    Float? // Deep red
+  red660_680    Float? // Hyper red
+  farRed680_700 Float? // Near far-red
+  farRed700_730 Float? // Far-red
+  farRed730_780 Float? // Extended far-red
+
+  // Total PPFD and ratios
+  totalPPFD    Float
+  rbrRatio     Float? // Red:Blue ratio
+  rfrRatio     Float? // Red:Far-red ratio
+  bluePercent  Float?
+  greenPercent Float?
+  redPercent   Float?
+
+  // Associated fixture settings
+  fixtureSettings Json? // Channel intensities, schedules, etc.
+
+  createdAt DateTime @default(now())
+
+  spectralCorrelations SpectralCorrelation[]
+
+  @@index([spaceId, timestamp])
+  @@index([environmentType, timestamp])
+}
+
+model PlantResponse {
+  id             String   @id @default(cuid())
+  spectralDataId String?
+  timestamp      DateTime
+
+  // Growth metrics
+  heightGrowth    Float? // mm/day
+  leafAreaGrowth  Float? // cm²/day
+  stemDiameter    Float? // mm
+  internodeLength Float? // mm
+  leafCount       Int?
+
+  // Physiological metrics
+  chlorophyllContent  Float? // SPAD units
+  photosynthesisRate  Float? // μmol CO₂/m²/s
+  transpiration       Float? // mmol H₂O/m²/s
+  stomatalConductance Float? // mmol/m²/s
+  waterUseEfficiency  Float? // μmol CO₂/mmol H₂O
+
+  // Morphological traits
+  compactness    Float? // 0-100 scale
+  leafAngle      Float? // degrees
+  branchingIndex Float? // branches per node
+  flowerCount    Int?
+  fruitCount     Int?
+
+  // Quality metrics
+  biomassAccumulation Float? // g/day
+  dryWeight           Float? // g
+  yieldWeight         Float? // g
+  qualityScore        Float? // 0-100
+
+  // Cannabis-specific compounds
+  thcContent        Float? // % by dry weight
+  cbdContent        Float? // % by dry weight
+  cbgContent        Float? // % by dry weight
+  cbcContent        Float? // % by dry weight
+  totalCannabinoids Float? // % by dry weight
+
+  // Terpene measurements (% by dry weight)
+  myrcene       Float?
+  limonene      Float?
+  caryophyllene Float?
+  pinene        Float?
+  linalool      Float?
+  humulene      Float?
+  terpinolene   Float?
+  ocimene       Float?
+  totalTerpenes Float?
+
+  // Terpene profile as JSON for extended compounds
+  terpeneProfile Json? // { "terpene_name": percentage, ... }
+
+  // Flavonoid content
+  flavonoidContent Float? // mg/g
+  anthocyanins     Float? // mg/g (purple coloration)
+
+  // Plant sensor data (if available)
+  sapFlowRate        Float? // g/h
+  stemWaterPotential Float? // MPa
+  leafTemperature    Float? // °C
+  electricalSignals  Json? // Raw signal data
+
+  // Metadata
+  plantId      String?
+  cultivar     String?
+  growthStage  GrowthStage
+  daysFromSeed Int?
+
+  createdAt DateTime @default(now())
+
+  spectralCorrelations SpectralCorrelation[]
+
+  @@index([timestamp])
+  @@index([plantId, timestamp])
+}
+
+model SpectralCorrelation {
+  id              String        @id @default(cuid())
+  spectralDataId  String
+  spectralData    SpectralData  @relation(fields: [spectralDataId], references: [id])
+  plantResponseId String
+  plantResponse   PlantResponse @relation(fields: [plantResponseId], references: [id])
+
+  // Correlation strengths (-1 to 1)
+  uvCorrelation     Float?
+  blueCorrelation   Float?
+  greenCorrelation  Float?
+  redCorrelation    Float?
+  farRedCorrelation Float?
+
+  // Interaction effects
+  rbInteraction Float? // Red-Blue interaction
+  rfInteraction Float? // Red-FarRed interaction
+
+  // Statistical metrics
+  rSquared           Float?
+  pValue             Float?
+  confidenceInterval Json?
+
+  // Environmental context
+  temperature Float
+  humidity    Float
+  co2         Float
+  vpd         Float
+
+  createdAt DateTime @default(now())
+
+  @@index([spectralDataId, plantResponseId])
+}
+
+model SpectralLearningProfile {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  userId      String
+  user        User    @relation(fields: [userId], references: [id])
+
+  // Target crop and growth stage
+  cropType    String
+  cultivar    String?
+  targetStage GrowthStage?
+
+  // Optimal spectrum discovered
+  optimalSpectrum Json // Channel intensities and ratios
+  confidenceScore Float // 0-100
+
+  // Performance metrics
+  yieldImprovement   Float? // % improvement
+  qualityImprovement Float? // % improvement
+  energySavings      Float? // % reduction
+
+  // Learning metadata
+  dataPoints  Int // Number of data points used
+  lastUpdated DateTime
+  version     Int      @default(1)
+
+  createdAt DateTime @default(now())
+
+  regressionModels SpectralRegressionModel[]
+
+  @@index([cropType, cultivar])
+}
+
+model SpectralRegressionModel {
+  id        String                  @id @default(cuid())
+  profileId String
+  profile   SpectralLearningProfile @relation(fields: [profileId], references: [id])
+
+  modelType    RegressionType
+  targetMetric String // What we're predicting
+  features     Json // Selected features
+  coefficients Json // Model coefficients
+
+  // Model performance
+  r2Score              Float
+  rmse                 Float
+  mape                 Float? // Mean absolute percentage error
+  crossValidationScore Float?
+
+  // Feature importance
+  featureImportance Json
+
+  // Model metadata
+  trainingDataSize Int
+  testDataSize     Int
+  lastTrained      DateTime
+  isActive         Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+
+  @@index([profileId, targetMetric])
+}
+
+model SpectralOutput {
+  id        String   @id @default(cuid())
+  fixtureId String
+  fixture   Fixture  @relation(fields: [fixtureId], references: [id])
+  timestamp DateTime
+
+  // Spectrum output settings
+  channelSettings Json // { "blue": 80, "red": 100, ... }
+  totalPower      Float // Watts
+  efficacy        Float // μmol/J
+
+  createdAt DateTime @default(now())
+
+  @@index([fixtureId, timestamp])
+}
+
+// Cannabis-specific cultivation profiles
+model CannabisStrainProfile {
+  id         String     @id @default(cuid())
+  strainName String
+  strainType StrainType // INDICA, SATIVA, HYBRID
+
+  // Target compound profiles
+  targetTHC      Float // Target THC %
+  targetCBD      Float // Target CBD %
+  targetTerpenes Json // { "myrcene": 1.2, "limonene": 0.8, ... }
+
+  // Optimal spectrum discovered through learning
+  vegetativeSpectrum Json // Optimal spectrum for veg stage
+  floweringSpectrum  Json // Optimal spectrum for flower stage
+  uvProtocol         Json // UV exposure timing and intensity
+
+  // Environmental preferences
+  optimalVPD  Json // { "veg": 0.8-1.0, "flower": 1.0-1.2 }
+  optimalTemp Json // { "day": 25, "night": 20 }
+
+  // Performance metrics
+  avgYield     Float? // g/m²
+  avgTHC       Float? // Achieved THC %
+  avgTerpenes  Float? // Total terpene %
+  qualityScore Float? // 0-100
+
+  dataPoints  Int      @default(0)
+  lastUpdated DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  cannabisExperiments CannabisExperiment[]
+
+  @@index([strainName])
+}
+
+model CannabisExperiment {
+  id              String                @id @default(cuid())
+  strainProfileId String
+  strainProfile   CannabisStrainProfile @relation(fields: [strainProfileId], references: [id])
+
+  // Spectrum treatment
+  uvbDose        Float // μmol/m²/day
+  uva380_390Dose Float // μmol/m²/day
+  uvTiming       String // "continuous", "end-of-day", "pulsed"
+  uvDuration     Int // minutes per day
+
+  // Results
+  finalTHC       Float?
+  finalCBD       Float?
+  terpeneProfile Json?
+  yieldPerPlant  Float?
+
+  // Growth observations
+  trichomeDensity  Float? // trichomes/mm²
+  trichomeMaturity Json? // { "clear": 10, "cloudy": 70, "amber": 20 }
+
+  startDate   DateTime
+  harvestDate DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([strainProfileId, finalTHC])
+}
+
+// Enums
+enum UserRole {
+  USER
+  ADMIN
+  RESEARCHER
+}
+
+enum SpaceType {
+  GREENHOUSE
+  INDOOR
+  VERTICAL_FARM
+  GROWTH_CHAMBER
+}
+
+enum ExperimentStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum MetricType {
+  HEIGHT
+  LEAF_AREA
+  BIOMASS
+  YIELD
+  QUALITY
+  CHLOROPHYLL
+  PHOTOSYNTHESIS
+}
+
+enum EnvironmentType {
+  INDOOR // 100% artificial light
+  GREENHOUSE // Mixed natural + artificial
+  OUTDOOR // Natural light only (control)
+}
+
+enum GrowthStage {
+  GERMINATION
+  SEEDLING
+  VEGETATIVE
+  FLOWERING
+  FRUITING
+  HARVEST
+}
+
+enum RegressionType {
+  LINEAR
+  POLYNOMIAL
+  RIDGE
+  LASSO
+  ELASTIC_NET
+  RANDOM_FOREST
+  GRADIENT_BOOST
+  NEURAL_NETWORK
+}
+
+enum StrainType {
+  INDICA
+  SATIVA
+  HYBRID_INDICA
+  HYBRID_SATIVA
+  HYBRID_BALANCED
+  RUDERALIS
+  HIGH_CBD
+}
+
+// Facility Management Models
+model Facility {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  type        FacilityType
+  address     String?
+  city        String?
+  state       String?
+  country     String?
+  zipCode     String?
+  size        Float? // square feet
+
+  // Owner relation
+  ownerId String?
+  owner   User?   @relation("FacilityOwner", fields: [ownerId], references: [id])
+
+  // Settings
+  settings Json? // General facility settings
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users             FacilityUser[]
+  investments       InvestmentOpportunity[]
+  projects          FacilityProject[]
+  invites           FacilityInvite[]
+  sensorReadings    SensorReading[]
+  harvestBatches    HarvestBatch[]
+  waterUsage        WaterUsage[]
+  waterAlerts       WaterAlert[]
+  scoutingRecords   ScoutingRecord[]
+  equipment         Equipment[]
+  serviceRequests   ServiceRequest[]
+  equipmentRequests EquipmentRequest[]
+
+  // Financial automation relationships
+  revenueSharingAgreements RevenueSharingAgreement[]
+  weatherNormalizations    WeatherNormalization[]
+  thirdPartyValidations    ThirdPartyValidation[]
+  facilityTrustScore       FacilityTrustScore?
+
+  // Market data & benchmarking relationships
+  marketData        MarketData[]
+  benchmarkReports  BenchmarkReport[]
+  dataContributions DataContribution[]
+  apiKeys           ApiKey[]
+
+  @@index([name])
+}
+
+model FacilityUser {
+  id          String       @id @default(cuid())
+  facilityId  String
+  facility    Facility     @relation(fields: [facilityId], references: [id])
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+  role        FacilityRole
+  permissions Json? // Specific permissions
+
+  joinedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([facilityId, userId])
+  @@index([userId])
+}
+
+model FacilityProject {
+  id         String   @id @default(cuid())
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+  projectId  String   @unique
+
+  createdAt DateTime @default(now())
+}
+
+model FacilityInvite {
+  id         String   @id @default(cuid())
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+
+  email String
+  role  FacilityRole
+  token String       @unique
+
+  invitedBy String
+  status    InviteStatus @default(PENDING)
+
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime
+  acceptedAt DateTime?
+
+  @@index([email])
+  @@index([token])
+}
+
+// Scouting Models
+model ScoutingRecord {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  facilityId String?
+  facility   Facility? @relation(fields: [facilityId], references: [id])
+
+  timestamp DateTime
+  latitude  Float
+  longitude Float
+  zone      String?
+  block     String?
+
+  issueType     String // pest, disease, deficiency, general
+  severity      String // low, medium, high, critical
+  issue         String
+  notes         String?
+  photos        String[] // Array of photo URLs
+  environmental Json? // temp, humidity, etc.
+
+  actionRequired Boolean @default(false)
+  assignedTo     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([facilityId])
+  @@index([timestamp])
+  @@index([issueType])
+  @@index([severity])
+}
+
+model Task {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  priority    String // low, medium, high
+  status      String // pending, in-progress, completed, overdue
+  taskType    String // watering, pruning, harvest, ipm, etc.
+
+  assignedTo   String
+  assignedUser User   @relation(fields: [assignedTo], references: [id])
+
+  dueDate     DateTime?
+  completedAt DateTime?
+
+  facilityId String
+  createdBy  String
+  metadata   Json? // Additional task-specific data
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([assignedTo])
+  @@index([status])
+  @@index([dueDate])
+  @@index([facilityId])
+}
+
+// Harvest & Yield Models
+model HarvestBatch {
+  id          String @id @default(cuid())
+  batchNumber String @unique
+  crop        String
+  variety     String
+  zone        String
+  block       String
+
+  plantedDate DateTime
+  harvestDate DateTime
+  status      String // planned, in-progress, completed, quality-check, shipped
+
+  estimatedYield Float
+  actualYield    Float  @default(0)
+  qualityGrade   String @default("A") // A, B, C, reject
+
+  equipment String[] // Array of equipment IDs
+  notes     String?
+  photos    String[] // Array of photo URLs
+
+  weight    Json // { gross, net, tare }
+  packaging Json // { type, count, size }
+  tracking  Json // { startTime, endTime, breaks, productivity }
+
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+  createdBy  String
+
+  crew      HarvestCrew[]
+  yieldData YieldData[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([facilityId])
+  @@index([status])
+  @@index([harvestDate])
+}
+
+model HarvestCrew {
+  id      String       @id @default(cuid())
+  batchId String
+  batch   HarvestBatch @relation(fields: [batchId], references: [id])
+
+  name         String
+  role         String // picker, packer, supervisor, quality-checker
+  hourlyRate   Float
+  hoursWorked  Float  @default(0)
+  productivity Float  @default(0) // kg/hour
+  qualityScore Float  @default(0) // percentage
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([batchId])
+}
+
+model YieldData {
+  id      String       @id @default(cuid())
+  batchId String
+  batch   HarvestBatch @relation(fields: [batchId], references: [id])
+
+  weight     Float
+  notes      String?
+  recordedAt DateTime @default(now())
+  recordedBy String
+
+  @@index([batchId])
+  @@index([recordedAt])
+}
+
+// Investment Models
+model InvestmentOpportunity {
+  id         String   @id @default(cuid())
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+
+  title       String
+  description String
+  type        InvestmentType
+  status      InvestmentStatus @default(ACTIVE)
+
+  // Financial details
+  minInvestment  Float
+  maxInvestment  Float
+  targetAmount   Float
+  currentAmount  Float @default(0)
+  expectedReturn Float // percentage
+
+  // Terms
+  duration        Int // months
+  paymentSchedule PaymentSchedule
+
+  // Documents
+  documents Json? // Array of document URLs/references
+
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  investments Investment[]
+
+  @@index([facilityId, status])
+}
+
+model Investment {
+  id            String                @id @default(cuid())
+  opportunityId String
+  opportunity   InvestmentOpportunity @relation(fields: [opportunityId], references: [id])
+  investorId    String
+  investor      User                  @relation(fields: [investorId], references: [id])
+
+  amount Float
+  status InvestmentTransactionStatus @default(PENDING)
+
+  // Payment details
+  paymentMethod String?
+  transactionId String?
+
+  // Returns tracking
+  totalReturns Float     @default(0)
+  lastPayout   DateTime?
+
+  notes String?
+
+  investedAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  payouts InvestmentPayout[]
+
+  @@index([investorId])
+  @@index([opportunityId])
+}
+
+model InvestmentPayout {
+  id           String     @id @default(cuid())
+  investmentId String
+  investment   Investment @relation(fields: [investmentId], references: [id])
+
+  amount Float
+  type   PayoutType
+  status PayoutStatus @default(PENDING)
+
+  scheduledDate DateTime
+  paidDate      DateTime?
+  transactionId String?
+
+  createdAt DateTime @default(now())
+
+  @@index([investmentId, scheduledDate])
+}
+
+// Affiliate Models
+model Affiliate {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  code   String          @unique
+  tier   AffiliateTier   @default(BRONZE)
+  status AffiliateStatus @default(ACTIVE)
+
+  // Commission rates
+  baseCommission  Float @default(10) // percentage
+  bonusCommission Float @default(0) // additional percentage
+
+  // Performance metrics
+  totalReferrals  Int       @default(0)
+  activeReferrals Int       @default(0)
+  totalRevenue    Float     @default(0)
+  totalCommission Float     @default(0)
+  totalClicks     Int       @default(0)
+  lastClickAt     DateTime?
+
+  // Payment info
+  paymentMethod  String?
+  paymentDetails Json?
+  lastPayout     DateTime?
+
+  joinedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  referrals AffiliateReferral[]
+  payouts   AffiliatePayout[]
+  clicks    AffiliateClick[]
+
+  // Financial automation relationships
+  revenueSharingAgreements RevenueSharingAgreement[]
+  commissions              AffiliateCommission[]
+
+  @@index([code])
+}
+
+model AffiliateReferral {
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+
+  referredEmail String
+  status        ReferralStatus @default(PENDING)
+
+  // Conversion tracking
+  signedUpAt      DateTime?
+  firstPurchaseAt DateTime?
+  totalPurchases  Float     @default(0)
+
+  // Commission tracking
+  totalCommission Float @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([affiliateId, status])
+  @@index([referredEmail])
+}
+
+model AffiliatePayout {
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+
+  amount Float
+  status PayoutStatus @default(PENDING)
+
+  period        String // e.g., "2024-01"
+  transactionId String?
+
+  createdAt DateTime  @default(now())
+  paidAt    DateTime?
+
+  @@index([affiliateId, period])
+}
+
+model AffiliateClick {
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+
+  clickId String  @unique
+  linkId  String?
+
+  // Visitor info
+  ipAddress  String
+  userAgent  String
+  deviceType String?
+  country    String?
+  city       String?
+
+  // Tracking data
+  referrer    String?
+  landingPage String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+
+  // Conversion tracking
+  converted       Boolean @default(false)
+  conversionId    String?
+  conversionValue Float?
+
+  createdAt DateTime @default(now())
+
+  @@index([affiliateId, createdAt])
+  @@index([clickId])
+}
+
+// Enums for new models
+enum FacilityType {
+  GREENHOUSE
+  INDOOR
+  VERTICAL_FARM
+  RESEARCH
+  HYBRID
+}
+
+enum FacilityRole {
+  OWNER
+  ADMIN
+  MANAGER
+  OPERATOR
+  VIEWER
+}
+
+enum InvestmentType {
+  EXPANSION
+  EQUIPMENT
+  TECHNOLOGY
+  OPERATIONS
+  RESEARCH
+}
+
+enum InvestmentStatus {
+  DRAFT
+  ACTIVE
+  FUNDED
+  CLOSED
+  COMPLETED
+}
+
+enum PaymentSchedule {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+  AT_MATURITY
+}
+
+enum InvestmentTransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum PayoutType {
+  INTEREST
+  PRINCIPAL
+  DIVIDEND
+  BONUS
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum AffiliateTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum AffiliateStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  TERMINATED
+}
+
+enum ReferralStatus {
+  PENDING
+  SIGNED_UP
+  CONVERTED
+  EXPIRED
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
+// Admin Log for audit trails
+model AdminLog {
+  id         String @id @default(cuid())
+  adminId    String
+  action     String
+  targetType String
+  targetId   String
+  details    Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([adminId, createdAt])
+  @@index([targetType, targetId])
+}
+
+// Cost tracking models
+model CostCategory {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  type        String // labor, materials, utilities, etc
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  expenses Expense[]
+
+  @@index([name])
+}
+
+model Expense {
+  id         String       @id @default(cuid())
+  facilityId String
+  categoryId String
+  category   CostCategory @relation(fields: [categoryId], references: [id])
+
+  amount        Float
+  description   String
+  batchId       String?
+  batch         ProductionBatch? @relation(fields: [batchId], references: [id])
+  cropType      String?
+  vendorName    String?
+  invoiceNumber String?
+  expenseDate   DateTime
+  recordedBy    String
+
+  isRecurring        Boolean   @default(false)
+  recurringFrequency String? // monthly, weekly, etc
+  recurringEndDate   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([facilityId, expenseDate])
+  @@index([batchId])
+  @@index([categoryId])
+}
+
+model ProductionBatch {
+  id         String  @id @default(cuid())
+  facilityId String
+  batchCode  String  @unique
+  cropType   String
+  cultivar   String?
+
+  // Production data
+  plantCount  Int
+  startDate   DateTime
+  harvestDate DateTime?
+  status      BatchStatus @default(ACTIVE)
+
+  // Yield data
+  wetWeight   Float? // grams
+  dryWeight   Float? // grams
+  trimWeight  Float? // grams
+  wasteWeight Float? // grams
+
+  // Cost data
+  directCosts  Float  @default(0)
+  laborCosts   Float  @default(0)
+  totalCosts   Float  @default(0)
+  costPerGram  Float?
+  costPerPound Float?
+
+  // Quality data
+  thcContent     Float?
+  cbdContent     Float?
+  terpeneProfile Json?
+  qualityGrade   String?
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  expenses Expense[]
+
+  @@index([facilityId, startDate])
+  @@index([batchCode])
+}
+
+enum BatchStatus {
+  PLANNED
+  ACTIVE
+  HARVESTED
+  CURING
+  COMPLETED
+  CANCELLED
+}
+
+// Updated SensorReading model
+model SensorReading {
+  id         String   @id @default(cuid())
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+  sensorId   String
+  sensorType String
+  zone       String?
+
+  value      Float
+  unit       String
+  quality    String  @default("good") // good, warning, error
+  calibrated Boolean @default(true)
+
+  timestamp DateTime
+  createdAt DateTime @default(now())
+
+  @@index([facilityId, timestamp])
+  @@index([sensorType, timestamp])
+}
+
+// Notification model
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  type    String // NotificationType
+  title   String
+  message String
+  data    Json?
+
+  read   Boolean   @default(false)
+  readAt DateTime?
+
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  @@index([userId, read, createdAt])
+  @@index([createdAt])
+}
+
+// Energy Optimization Models
+model energy_optimization_config {
+  id            String @id @default(cuid())
+  facility_id   String @unique
+  facility_name String
+
+  control_system_type   String? // 'argus-titan', 'priva-connext', etc.
+  control_system_config Json? // Connection parameters
+  last_connection_test  DateTime?
+
+  optimization_active Boolean @default(false)
+  optimization_mode   String  @default("conservative") // conservative, balanced, aggressive
+
+  crop_type    String @default("cannabis")
+  growth_stage String @default("vegetative")
+
+  peak_demand_limit       Float? // kW limit during peak hours
+  emergency_contact_email String?
+
+  stripe_customer_id String? // For billing
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([facility_id])
+  @@index([optimization_active])
+}
+
+model power_readings {
+  id          String   @id @default(cuid())
+  facility_id String
+  zone_id     String?
+  timestamp   DateTime
+
+  power_kw     Float
+  energy_kwh   Float? // Cumulative kWh for billing period
+  rate_per_kwh Float? // Rate at time of reading
+
+  source    String  @default("meter") // meter, control_system, estimated
+  device_id String?
+
+  created_at DateTime @default(now())
+
+  @@index([facility_id, timestamp])
+  @@index([zone_id, timestamp])
+  @@index([timestamp])
+}
+
+model energy_baselines {
+  id          String @id @default(cuid())
+  facility_id String
+
+  baseline_name String
+  start_date    DateTime
+  end_date      DateTime
+
+  avg_daily_kwh      Float
+  avg_daily_cost     Float
+  data_quality_score Float // 0-100 confidence level
+
+  methodology String    @default("IPMVP Option C")
+  approved    Boolean   @default(false)
+  approved_by String?
+  approved_at DateTime?
+
+  created_at DateTime @default(now())
+
+  @@index([facility_id])
+  @@index([approved, facility_id])
+}
+
+model verified_savings {
+  id          String @id @default(cuid())
+  facility_id String
+
+  billing_period_start DateTime
+  billing_period_end   DateTime
+
+  baseline_kwh  Float
+  baseline_cost Float
+  actual_kwh    Float
+  actual_cost   Float
+
+  kwh_saved            Float
+  dollars_saved        Float
+  percent_saved        Float
+  revenue_share_amount Float // 20% of dollars_saved
+
+  verification_method String @default("IPMVP Option C")
+  confidence_score    Float // 0-100
+
+  verified_by String
+  verified_at DateTime
+
+  invoice_number      String?
+  invoice_sent_at     DateTime?
+  payment_status      String    @default("pending") // pending, paid, failed
+  payment_received_at DateTime?
+
+  created_at DateTime @default(now())
+
+  @@index([facility_id, billing_period_start])
+  @@index([payment_status])
+  @@index([invoice_number])
+}
+
+model optimization_events {
+  id          String @id @default(cuid())
+  facility_id String
+  zone_id     String
+
+  event_time   DateTime
+  action_type  String // adjust_lighting, emergency_stop, etc.
+  action_value Json // Command details
+
+  before_state Json? // State before optimization
+  after_state  Json? // State after optimization
+
+  safety_score Float // 0-100 safety assessment
+  crop_type    String
+  growth_stage String
+
+  ai_confidence Float? // Claude's confidence in recommendation
+  ai_reasoning  String? // Claude's explanation
+
+  created_at DateTime @default(now())
+
+  @@index([facility_id, event_time])
+  @@index([zone_id, event_time])
+  @@index([action_type])
+}
+
+model utility_rates {
+  id          String @id @default(cuid())
+  facility_id String @unique
+
+  utility_id         String
+  utility_name       String
+  rate_schedule_name String
+
+  peak_rate     Float // $/kWh during peak hours
+  off_peak_rate Float // $/kWh during off-peak hours
+  shoulder_rate Float? // $/kWh during shoulder hours
+  demand_charge Float // $/kW monthly demand charge
+
+  time_of_use_schedule Json // Peak/off-peak schedule
+  seasonal_rates       Json? // Summer/winter rate variations
+
+  last_verified DateTime @default(now())
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@index([facility_id])
+  @@index([utility_id])
+}
+
+// Security Models
+model facility_security {
+  id          String @id @default(cuid())
+  facility_id String @unique
+
+  security_level String @default("standard") // standard, enterprise, premium
+  encryption_key String // Encrypted with master key
+  access_tokens  String // Encrypted JSON of access tokens
+
+  vpn_enabled Boolean @default(false)
+  vpn_config  String? // Encrypted VPN configuration
+
+  credential_rotation_at DateTime?
+  last_security_audit    DateTime?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([facility_id])
+  @@index([security_level])
+}
+
+model security_audit_log {
+  id          String  @id @default(cuid())
+  facility_id String
+  user_id     String?
+
+  action   String // access_granted, access_denied, credentials_rotated, etc.
+  resource String // control_system, security_config, etc.
+
+  ip_address String
+  user_agent String
+  success    Boolean
+  details    String? // JSON details
+
+  timestamp DateTime @default(now())
+
+  @@index([facility_id, timestamp])
+  @@index([action, timestamp])
+  @@index([success, timestamp])
+}
+
+// Customer Onboarding & Support Models
+model customer_profiles {
+  id          String @id @default(cuid())
+  facility_id String @unique
+
+  company_name  String
+  contact_name  String
+  contact_email String
+  phone         String
+
+  facility_type       String // greenhouse, indoor, vertical_farm
+  crop_types          String[] // Array of crop types
+  facility_size       Float // Square feet
+  current_energy_bill Float // Monthly energy cost
+  zip_code            String
+  time_zone           String   @default("America/Los_Angeles")
+
+  control_system      String? // Detected/configured control system
+  onboarding_progress Float   @default(0) // 0-100%
+  onboarding_status   String  @default("not_started") // not_started, started, in_progress, completed
+
+  assigned_csm String? // Customer Success Manager email
+  go_live_date DateTime?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([facility_id])
+  @@index([onboarding_status])
+  @@index([assigned_csm])
+}
+
+model onboarding_plans {
+  id          String @id @default(cuid())
+  facility_id String @unique
+
+  steps                      Json // Array of OnboardingStep objects
+  estimated_completion_hours Float
+  actual_completion_hours    Float?
+
+  started_at   DateTime  @default(now())
+  completed_at DateTime?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([facility_id])
+}
+
+model onboarding_events {
+  id          String @id @default(cuid())
+  facility_id String
+
+  event_type String // step_completed, call_scheduled, training_completed, etc.
+  details    Json? // Event-specific data
+
+  timestamp DateTime @default(now())
+
+  @@index([facility_id, timestamp])
+  @@index([event_type])
+}
+
+model support_tickets {
+  id          String @id @default(cuid())
+  facility_id String
+
+  subject     String
+  description String
+  priority    String // low, medium, high, urgent
+  status      String @default("open") // open, in_progress, resolved, closed
+  category    String // technical, billing, training, integration
+
+  user_email  String
+  assigned_to String?
+  resolution  String?
+
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  resolved_at DateTime?
+
+  @@index([facility_id])
+  @@index([status, priority])
+  @@index([assigned_to])
+  @@index([created_at])
+}
+
+// Legal & Compliance Models
+model legal_agreements {
+  id          String @id @default(cuid())
+  facility_id String
+
+  agreement_type String // energy_optimization, data_sharing, control_system_access
+  version        String
+  signed_by      String?
+  signed_at      DateTime?
+  ip_address     String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([facility_id, agreement_type, version])
+  @@index([facility_id])
+  @@index([agreement_type])
+}
+
+model liability_waivers {
+  id          String @id @default(cuid())
+  facility_id String
+
+  waiver_type  String // crop_damage, equipment_failure, system_downtime
+  acknowledged Boolean   @default(false)
+  signed_by    String?
+  signed_at    DateTime?
+  ip_address   String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([facility_id, waiver_type])
+  @@index([facility_id])
+  @@index([waiver_type])
+}
+
+// Water Management Models
+model WaterUsage {
+  id         String   @id @default(cuid())
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+  zone       String
+
+  timestamp   DateTime @default(now())
+  usage       Float // liters
+  flow        Float // L/min
+  pressure    Float // PSI
+  temperature Float // °C
+  ph          Float
+  ec          Float // mS/cm
+  runoff      Float // liters
+  efficiency  Float? // percentage
+
+  createdAt DateTime @default(now())
+
+  @@index([facilityId, timestamp])
+  @@index([zone, timestamp])
+}
+
+model WaterAlert {
+  id         String   @id @default(cuid())
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+  zone       String
+
+  type           String // high_usage, low_pressure, ph_alert, ec_alert, leak, maintenance
+  severity       String // low, medium, high, critical
+  message        String
+  acknowledged   Boolean   @default(false)
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([facilityId, acknowledged])
+  @@index([zone, acknowledged])
+  @@index([createdAt])
+}
+
+model WaterZone {
+  id         String @id @default(cuid())
+  facilityId String
+  name       String
+  type       String // irrigation, fertigation, foliar, cleaning
+  status     String @default("active") // active, inactive, maintenance, alert
+
+  sensors    Json // { flowMeter, pressureSensor, phSensor, etc. }
+  thresholds Json // Alert thresholds
+
+  lastMaintenance DateTime?
+  nextMaintenance DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([facilityId])
+  @@index([status])
+}
+
+// Financial Integration Models
+model FinancialIntegration {
+  id         String @id @default(cuid())
+  userId     String
+  facilityId String
+  provider   String // QUICKBOOKS, XERO, SAGE, etc.
+
+  accessToken  String // Encrypted
+  refreshToken String // Encrypted
+  config       Json // Provider-specific configuration
+
+  active     Boolean   @default(true)
+  lastSyncAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, facilityId, provider])
+  @@index([userId])
+  @@index([provider])
+  @@index([active])
+}
+
+model FinancialDocument {
+  id         String  @id @default(cuid())
+  userId     String
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  facilityId String?
+
+  // File information
+  filename     String
+  originalName String
+  fileType     String
+  fileSize     Int
+  filePath     String
+
+  // Analysis results
+  documentType   String // profit_loss, balance_sheet, cash_flow, bank_statement, etc.
+  analysisResult Json // Full Claude analysis result
+  extractedData  Json // Structured financial data
+  confidence     Int // 0-100 confidence score
+
+  // Financial period
+  period   Json? // { startDate, endDate }
+  currency String?
+
+  // Processing status
+  processingStatus String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, ERROR
+  errors           String[]
+  warnings         String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([facilityId])
+  @@index([documentType])
+  @@index([processingStatus])
+}
+
+model DiseasePrediction {
+  id         String @id @default(cuid())
+  facilityId String
+  userId     String
+
+  predictions Json // Array of prediction results
+  conditions  Json // Environmental conditions at time of prediction
+  cropInfo    Json // Crop information
+
+  createdAt DateTime @default(now())
+
+  @@index([facilityId, createdAt])
+  @@index([userId, createdAt])
+}
+
+// Session Management Models
+model UserSession {
+  id     String @id
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  deviceFingerprint String
+  ipAddress         String
+  userAgent         String
+  location          String? // Geolocation data
+
+  createdAt    DateTime @default(now())
+  lastActiveAt DateTime @default(now())
+  expiresAt    DateTime
+
+  isActive          Boolean   @default(true)
+  terminatedAt      DateTime?
+  terminationReason String?
+
+  @@index([userId, isActive])
+  @@index([deviceFingerprint])
+  @@index([expiresAt])
+}
+
+model AuditLog {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  action     String // LOGIN, LOGOUT, UPDATE_SETTINGS, etc.
+  entityType String? // User, Facility, Project, etc.
+  entityId   String?
+
+  details   Json? // Additional context
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+  @@index([entityType, entityId])
+}
+
+model SecurityEvent {
+  id     String  @id @default(cuid())
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  eventType String // SUSPICIOUS_LOGIN, BRUTE_FORCE, CREDENTIAL_SHARING, etc.
+  severity  String // low, medium, high, critical
+
+  details    Json // Event-specific details
+  ipAddress  String?
+  resolved   Boolean   @default(false)
+  resolvedAt DateTime?
+  resolvedBy String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([eventType, severity])
+  @@index([resolved, createdAt])
+}
+
+// Maintenance and Service Network Models
+
+// Service Provider Models
+model ServiceProvider {
+  id          String @id @default(cuid())
+  companyName String
+  contactName String
+  email       String @unique
+  phone       String
+
+  // Business details
+  businessType    ServiceProviderType
+  licenseNumber   String?
+  insuranceNumber String?
+  bondNumber      String?
+
+  // Location and coverage
+  address       String
+  city          String
+  state         String
+  zipCode       String
+  country       String @default("US")
+  serviceRadius Float  @default(50) // miles
+  geoLocation   Json? // { lat, lng }
+
+  // Verification and ratings
+  verified      Boolean   @default(false)
+  verifiedAt    DateTime?
+  rating        Float     @default(0)
+  reviewCount   Int       @default(0)
+  completedJobs Int       @default(0)
+
+  // Availability
+  status           ServiceProviderStatus @default(PENDING)
+  availability     Json? // Schedule availability
+  emergencyService Boolean               @default(false)
+
+  // Financial
+  stripeAccountId String?
+  taxId           String?
+  w9OnFile        Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  certifications     ServiceProviderCertification[]
+  specializations    ServiceProviderSpecialization[]
+  serviceAreas       ServiceArea[]
+  serviceRequests    ServiceRequest[]
+  maintenanceRecords MaintenanceRecord[]
+  serviceBids        ServiceBid[]
+  workOrders         WorkOrder[]
+  reviews            ServiceReview[]
+
+  @@index([status, serviceRadius])
+  @@index([rating, reviewCount])
+  @@index([city, state])
+}
+
+model ServiceProviderCertification {
+  id                String          @id @default(cuid())
+  serviceProviderId String
+  serviceProvider   ServiceProvider @relation(fields: [serviceProviderId], references: [id])
+
+  certificationType   CertificationType
+  certificationBody   String
+  certificationNumber String
+  issueDate           DateTime
+  expirationDate      DateTime?
+  verified            Boolean           @default(false)
+  documentUrl         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([serviceProviderId, certificationType])
+  @@index([expirationDate])
+}
+
+model ServiceProviderSpecialization {
+  id                String          @id @default(cuid())
+  serviceProviderId String
+  serviceProvider   ServiceProvider @relation(fields: [serviceProviderId], references: [id])
+
+  category        ServiceCategory
+  subcategory     String?
+  experienceYears Int             @default(0)
+  skillLevel      SkillLevel      @default(BEGINNER)
+
+  createdAt DateTime @default(now())
+
+  @@unique([serviceProviderId, category, subcategory])
+  @@index([category, skillLevel])
+}
+
+model ServiceArea {
+  id                String          @id @default(cuid())
+  serviceProviderId String
+  serviceProvider   ServiceProvider @relation(fields: [serviceProviderId], references: [id])
+
+  zipCode    String
+  city       String
+  state      String
+  travelTime Int? // minutes
+  serviceFee Float? // additional fee for this area
+
+  createdAt DateTime @default(now())
+
+  @@unique([serviceProviderId, zipCode])
+  @@index([zipCode, state])
+}
+
+// Equipment and Warranty Models
+model Equipment {
+  id         String   @id @default(cuid())
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+
+  // Equipment details
+  name         String
+  category     EquipmentCategory
+  manufacturer String
+  model        String
+  serialNumber String?
+
+  // Installation details
+  installDate     DateTime
+  installLocation String? // Zone, room, etc.
+  installedBy     String? // Service provider ID
+
+  // Warranty information
+  warrantyStart    DateTime
+  warrantyEnd      DateTime
+  warrantyTerms    Json? // Warranty terms and conditions
+  warrantyProvider String? // Manufacturer or extended warranty provider
+
+  // Performance metrics
+  uptime              Float     @default(100) // percentage
+  lastMaintenance     DateTime?
+  nextMaintenance     DateTime?
+  maintenanceInterval Int? // days
+
+  // Status and health
+  status        EquipmentStatus @default(ACTIVE)
+  healthScore   Float           @default(100) // 0-100
+  alertsEnabled Boolean         @default(true)
+
+  // Financial
+  purchasePrice Float?
+  currentValue  Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  maintenanceRecords    MaintenanceRecord[]
+  maintenanceSchedules  MaintenanceSchedule[]
+  serviceRequests       ServiceRequest[]
+  performanceGuarantees PerformanceGuarantee[]
+
+  @@index([facilityId, category])
+  @@index([warrantyEnd])
+  @@index([nextMaintenance])
+}
+
+model PerformanceGuarantee {
+  id          String    @id @default(cuid())
+  equipmentId String
+  equipment   Equipment @relation(fields: [equipmentId], references: [id])
+
+  // Guarantee details
+  guaranteeType GuaranteeType
+  description   String
+  startDate     DateTime
+  endDate       DateTime
+
+  // Performance metrics
+  targetMetric    String // uptime, efficiency, output, etc.
+  targetValue     Float
+  currentValue    Float  @default(0)
+  measurementUnit String
+
+  // Financial penalties
+  penaltyStructure Json? // Penalty amounts for non-compliance
+  maxPenalty       Float?
+  penaltiesApplied Float  @default(0)
+
+  // Status
+  status         GuaranteeStatus @default(ACTIVE)
+  violationCount Int             @default(0)
+  lastViolation  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  violations GuaranteeViolation[]
+
+  @@index([equipmentId, status])
+  @@index([endDate, status])
+}
+
+model GuaranteeViolation {
+  id                     String               @id @default(cuid())
+  performanceGuaranteeId String
+  performanceGuarantee   PerformanceGuarantee @relation(fields: [performanceGuaranteeId], references: [id])
+
+  violationDate    DateTime
+  actualValue      Float
+  targetValue      Float
+  deviationPercent Float
+
+  penaltyAmount    Float     @default(0)
+  penaltyApplied   Boolean   @default(false)
+  penaltyAppliedAt DateTime?
+
+  description String?
+  resolved    Boolean   @default(false)
+  resolvedAt  DateTime?
+  resolution  String?
+
+  createdAt DateTime @default(now())
+
+  @@index([performanceGuaranteeId, violationDate])
+}
+
+// Maintenance and Service Request Models
+model MaintenanceSchedule {
+  id          String    @id @default(cuid())
+  equipmentId String
+  equipment   Equipment @relation(fields: [equipmentId], references: [id])
+
+  // Schedule details
+  name         String
+  description  String?
+  scheduleType MaintenanceType
+  frequency    MaintenanceFrequency
+
+  // Timing
+  intervalDays  Int? // For recurring maintenance
+  intervalHours Int? // For hour-based maintenance
+  lastPerformed DateTime?
+  nextDue       DateTime
+
+  // Assignment
+  assignedTo        String? // Service provider ID
+  estimatedDuration Int? // minutes
+  priority          MaintenancePriority @default(MEDIUM)
+
+  // Predictive maintenance
+  predictiveEnabled Boolean @default(false)
+  triggerConditions Json? // Conditions that trigger maintenance
+
+  // Status
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  records MaintenanceRecord[]
+
+  @@index([equipmentId, nextDue])
+  @@index([nextDue, priority])
+}
+
+model MaintenanceRecord {
+  id                    String               @id @default(cuid())
+  equipmentId           String
+  equipment             Equipment            @relation(fields: [equipmentId], references: [id])
+  maintenanceScheduleId String?
+  maintenanceSchedule   MaintenanceSchedule? @relation(fields: [maintenanceScheduleId], references: [id])
+
+  // Service details
+  serviceType MaintenanceType
+  description String
+
+  // Timing
+  scheduledDate DateTime
+  startTime     DateTime?
+  endTime       DateTime?
+  duration      Int? // minutes
+
+  // Service provider
+  serviceProviderId String?
+  serviceProvider   ServiceProvider? @relation(fields: [serviceProviderId], references: [id])
+  technicianName    String?
+
+  // Work performed
+  workPerformed String?
+  partsUsed     Json? // Array of parts with costs
+  laborHours    Float?
+  totalCost     Float?
+
+  // Results
+  status          MaintenanceStatus @default(SCHEDULED)
+  completionNotes String?
+  beforePhotos    String[] // Array of photo URLs
+  afterPhotos     String[] // Array of photo URLs
+
+  // Quality and compliance
+  qualityCheck      Boolean @default(false)
+  qualityCheckBy    String?
+  complianceCheck   Boolean @default(false)
+  certificateIssued Boolean @default(false)
+  certificateUrl    String?
+
+  // Next maintenance
+  nextMaintenanceDate DateTime?
+  recommendedActions  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([equipmentId, scheduledDate])
+  @@index([serviceProviderId, status])
+}
+
+model ServiceRequest {
+  id          String   @id @default(cuid())
+  facilityId  String
+  facility    Facility @relation(fields: [facilityId], references: [id])
+  requesterId String
+  requester   User     @relation(fields: [requesterId], references: [id])
+
+  // Request details
+  title       String
+  description String
+  category    ServiceCategory
+  priority    ServicePriority @default(MEDIUM)
+  urgency     ServiceUrgency  @default(STANDARD)
+
+  // Equipment related
+  equipmentId String?
+  equipment   Equipment? @relation(fields: [equipmentId], references: [id])
+
+  // Location
+  location           String? // Specific location within facility
+  accessInstructions String?
+
+  // Timing
+  preferredDate    DateTime?
+  flexibleTiming   Boolean   @default(true)
+  emergencyService Boolean   @default(false)
+
+  // Budget
+  budgetRange String? // "under-500", "500-1000", etc.
+  maxBudget   Float?
+
+  // Status and assignment
+  status          ServiceRequestStatus @default(OPEN)
+  assignedTo      String? // Service provider ID
+  serviceProvider ServiceProvider?     @relation(fields: [assignedTo], references: [id])
+  assignedAt      DateTime?
+
+  // Bidding
+  biddingEnabled  Boolean   @default(true)
+  biddingDeadline DateTime?
+
+  // Photos and documentation
+  photos    String[] // Array of photo URLs
+  documents String[] // Array of document URLs
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bids      ServiceBid[]
+  workOrder WorkOrder?
+  messages  ServiceMessage[]
+
+  @@index([facilityId, status])
+  @@index([category, status])
+  @@index([priority, createdAt])
+}
+
+model ServiceBid {
+  id                String          @id @default(cuid())
+  serviceRequestId  String
+  serviceRequest    ServiceRequest  @relation(fields: [serviceRequestId], references: [id])
+  serviceProviderId String
+  serviceProvider   ServiceProvider @relation(fields: [serviceProviderId], references: [id])
+
+  // Bid details
+  amount            Float
+  description       String
+  estimatedDuration Int? // hours
+  proposedDate      DateTime?
+
+  // Terms
+  warrantyOffered Boolean @default(false)
+  warrantyTerms   String?
+  paymentTerms    String?
+
+  // Materials and labor breakdown
+  laborCost     Float?
+  materialsCost Float?
+  travelCost    Float?
+  breakdown     Json? // Detailed cost breakdown
+
+  // Status
+  status          BidStatus @default(SUBMITTED)
+  acceptedAt      DateTime?
+  rejectedAt      DateTime?
+  rejectionReason String?
+
+  // Validity
+  validUntil DateTime?
+
+  // Communication
+  questions String? // Questions from service provider
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([serviceRequestId, status])
+  @@index([serviceProviderId, status])
+}
+
+model WorkOrder {
+  id                String          @id @default(cuid())
+  serviceRequestId  String          @unique
+  serviceRequest    ServiceRequest  @relation(fields: [serviceRequestId], references: [id])
+  serviceProviderId String
+  serviceProvider   ServiceProvider @relation(fields: [serviceProviderId], references: [id])
+
+  // Work order details
+  workOrderNumber String @unique
+  title           String
+  description     String
+
+  // Timing
+  scheduledDate     DateTime
+  estimatedDuration Int? // hours
+  startTime         DateTime?
+  endTime           DateTime?
+
+  // Financial
+  agreedAmount    Float
+  laborCost       Float?
+  materialsCost   Float?
+  additionalCosts Float  @default(0)
+  totalCost       Float?
+
+  // Status tracking
+  status   WorkOrderStatus @default(SCHEDULED)
+  progress Int             @default(0) // percentage
+
+  // Work details
+  workPerformed String?
+  materialsUsed Json? // Array of materials
+  hoursWorked   Float?
+
+  // Quality control
+  qualityCheck     Boolean   @default(false)
+  qualityRating    Float? // 1-5 stars
+  customerApproval Boolean   @default(false)
+  approvedAt       DateTime?
+
+  // Documentation
+  beforePhotos String[] // Array of photo URLs
+  afterPhotos  String[] // Array of photo URLs
+  invoiceUrl   String?
+  certificate  String?
+
+  // Payment
+  paymentStatus MarketplacePaymentStatus @default(PENDING)
+  paidAt        DateTime?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
+
+  timeEntries WorkOrderTimeEntry[]
+  expenses    WorkOrderExpense[]
+  review      ServiceReview?
+
+  @@index([serviceProviderId, status])
+  @@index([scheduledDate, status])
+}
+
+model WorkOrderTimeEntry {
+  id          String    @id @default(cuid())
+  workOrderId String
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
+
+  date      DateTime
+  startTime DateTime
+  endTime   DateTime?
+  hours     Float?
+
+  description String?
+  hourlyRate  Float?
+  totalCost   Float?
+
+  createdAt DateTime @default(now())
+
+  @@index([workOrderId, date])
+}
+
+model WorkOrderExpense {
+  id          String    @id @default(cuid())
+  workOrderId String
+  workOrder   WorkOrder @relation(fields: [workOrderId], references: [id])
+
+  category    String // materials, travel, equipment, etc.
+  description String
+  amount      Float
+  receipt     String? // Receipt photo URL
+
+  createdAt DateTime @default(now())
+
+  @@index([workOrderId, category])
+}
+
+model ServiceMessage {
+  id               String         @id @default(cuid())
+  serviceRequestId String
+  serviceRequest   ServiceRequest @relation(fields: [serviceRequestId], references: [id])
+
+  senderId    String // User ID or Service Provider ID
+  senderType  String // "customer" or "provider"
+  message     String
+  attachments String[] // Array of file URLs
+
+  read   Boolean   @default(false)
+  readAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([serviceRequestId, createdAt])
+}
+
+model ServiceReview {
+  id                String          @id @default(cuid())
+  serviceProviderId String
+  serviceProvider   ServiceProvider @relation(fields: [serviceProviderId], references: [id])
+  workOrderId       String          @unique
+  workOrder         WorkOrder       @relation(fields: [workOrderId], references: [id])
+  reviewerId        String
+  reviewer          User            @relation(fields: [reviewerId], references: [id])
+
+  // Ratings (1-5 stars)
+  overallRating       Float
+  qualityRating       Float?
+  timelinessRating    Float?
+  communicationRating Float?
+  valueRating         Float?
+
+  // Review content
+  title   String?
+  comment String?
+  photos  String[] // Array of photo URLs
+
+  // Verification
+  verified   Boolean   @default(false)
+  verifiedAt DateTime?
+
+  // Response
+  response    String? // Service provider response
+  respondedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([serviceProviderId, overallRating])
+  @@index([reviewerId, createdAt])
+}
+
+// Enums for Maintenance and Service Network
+
+enum ServiceProviderType {
+  INDIVIDUAL
+  COMPANY
+  PARTNERSHIP
+  CORPORATION
+}
+
+enum ServiceProviderStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+  REJECTED
+}
+
+enum CertificationType {
+  ELECTRICAL
+  HVAC
+  PLUMBING
+  IRRIGATION
+  INTEGRATED_PEST_MANAGEMENT
+  ORGANIC_CERTIFICATION
+  SAFETY_CERTIFICATION
+  EQUIPMENT_SPECIFIC
+  REGULATORY_COMPLIANCE
+}
+
+enum ServiceCategory {
+  LIGHTING_SYSTEMS
+  HVAC_CLIMATE_CONTROL
+  IRRIGATION_FERTIGATION
+  ELECTRICAL_SYSTEMS
+  AUTOMATION_CONTROLS
+  PEST_MANAGEMENT
+  EQUIPMENT_INSTALLATION
+  EQUIPMENT_REPAIR
+  PREVENTIVE_MAINTENANCE
+  EMERGENCY_SERVICES
+  CONSULTATION
+  TRAINING
+  COMPLIANCE_AUDIT
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum EquipmentCategory {
+  LIGHTING
+  HVAC
+  IRRIGATION
+  ELECTRICAL
+  AUTOMATION
+  SENSORS
+  SECURITY
+  PACKAGING
+  PROCESSING
+}
+
+enum EquipmentStatus {
+  ACTIVE
+  MAINTENANCE
+  REPAIR
+  OFFLINE
+  DECOMMISSIONED
+}
+
+enum GuaranteeType {
+  UPTIME
+  EFFICIENCY
+  OUTPUT
+  QUALITY
+  ENERGY_SAVINGS
+  CUSTOM
+}
+
+enum GuaranteeStatus {
+  ACTIVE
+  VIOLATED
+  EXPIRED
+  CANCELLED
+}
+
+enum MaintenanceType {
+  PREVENTIVE
+  PREDICTIVE
+  CORRECTIVE
+  EMERGENCY
+  INSPECTION
+  CALIBRATION
+  CLEANING
+}
+
+enum MaintenanceFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  SEMI_ANNUAL
+  ANNUAL
+  CONDITION_BASED
+  RUNTIME_BASED
+}
+
+enum MaintenancePriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum MaintenanceStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  OVERDUE
+}
+
+enum ServicePriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ServiceUrgency {
+  STANDARD
+  URGENT
+  EMERGENCY
+}
+
+enum ServiceRequestStatus {
+  OPEN
+  BIDDING
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  ON_HOLD
+}
+
+enum BidStatus {
+  SUBMITTED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+  EXPIRED
+}
+
+enum WorkOrderStatus {
+  SCHEDULED
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIAL
+  OVERDUE
+  DISPUTED
+}
+
+// Equipment Investment Request Board Models
+model EquipmentRequest {
+  id          String   @id @default(cuid())
+  facilityId  String
+  facility    Facility @relation(fields: [facilityId], references: [id])
+  requesterId String
+  requester   User     @relation(fields: [requesterId], references: [id])
+
+  // Equipment Details
+  equipmentType  String // LED lights, HVAC, sensors, etc.
+  brand          String? // Preferred brand if any
+  specifications Json // Detailed specs needed
+  quantity       Int
+  estimatedValue Float // Estimated total value
+
+  // Investment Terms
+  proposedRevShare Float // Proposed revenue share percentage
+  termMonths       Int // Length of agreement
+  minPerformance   Json? // Minimum performance guarantees
+
+  // Request Details
+  title            String
+  description      String  @db.Text
+  useCase          String  @db.Text
+  expectedROI      Float? // Expected ROI percentage
+  currentSituation String? @db.Text // Current equipment/situation
+
+  // Location & Timeline
+  deliveryLocation  String
+  neededBy          DateTime
+  installationReady Boolean  @default(false)
+
+  // Status
+  status    EquipmentRequestStatus @default(OPEN)
+  viewCount Int                    @default(0)
+
+  // Platform Fee (15%)
+  platformFeeRate Float @default(0.15)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  expiresAt DateTime?
+
+  // Relations
+  offers    EquipmentOffer[]
+  matches   EquipmentMatch[]
+  documents EquipmentDocument[]
+  questions EquipmentQuestion[]
+}
+
+model EquipmentOffer {
+  id         String           @id @default(cuid())
+  requestId  String
+  request    EquipmentRequest @relation(fields: [requestId], references: [id])
+  investorId String
+  investor   User             @relation(fields: [investorId], references: [id])
+
+  // Equipment Offered
+  equipmentDetails   Json // Detailed equipment specs
+  condition          EquipmentCondition
+  age                Int? // Age in months
+  hoursUsed          Int? // Operating hours if applicable
+  maintenanceHistory Json? // Maintenance records
+
+  // Financial Terms
+  equipmentValue   Float // Investor's valuation
+  proposedRevShare Float // Counter-offer on revenue share
+  termMonths       Int // Counter-offer on term length
+
+  // Additional Terms
+  warranty     String? // Warranty details
+  installation Boolean // Installation included?
+  maintenance  Boolean // Maintenance included?
+  training     Boolean // Training included?
+
+  // Offer Details
+  message    String   @db.Text
+  highlights String[] // Key selling points
+
+  // Status
+  status OfferStatus @default(PENDING)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  expiresAt DateTime?
+
+  // Relations
+  match     EquipmentMatch?
+  documents EquipmentOfferDocument[]
+}
+
+model EquipmentMatch {
+  id        String           @id @default(cuid())
+  requestId String           @unique
+  request   EquipmentRequest @relation(fields: [requestId], references: [id])
+  offerId   String           @unique
+  offer     EquipmentOffer   @relation(fields: [offerId], references: [id])
+
+  // Final Terms
+  finalRevShare   Float
+  finalTermMonths Int
+  finalValue      Float
+
+  // Platform Fee
+  platformFee     Float // 15% of equipment value
+  platformFeePaid Boolean @default(false)
+
+  // Agreement Details
+  agreementHash   String? // IPFS hash of agreement
+  contractAddress String? // Smart contract address
+
+  // Status
+  status MatchStatus @default(PENDING_ESCROW)
+
+  // Important Dates
+  matchedAt   DateTime  @default(now())
+  escrowedAt  DateTime?
+  deliveredAt DateTime?
+  installedAt DateTime?
+  activatedAt DateTime?
+
+  // Relations
+  escrow       EquipmentEscrow?
+  verification EquipmentVerification?
+}
+
+model EquipmentEscrow {
+  id      String         @id @default(cuid())
+  matchId String         @unique
+  match   EquipmentMatch @relation(fields: [matchId], references: [id])
+
+  // Escrow Details
+  escrowAddress     String // Smart contract escrow address
+  totalAmount       Float // Total held in escrow
+  platformFeeAmount Float // 15% platform fee portion
+
+  // Release Conditions
+  releaseConditions Json // Conditions for release
+  conditionsMet     Boolean @default(false)
+
+  // Status
+  status EscrowStatus @default(FUNDED)
+
+  // Timestamps
+  fundedAt   DateTime  @default(now())
+  releasedAt DateTime?
+  refundedAt DateTime?
+
+  // Relations
+  transactions EscrowTransaction[]
+}
+
+model EscrowTransaction {
+  id       String          @id @default(cuid())
+  escrowId String
+  escrow   EquipmentEscrow @relation(fields: [escrowId], references: [id])
+
+  transactionHash String                @unique
+  type            EscrowTransactionType
+  amount          Float
+  fromAddress     String
+  toAddress       String
+
+  createdAt DateTime @default(now())
+}
+
+model EquipmentVerification {
+  id      String         @id @default(cuid())
+  matchId String         @unique
+  match   EquipmentMatch @relation(fields: [matchId], references: [id])
+
+  // Verification Steps
+  equipmentReceived Boolean @default(false)
+  specsMet          Boolean @default(false)
+  installed         Boolean @default(false)
+  operational       Boolean @default(false)
+
+  // IoT Verification
+  iotConnected        Boolean @default(false)
+  performanceVerified Boolean @default(false)
+
+  // Evidence
+  photos     String[] // URLs to verification photos
+  documents  String[] // Inspection reports, etc.
+  sensorData Json? // Initial sensor readings
+
+  verifiedBy String? // Inspector/technician ID
+  verifiedAt DateTime?
+  notes      String?   @db.Text
+}
+
+model EquipmentDocument {
+  id        String           @id @default(cuid())
+  requestId String
+  request   EquipmentRequest @relation(fields: [requestId], references: [id])
+
+  name String
+  type DocumentType
+  url  String // IPFS or S3 URL
+  size Int // File size in bytes
+
+  uploadedBy String
+  uploadedAt DateTime @default(now())
+}
+
+model EquipmentOfferDocument {
+  id      String         @id @default(cuid())
+  offerId String
+  offer   EquipmentOffer @relation(fields: [offerId], references: [id])
+
+  name String
+  type DocumentType
+  url  String
+  size Int
+
+  uploadedAt DateTime @default(now())
+}
+
+model EquipmentQuestion {
+  id        String           @id @default(cuid())
+  requestId String
+  request   EquipmentRequest @relation(fields: [requestId], references: [id])
+
+  askerId String
+  asker   User   @relation(fields: [askerId], references: [id])
+
+  question   String  @db.Text
+  answer     String? @db.Text
+  answeredBy String?
+
+  isPublic Boolean @default(true)
+
+  askedAt    DateTime  @default(now())
+  answeredAt DateTime?
+}
+
+// Equipment Request Board Enums
+enum EquipmentRequestStatus {
+  DRAFT
+  OPEN
+  REVIEWING_OFFERS
+  MATCHED
+  IN_ESCROW
+  DELIVERED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum EquipmentCondition {
+  NEW
+  LIKE_NEW
+  EXCELLENT
+  GOOD
+  FAIR
+  NEEDS_REPAIR
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+  EXPIRED
+  COUNTERED
+}
+
+enum MatchStatus {
+  PENDING_ESCROW
+  IN_ESCROW
+  PENDING_DELIVERY
+  PENDING_VERIFICATION
+  ACTIVE
+  COMPLETED
+  DISPUTED
+  CANCELLED
+}
+
+enum EscrowStatus {
+  PENDING
+  FUNDED
+  PARTIALLY_FUNDED
+  RELEASED
+  REFUNDED
+  DISPUTED
+}
+
+enum EscrowTransactionType {
+  FUND
+  RELEASE
+  REFUND
+  FEE_PAYMENT
+}
+
+enum DocumentType {
+  SPECIFICATION
+  WARRANTY
+  INSPECTION_REPORT
+  PHOTO
+  VIDEO
+  AGREEMENT
+  INVOICE
+  OTHER
+}
+
+// Utility Bill Data Model
+model UtilityBillData {
+  id                 String             @id @default(cuid())
+  clientId           String
+  connectionId       String?
+  connection         UtilityConnection? @relation(fields: [connectionId], references: [id])
+  fileName           String
+  extractedData      Json
+  accountNumber      String?
+  billingPeriodStart DateTime?
+  billingPeriodEnd   DateTime?
+  totalKwh           Float?
+  peakDemand         Float?
+  totalCharges       Float?
+  rateSchedule       String?
+  timeOfUseData      Json?
+  status             String             @default("pending") // pending, processed, failed
+  processedAt        DateTime?
+  processedBy        String? // manual, claude-api, utility-api
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  client User @relation(fields: [clientId], references: [id])
+
+  @@index([clientId])
+  @@index([billingPeriodEnd])
+}
+
+// Client Baseline Model
+model ClientBaseline {
+  id                String    @id @default(cuid())
+  clientId          String    @unique
+  averageMonthlyKwh Float
+  averagePeakDemand Float
+  baselineStart     DateTime?
+  baselineEnd       DateTime?
+  dataPoints        Int // Number of bills used to calculate baseline
+  seasonalFactors   Json? // Seasonal adjustment factors
+  status            String    @default("calculating") // calculating, verified, manual
+  lastUpdated       DateTime  @default(now())
+  createdAt         DateTime  @default(now())
+
+  client User @relation(fields: [clientId], references: [id])
+}
+
+// VibeLux Invoice Model
+model VibeLuxInvoice {
+  id               String    @id @default(cuid())
+  clientId         String
+  invoiceNumber    String    @unique
+  billingPeriod    String
+  baselineKwh      Float
+  actualKwh        Float
+  savingsKwh       Float
+  savingsAmount    Float
+  sharePercentage  Float     @default(50) // Default 50% share
+  invoiceAmount    Float
+  verificationData Json? // Links to utility bills and IoT data
+  status           String    @default("draft") // draft, pending, sent, paid
+  dueDate          DateTime
+  sentAt           DateTime?
+  paidAt           DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  client   User             @relation(fields: [clientId], references: [id])
+  disputes VibeLuxDispute[]
+
+  @@index([clientId])
+  @@index([status])
+}
+
+// Dispute Model
+model VibeLuxDispute {
+  id               String    @id @default(cuid())
+  invoiceId        String
+  reason           String
+  description      String
+  status           String    @default("open") // open, under-review, resolved, rejected
+  resolution       String?
+  utilityDataProof Json? // Utility bill data supporting resolution
+  resolvedAt       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  invoice VibeLuxInvoice @relation(fields: [invoiceId], references: [id])
+
+  @@index([invoiceId])
+}
+
+// ============================================
+// NEW PRODUCTION SYSTEMS - ADDED FOR COMPLETION
+// ============================================
+
+// Utility Connection & Authorization Models
+model UtilityConnection {
+  id               String  @id @default(cuid())
+  customerId       String
+  utilityProvider  String // Name of utility company
+  apiProvider      String // 'utilityapi', 'arcadia', 'manual'
+  utilityAccountId String? // External account ID
+  status           String // 'ACTIVE', 'DISCONNECTED', 'ERROR'
+
+  accessToken          String? // Encrypted access token
+  refreshToken         String? // Encrypted refresh token  
+  tokenExpiresAt       DateTime?
+  externalConnectionId String? // Provider's connection ID
+
+  lastSyncAt     DateTime?
+  lastError      String?
+  lastErrorAt    DateTime?
+  disconnectedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bills  UtilityBillData[]
+  User   User?             @relation(fields: [userId], references: [id])
+  userId String?
+
+  @@index([customerId, status])
+  @@index([apiProvider, status])
+}
+
+model UtilityAuthorization {
+  id         String  @id @default(cuid())
+  customerId String
+  utility    String // Utility name
+  state      String  @unique // Encrypted authorization state
+  status     String // 'PENDING', 'COMPLETED', 'FAILED'
+  authUrl    String? // Authorization URL
+  provider   String  @default("utilityapi") // 'utilityapi', 'arcadia'
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([customerId, status])
+}
+
+// Enhanced Utility Bill Data
+// ===================== MARKETPLACE MODELS =====================
+
+// Marketplace Vendor Model
+model MarketplaceVendor {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Business Information
+  businessName    String
+  businessType    MarketplaceVendorBusinessType
+  taxId           String?
+  yearEstablished Int?
+  description     String?
+
+  // Contact and Location
+  contactEmail  String
+  contactPhone  String?
+  address       Json? // { street, city, state, zip, country }
+  shippingZones String[] // Array of supported regions
+
+  // Verification and Status
+  verified         Boolean                 @default(false)
+  verificationDate DateTime?
+  status           MarketplaceVendorStatus @default(PENDING)
+
+  // Business Metrics
+  rating       Float @default(0)
+  reviewCount  Int   @default(0)
+  totalSales   Int   @default(0)
+  minimumOrder Float @default(0)
+
+  // Payment and Terms
+  paymentTerms   String @default("Net 30")
+  bankingInfo    Json? // Encrypted banking details
+  commissionRate Float  @default(0.15) // Platform commission rate
+
+  // Certifications and Specialties
+  certifications String[] // Array of certification names
+  specialties    String[] // Array of specialty areas
+
+  // Platform Integration
+  apiKeyEnabled Boolean @default(false)
+  webhookUrl    String?
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  lastActive DateTime?
+
+  // Relations
+  products         MarketplaceProduct[]
+  orders           MarketplaceOrder[]   @relation("OrderVendor")
+  geneticsListings GeneticsListing[]
+  rfqQuotes        RFQQuote[]
+
+  @@index([verified])
+  @@index([status])
+  @@index([businessType])
+  @@index([rating])
+}
+
+// Marketplace Product Model
+model MarketplaceProduct {
+  id       String            @id @default(cuid())
+  vendorId String
+  vendor   MarketplaceVendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Basic Product Information
+  name        String
+  description String
+  brand       String?
+  model       String?
+  sku         String?                    @unique
+  category    MarketplaceProductCategory
+  subcategory String?
+
+  // Pricing
+  listPrice      Float
+  wholesalePrice Float?
+  bulkPricing    Json? // { quantity: number, price: number }[]
+  currency       String @default("USD")
+
+  // Inventory
+  stockQuantity     Int                    @default(0)
+  stockStatus       MarketplaceStockStatus @default(IN_STOCK)
+  lowStockThreshold Int                    @default(10)
+  leadTime          Int                    @default(7) // Days
+
+  // Product Details
+  specifications Json? // Technical specifications
+  dimensions     Json? // { length, width, height, weight }
+  images         String[] // Array of image URLs
+  documents      String[] // Array of document URLs (PDFs, manuals)
+
+  // Quality and Certifications
+  warranty       String?
+  certifications String[]
+  tags           String[]
+
+  // Status and Visibility
+  status         MarketplaceProductStatus @default(DRAFT)
+  featured       Boolean                  @default(false)
+  searchKeywords String?
+
+  // SEO and Marketing
+  metaTitle       String?
+  metaDescription String?
+
+  // Analytics
+  viewCount     Int       @default(0)
+  purchaseCount Int       @default(0)
+  lastViewed    DateTime?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+
+  // Relations
+  cartItems     MarketplaceCartItem[]
+  orderItems    MarketplaceOrderItem[]
+  inventoryLogs InventoryLog[]
+  // Note: Fulltext search not supported with PostgreSQL, use external search solution
+
+  @@index([vendorId])
+  @@index([category])
+  @@index([status])
+  @@index([stockStatus])
+  @@index([featured])
+}
+
+// Shopping Cart Model
+model MarketplaceCartItem {
+  id        String             @id @default(cuid())
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   MarketplaceProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  quantity Int
+  price    Float // Price at time of adding to cart
+  notes    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+// Order Management
+model MarketplaceOrder {
+  id          String @id @default(cuid())
+  orderNumber String @unique
+
+  // Buyer Information
+  buyerId String
+  buyer   User   @relation("OrderBuyer", fields: [buyerId], references: [id])
+
+  // Vendor Information  
+  vendorId     String
+  vendor       MarketplaceVendor @relation("OrderVendor", fields: [vendorId], references: [id])
+  vendorUserId String
+  vendorUser   User              @relation("OrderVendor", fields: [vendorUserId], references: [id])
+
+  // Order Status
+  status    MarketplaceOrderStatus @default(PENDING)
+  orderType MarketplaceOrderType   @default(STANDARD)
+
+  // Financial Information
+  subtotal    Float
+  taxAmount   Float  @default(0)
+  shippingFee Float  @default(0)
+  platformFee Float // VibeLux commission
+  totalAmount Float
+  currency    String @default("USD")
+
+  // Shipping Information
+  shippingAddress   Json // { name, street, city, state, zip, country }
+  billingAddress    Json // { name, street, city, state, zip, country }
+  shippingMethod    String?
+  trackingNumber    String?
+  estimatedDelivery DateTime?
+  actualDelivery    DateTime?
+
+  // Payment Information
+  paymentMethod   String // stripe, bank_transfer, etc.
+  paymentStatus   MarketplacePaymentStatus @default(PENDING)
+  stripePaymentId String?
+  paymentDate     DateTime?
+
+  // Additional Information
+  notes         String?
+  internalNotes String? // For vendor/admin use
+
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  confirmedAt DateTime?
+  shippedAt   DateTime?
+  deliveredAt DateTime?
+  cancelledAt DateTime?
+
+  // Relations
+  items         MarketplaceOrderItem[]
+  statusHistory OrderStatusHistory[]
+
+  @@index([buyerId])
+  @@index([vendorId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+// Order Items
+model MarketplaceOrderItem {
+  id        String             @id @default(cuid())
+  orderId   String
+  order     MarketplaceOrder   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   MarketplaceProduct @relation(fields: [productId], references: [id])
+
+  quantity   Int
+  unitPrice  Float
+  totalPrice Float
+
+  // Product snapshot at time of order
+  productSnapshot Json // Store product details at time of purchase
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+// Order Status Tracking
+model OrderStatusHistory {
+  id      String           @id @default(cuid())
+  orderId String
+  order   MarketplaceOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  status    MarketplaceOrderStatus
+  notes     String?
+  createdBy String? // User ID who made the change
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([createdAt])
+}
+
+// Genetics Marketplace
+model GeneticsListing {
+  id       String            @id @default(cuid())
+  vendorId String
+  vendor   MarketplaceVendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Basic Information
+  strain      String
+  type        GeneticsType
+  description String
+
+  // Genetics Information
+  lineage        String?
+  thcRange       Json // { min: number, max: number }
+  cbdRange       Json // { min: number, max: number }
+  terpenes       String[]
+  floweringTime  Int? // weeks
+  yieldPotential String?
+
+  // Licensing and Availability
+  licensingType LicensingType
+  royaltyRate   Float?
+  minimumOrder  Int?
+  availability  Int
+  pricePerUnit  Float
+
+  // Quality Assurance
+  labResults     String? // URL to lab results
+  certifications String[]
+  virusFree      Boolean  @default(false)
+
+  // Restrictions
+  territoryRestrictions String[]
+  ageRestrictions       Boolean  @default(true)
+
+  // Media
+  images String[]
+  videos String[]
+
+  // Status
+  status   MarketplaceProductStatus @default(DRAFT)
+  featured Boolean                  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Note: Fulltext search not supported with PostgreSQL, use external search solution
+
+  @@index([vendorId])
+  @@index([type])
+  @@index([status])
+}
+
+// Request for Quote System
+model RequestForQuote {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // RFQ Details
+  title       String
+  description String
+  category    String
+  quantity    Int
+  targetPrice Float?
+  currency    String @default("USD")
+
+  // Timeline
+  neededBy   DateTime
+  validUntil DateTime
+
+  // Requirements
+  specifications   Json? // Technical requirements
+  deliveryLocation Json // { city, state, country }
+  paymentTerms     String?
+
+  // Attachments
+  attachments String[] // Array of file URLs
+
+  // Status
+  status RFQStatus @default(OPEN)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  closedAt  DateTime?
+
+  // Relations
+  quotes RFQQuote[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([category])
+  @@index([neededBy])
+}
+
+// RFQ Quotes
+model RFQQuote {
+  id       String            @id @default(cuid())
+  rfqId    String
+  rfq      RequestForQuote   @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  vendorId String
+  vendor   MarketplaceVendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Quote Details
+  price      Float
+  currency   String   @default("USD")
+  leadTime   Int // days
+  validUntil DateTime
+
+  // Additional Information
+  notes       String?
+  attachments String[]
+
+  // Terms
+  paymentTerms  String?
+  shippingTerms String?
+  warrantyTerms String?
+
+  // Status
+  status QuoteStatus @default(SUBMITTED)
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  acceptedAt DateTime?
+  rejectedAt DateTime?
+
+  @@index([rfqId])
+  @@index([vendorId])
+  @@index([status])
+}
+
+// Inventory Management
+model InventoryLog {
+  id        String             @id @default(cuid())
+  productId String
+  product   MarketplaceProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // Movement Details
+  movementType InventoryMovementType
+  quantity     Int // Positive for additions, negative for subtractions
+  newQuantity  Int // Quantity after movement
+
+  // Context
+  reason  String?
+  orderId String? // If related to an order
+  userId  String? // User who made the change
+
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@index([movementType])
+  @@index([createdAt])
+}
+
+// ===================== ENUMS =====================
+
+enum MarketplaceVendorBusinessType {
+  MANUFACTURER
+  DISTRIBUTOR
+  RETAILER
+  GROWER
+  GENETICS_LAB
+  SERVICE_PROVIDER
+  OTHER
+}
+
+enum MarketplaceVendorStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+enum MarketplaceProductCategory {
+  LIGHTING
+  HVAC
+  AUTOMATION
+  NUTRIENTS
+  MEDIA
+  GENETICS
+  EQUIPMENT
+  SUPPLIES
+  SERVICES
+  OTHER
+}
+
+enum MarketplaceStockStatus {
+  IN_STOCK
+  LOW_STOCK
+  OUT_OF_STOCK
+  DISCONTINUED
+  PRE_ORDER
+}
+
+enum MarketplaceProductStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  INACTIVE
+  DISCONTINUED
+}
+
+enum MarketplaceOrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum MarketplaceOrderType {
+  STANDARD
+  BULK
+  CUSTOM
+  SUBSCRIPTION
+}
+
+enum MarketplacePaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum GeneticsType {
+  SEED
+  CLONE
+  TISSUE_CULTURE
+  POLLEN
+}
+
+enum LicensingType {
+  EXCLUSIVE
+  NON_EXCLUSIVE
+  WHITE_LABEL
+}
+
+enum RFQStatus {
+  OPEN
+  CLOSED
+  AWARDED
+  CANCELLED
+}
+
+enum QuoteStatus {
+  SUBMITTED
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum InventoryMovementType {
+  INITIAL_STOCK
+  PURCHASE
+  SALE
+  ADJUSTMENT
+  DAMAGE
+  RETURN
+  TRANSFER
+}
+
+// ============================================================================
+// FINANCIAL AUTOMATION MODELS
+// ============================================================================
+
+model RevenueSharingAgreement {
+  id          String     @id @default(cuid())
+  customerId  String
+  customer    User       @relation(fields: [customerId], references: [id])
+  facilityId  String
+  facility    Facility   @relation(fields: [facilityId], references: [id])
+  affiliateId String?
+  affiliate   Affiliate? @relation(fields: [affiliateId], references: [id])
+
+  status           AgreementStatus @default(ACTIVE)
+  revenueShareRate Float // Percentage (e.g., 20 for 20%)
+  minimumThreshold Float           @default(100)
+
+  startDate DateTime
+  endDate   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoices Invoice[]
+}
+
+model Invoice {
+  id            String                  @id @default(cuid())
+  invoiceNumber String                  @unique
+  customerId    String
+  customer      User                    @relation(fields: [customerId], references: [id])
+  agreementId   String
+  agreement     RevenueSharingAgreement @relation(fields: [agreementId], references: [id])
+
+  periodStart DateTime
+  periodEnd   DateTime
+
+  totalSavings     Float
+  revenueShareRate Float
+  amountDue        Float
+
+  dueDate DateTime
+  status  InvoiceStatus @default(PENDING)
+
+  paidAt               DateTime?
+  paymentTransactionId String?
+
+  pdfUrl                      String?
+  verificationData            Json?
+  weatherNormalizationApplied Boolean @default(false)
+  thirdPartyVerified          Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  payments             Payment[]
+  collectionActivities CollectionActivity[]
+  paymentSchedules     PaymentScheduleEntry[]
+  collectionCase       CollectionCase?
+  AffiliateCommission  AffiliateCommission[]
+}
+
+model PaymentScheduleEntry {
+  id        String  @id @default(cuid())
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+
+  scheduledDate DateTime
+  status        PaymentScheduleStatus @default(SCHEDULED)
+  paymentMethod String
+  amount        Float
+
+  retryCount Int     @default(0)
+  maxRetries Int     @default(3)
+  lastError  String?
+
+  completedAt   DateTime?
+  transactionId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id         String  @id @default(cuid())
+  invoiceId  String
+  invoice    Invoice @relation(fields: [invoiceId], references: [id])
+  customerId String
+  customer   User    @relation(fields: [customerId], references: [id])
+
+  amount        Float
+  paymentMethod String
+  transactionId String                  @unique
+  status        PaymentProcessingStatus
+
+  processedAt DateTime
+
+  createdAt DateTime @default(now())
+}
+
+model PaymentMethod {
+  id         String @id @default(cuid())
+  customerId String
+  customer   User   @relation(fields: [customerId], references: [id])
+
+  type      PaymentMethodType
+  isDefault Boolean             @default(false)
+  status    PaymentMethodStatus @default(ACTIVE)
+
+  // Stripe fields
+  stripeCustomerId      String?
+  stripePaymentMethodId String?
+
+  // Plaid ACH fields
+  plaidAccessToken String? @db.Text
+  plaidAccountId   String?
+
+  // Bank details (encrypted)
+  bankName        String?
+  accountLastFour String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WeatherNormalization {
+  id         String   @id @default(cuid())
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+
+  periodStart DateTime
+  periodEnd   DateTime
+
+  originalUsage    Float
+  normalizedUsage  Float
+  adjustmentFactor Float
+
+  heatingDDActual   Float
+  heatingDDBaseline Float
+  coolingDDActual   Float
+  coolingDDBaseline Float
+
+  confidence Float
+  method     String
+
+  createdAt DateTime @default(now())
+}
+
+model ThirdPartyValidation {
+  id         String   @id @default(cuid())
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+
+  validationType ValidationType
+  verified       Boolean
+  confidence     Float
+
+  discrepancies   String[]
+  recommendations String[]
+
+  auditorNotes    String?
+  certificationId String?
+  dataChecksum    String
+
+  validatedAt DateTime @default(now())
+}
+
+model CollectionActivity {
+  id         String  @id @default(cuid())
+  invoiceId  String
+  invoice    Invoice @relation(fields: [invoiceId], references: [id])
+  customerId String
+  customer   User    @relation(fields: [customerId], references: [id])
+
+  actionType     CollectionActionType
+  actionTemplate String
+  daysPastDue    Int
+
+  success         Boolean
+  responseDetails Json?
+
+  createdAt DateTime @default(now())
+}
+
+model CollectionCase {
+  id         String  @id @default(cuid())
+  invoiceId  String  @unique
+  invoice    Invoice @relation(fields: [invoiceId], references: [id])
+  customerId String
+  customer   User    @relation(fields: [customerId], references: [id])
+
+  amount   Float
+  status   CaseStatus   @default(OPEN)
+  priority CasePriority @default(MEDIUM)
+
+  assignedTo String
+
+  resolvedAt     DateTime?
+  resolutionType String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AffiliateCommission {
+  id          String    @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id])
+  invoiceId   String
+  invoice     Invoice   @relation(fields: [invoiceId], references: [id])
+  customerId  String
+  customer    User      @relation(fields: [customerId], references: [id])
+
+  amount Float
+  rate   Float
+  tier   String
+
+  status        CommissionStatus @default(PENDING)
+  payoutDate    DateTime
+  paidAt        DateTime?
+  transactionId String?
+
+  createdAt DateTime @default(now())
+}
+
+model FacilityTrustScore {
+  id         String   @id @default(cuid())
+  facilityId String   @unique
+  facility   Facility @relation(fields: [facilityId], references: [id])
+
+  score           Float // 0-1
+  lastValidation  DateTime
+  validationCount Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Financial Automation Enums
+enum AgreementStatus {
+  ACTIVE
+  PAUSED
+  TERMINATED
+  EXPIRED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  PENDING
+  OVERDUE
+  PAID
+  CANCELLED
+}
+
+enum PaymentScheduleStatus {
+  SCHEDULED
+  RETRY
+  COMPLETED
+  FAILED
+}
+
+enum PaymentProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethodType {
+  CARD
+  ACH
+  WIRE
+}
+
+enum PaymentMethodStatus {
+  ACTIVE
+  EXPIRED
+  SUSPENDED
+}
+
+enum ConnectionStatus {
+  PENDING_AUTH
+  CONNECTED
+  ACTIVE
+  ERROR
+  DISCONNECTED
+}
+
+enum ValidationType {
+  AUTOMATED
+  MANUAL
+  CERTIFIED
+}
+
+enum CollectionActionType {
+  EMAIL
+  SMS
+  CALL
+  LEGAL
+}
+
+enum CaseStatus {
+  OPEN
+  RESOLVED
+  ESCALATED
+  LEGAL
+}
+
+enum CasePriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum CommissionStatus {
+  PENDING
+  APPROVED
+  PAID
+  CANCELLED
+}
+
+// Market Data & Benchmarking Models
+model MarketData {
+  id         String   @id @default(cuid())
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+
+  // Product Details
+  cropType        String
+  strain          String?
+  productCategory String // flower, trim, extract, etc.
+  quality         String // A, B, C grade
+
+  // Transaction Data
+  pricePerUnit Float
+  unitType     String // lb, kg, gram, etc.
+  quantity     Float
+  totalRevenue Float
+
+  // Market Context
+  buyerType     String? // dispensary, processor, wholesale
+  buyerLocation String? // city/state
+  contractType  String? // spot, contract, futures
+
+  // Metadata
+  harvestDate DateTime?
+  saleDate    DateTime
+  reportedBy  String
+  reporter    User      @relation(fields: [reportedBy], references: [id])
+  verified    Boolean   @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([facilityId, cropType, saleDate])
+  @@index([cropType, quality, saleDate])
+}
+
+model BenchmarkReport {
+  id         String   @id @default(cuid())
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+
+  // Report Details
+  reportType String // energy, yield, quality, financial
+  period     String // monthly, quarterly, annual
+  startDate  DateTime
+  endDate    DateTime
+
+  // Metrics
+  metrics     Json // Flexible JSON for various metric types
+  rankings    Json // Facility rankings in different categories
+  comparisons Json // Peer group comparisons
+
+  // Access Control
+  accessTier String // basic, pro, enterprise
+  isPublic   Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([facilityId, reportType, startDate])
+  @@index([reportType, period, createdAt])
+}
+
+model BenchmarkSubscription {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  // Subscription Details
+  tier     String // basic, pro, enterprise
+  status   String // active, cancelled, expired
+  features Json // Array of enabled features
+
+  // Billing
+  monthlyPrice    Float
+  billingCycle    String // monthly, annual
+  nextBillingDate DateTime?
+
+  // Usage
+  reportsAccessed Int       @default(0)
+  lastAccessedAt  DateTime?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  expiresAt DateTime?
+
+  @@index([userId, status])
+}
+
+model IndustryBenchmark {
+  id String @id @default(cuid())
+
+  // Benchmark Details
+  metricType   String // yield_per_sqft, energy_per_gram, etc.
+  cropType     String
+  facilityType String // indoor, greenhouse, vertical
+  region       String? // geographic region
+
+  // Statistical Data
+  sampleSize   Int
+  average      Float
+  median       Float
+  percentile25 Float
+  percentile75 Float
+  percentile90 Float
+  standardDev  Float
+
+  // Time Period
+  periodStart DateTime
+  periodEnd   DateTime
+
+  // Metadata
+  confidence  Float // 0-1 confidence score
+  lastUpdated DateTime @default(now())
+
+  @@unique([metricType, cropType, facilityType, region, periodStart])
+  @@index([metricType, cropType, lastUpdated])
+}
+
+model DataContribution {
+  id         String   @id @default(cuid())
+  facilityId String
+  facility   Facility @relation(fields: [facilityId], references: [id])
+
+  // Contribution Details
+  dataType     String // market_price, yield_data, energy_data
+  recordCount  Int
+  qualityScore Float // 0-1 data quality
+
+  // Rewards
+  creditsEarned   Int      @default(0)
+  reportsUnlocked String[] // Array of report IDs unlocked
+
+  createdAt DateTime @default(now())
+
+  @@index([facilityId, dataType, createdAt])
+}
+
+// Enhanced Mobile Authentication Models
+
+model MobileSession {
   id          String   @id @default(cuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
   
-  name        String
-  key         String   @unique
-  permissions Json     // Array of allowed endpoints/actions
-  lastUsed    DateTime?
-  expiresAt   DateTime?
+  // Device Information
+  deviceId    String
+  fingerprint String
+  platform    String   // ios, android, web
+  deviceModel String?
+  osVersion   String?
+  appVersion  String
+  
+  // Session Security
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+  lastActiveAt DateTime @default(now())
+  
+  // Session State
+  isRevoked   Boolean  @default(false)
+  revokedAt   DateTime?
+  revokeReason String?
+  
+  @@unique([userId, deviceId, fingerprint])
+  @@index([userId, expiresAt])
+  @@index([deviceId])
+  @@index([lastActiveAt])
+}
+
+model ApiKey {
+  id           String    @id @default(cuid())
+  name         String
+  keyHash      String    @unique // SHA256 hash of the actual key
+  prefix       String    // First 8 chars for identification
+  
+  // Ownership
+  userId       String?
+  user         User?     @relation(fields: [userId], references: [id])
+  facilityId   String?
+  facility     Facility? @relation(fields: [facilityId], references: [id])
+  
+  // Permissions
+  permissions  String[]  // Array of allowed permissions
+  scopes       String[]  // API scopes (read, write, admin)
+  
+  // Usage & Security
+  lastUsedAt   DateTime?
+  usageCount   Int       @default(0)
+  rateLimit    Int?      // Requests per hour
+  ipWhitelist  String[]  // Allowed IP addresses
+  
+  // Lifecycle
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  expiresAt    DateTime?
+  revokedAt    DateTime?
+  revokeReason String?
+  
+  @@index([keyHash])
+  @@index([userId])
+  @@index([facilityId])
+  @@index([isActive, expiresAt])
+}
+
+model WebhookEvent {
+  id          String   @id @default(cuid())
+  eventId     String   @unique // Stripe event ID for idempotency
+  eventType   String   // checkout.session.completed, etc.
+  status      String   // success, failed
+  error       String?  // Error details if failed
+  processedAt DateTime @default(now())
+  
+  @@index([eventId])
+  @@index([eventType, processedAt])
+  @@index([status, processedAt])
+}
+
+// Update Management Models
+
+model SystemUpdate {
+  id               String   @id @default(cuid())
+  version          String   @unique
+  title            String
+  description      String
+  type             String   // feature, improvement, bugfix, security, breaking
+  severity         String   // minor, major, critical
+  affectedPlans    String[] // Array of plan IDs affected
+  rolloutPercentage Int     @default(100)
+  scheduledFor     DateTime
+  releasedAt       DateTime?
+  features         Json?    // { added: [], changed: [], deprecated: [], removed: [] }
+  
+  // Relationships
+  affectedUsers    UserUpdateStatus[]
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@index([version])
+  @@index([releasedAt])
+  @@index([type, severity])
+}
+
+model FeatureFlag {
+  id                String    @id @default(cuid())
+  name              String    @unique
+  description       String
+  enabled           Boolean   @default(true)
+  rolloutPercentage Int       @default(100)
+  allowedPlans      String[]  // Plans that have access
+  targetUsers       String[]  // Specific user IDs (for beta testing)
+  expiresAt         DateTime?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([name])
+  @@index([enabled, rolloutPercentage])
+}
+
+model UserFeatureOverride {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  feature   String
+  enabled   Boolean
+  reason    String    // grandfathered, beta_tester, downgrade_protection, etc.
+  expiresAt DateTime?
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  @@unique([userId, feature])
+  @@index([userId])
+  @@index([feature, enabled])
+}
+
+model UserUpdateStatus {
+  id       String       @id @default(cuid())
+  userId   String
+  user     User         @relation(fields: [userId], references: [id])
+  updateId String
+  update   SystemUpdate @relation(fields: [updateId], references: [id])
+  
+  // Status tracking
+  notified Boolean @default(false)
+  viewed   Boolean @default(false)
+  
+  notifiedAt DateTime?
+  viewedAt   DateTime?
+  createdAt  DateTime  @default(now())
+  
+  @@unique([userId, updateId])
+  @@index([userId])
+  @@index([updateId])
+}
+
+model PriceProtection {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  oldPrice      Float    // Price in dollars
+  newPrice      Float
+  protectedUntil DateTime // Keep old price until this date
+  
+  createdAt     DateTime @default(now())
+  
+  @@index([userId])
+  @@index([protectedUntil])
+}
+// Expert Consultation System Schema
+
+model Expert {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id])
+  
+  // Profile Information
+  displayName       String
+  title             String
+  bio               String   @db.Text
+  photoUrl          String?
+  linkedinUrl       String?
+  websiteUrl        String?
+  
+  // Expertise Areas
+  specialties       String[] // growing, packaging, engineering, IPM, sales, compliance, etc.
+  certifications    String[]
+  yearsExperience   Int
+  
+  // Pricing
+  hourlyRate        Float    @default(200) // in USD
+  minimumHours      Float    @default(1)   // minimum booking duration
+  currency          String   @default("USD")
+  
+  // Availability
+  timezone          String   @default("America/Los_Angeles")
+  availableDays     Int[]    // 0-6 (Sunday to Saturday)
+  availableHours    Json     // { start: "09:00", end: "17:00" }
+  bufferTime        Int      @default(15) // minutes between sessions
+  
+  // Settings
+  autoApprove       Boolean  @default(false) // auto-approve bookings
+  videoPreference   String   @default("platform") // platform, zoom, google_meet
+  cancellationHours Int      @default(24) // hours notice required
+  
+  // Stats
+  totalSessions     Int      @default(0)
+  totalEarnings     Float    @default(0)
+  averageRating     Float?
+  responseTime      Int?     // average response time in hours
+  
+  // Status
+  status            ExpertStatus @default(PENDING)
+  verifiedAt        DateTime?
+  suspendedAt       DateTime?
+  suspensionReason  String?
+  
+  // Relationships
+  consultations     Consultation[]
+  reviews           ExpertReview[]
+  availability      ExpertAvailability[]
+  payouts           ExpertPayout[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([status])
+  @@index([specialties])
+}
+
+enum ExpertStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+model Consultation {
+  id                String   @id @default(cuid())
+  
+  // Participants
+  expertId          String
+  expert            Expert   @relation(fields: [expertId], references: [id])
+  clientId          String
+  client            User     @relation("ClientConsultations", fields: [clientId], references: [id])
+  
+  // Scheduling
+  scheduledStart    DateTime
+  scheduledEnd      DateTime
+  duration          Int      // in minutes
+  timezone          String
+  
+  // Meeting Details
+  title             String
+  description       String?  @db.Text
+  objectives        String[] // what client wants to achieve
+  preparationNotes  String?  @db.Text
+  
+  // Status
+  status            ConsultationStatus @default(REQUESTED)
+  
+  // Meeting Info
+  meetingUrl        String?  // platform video call URL
+  meetingId         String?  // internal meeting ID
+  recordingUrl      String?  // if recording enabled
+  
+  // Financial
+  hourlyRate        Float
+  totalAmount       Float
+  platformFee       Float    // 10% of total
+  expertEarnings    Float    // 90% of total
+  currency          String   @default("USD")
+  
+  // Payment
+  paymentStatus     ConsultationPaymentStatus @default(PENDING)
+  paymentIntentId   String?  // Stripe payment intent
+  paidAt            DateTime?
+  refundedAt        DateTime?
+  refundReason      String?
+  
+  // Post-session
+  actualStart       DateTime?
+  actualEnd         DateTime?
+  notes             String?  @db.Text // expert's notes
+  followUpItems     String[] // action items
+  attachments       ConsultationAttachment[]
+  
+  // Cancellation
+  cancelledAt       DateTime?
+  cancelledBy       String?  // userId who cancelled
+  cancellationReason String?
+  
+  // Anti-disintermediation
+  platformCallUsed  Boolean  @default(false)
+  externalContact   Boolean  @default(false) // flag if external contact detected
+  warningsSent      Int      @default(0)
+  
+  // Relationships
+  messages          ConsultationMessage[]
+  review            ExpertReview?
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([expertId, scheduledStart])
+  @@index([clientId, scheduledStart])
+  @@index([status])
+  @@index([paymentStatus])
+}
+
+enum ConsultationStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum ConsultationPaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  REFUNDED
+  FAILED
+}
+
+model ConsultationMessage {
+  id              String   @id @default(cuid())
+  consultationId  String
+  consultation    Consultation @relation(fields: [consultationId], references: [id])
+  
+  senderId        String
+  sender          User     @relation(fields: [senderId], references: [id])
+  
+  content         String   @db.Text
+  
+  // Anti-disintermediation monitoring
+  flaggedContent  Boolean  @default(false)
+  flagReason      String?  // "phone_number", "email", "external_link", etc.
+  
+  attachments     MessageAttachment[]
+  
+  createdAt       DateTime @default(now())
+  
+  @@index([consultationId])
+}
+
+model ExpertReview {
+  id              String   @id @default(cuid())
+  consultationId  String   @unique
+  consultation    Consultation @relation(fields: [consultationId], references: [id])
+  expertId        String
+  expert          Expert   @relation(fields: [expertId], references: [id])
+  clientId        String
+  client          User     @relation(fields: [clientId], references: [id])
+  
+  rating          Int      // 1-5 stars
+  comment         String?  @db.Text
+  
+  // Specific ratings
+  knowledge       Int?     // 1-5
+  communication   Int?     // 1-5
+  professionalism Int?     // 1-5
+  value           Int?     // 1-5
+  
+  // Expert response
+  expertResponse  String?  @db.Text
+  respondedAt     DateTime?
+  
+  isPublic        Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([expertId])
+  @@index([rating])
+}
+
+model ExpertAvailability {
+  id          String   @id @default(cuid())
+  expertId    String
+  expert      Expert   @relation(fields: [expertId], references: [id])
+  
+  date        DateTime @db.Date
+  startTime   String   // "09:00"
+  endTime     String   // "17:00"
+  
+  isAvailable Boolean  @default(true)
+  reason      String?  // if not available
   
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  
+  @@unique([expertId, date])
+  @@index([expertId, date])
+}
+
+model ExpertPayout {
+  id              String   @id @default(cuid())
+  expertId        String
+  expert          Expert   @relation(fields: [expertId], references: [id])
+  
+  amount          Float
+  currency        String   @default("USD")
+  
+  // Stripe Connect
+  transferId      String?
+  destinationId   String?  // Stripe Connect account
+  
+  status          ExpertPayoutStatus @default(PENDING)
+  
+  // Period
+  periodStart     DateTime
+  periodEnd       DateTime
+  consultationIds String[]
+  
+  processedAt     DateTime?
+  failedAt        DateTime?
+  failureReason   String?
+  
+  createdAt       DateTime @default(now())
+  
+  @@index([expertId])
+  @@index([status])
+}
+
+enum ExpertPayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model ConsultationAttachment {
+  id              String   @id @default(cuid())
+  consultationId  String
+  consultation    Consultation @relation(fields: [consultationId], references: [id])
+  
+  fileName        String
+  fileUrl         String
+  fileSize        Int
+  mimeType        String
+  
+  uploadedBy      String
+  uploader        User     @relation(fields: [uploadedBy], references: [id])
+  
+  createdAt       DateTime @default(now())
+}
+
+model MessageAttachment {
+  id          String   @id @default(cuid())
+  messageId   String
+  message     ConsultationMessage @relation(fields: [messageId], references: [id])
+  
+  fileName    String
+  fileUrl     String
+  fileSize   Int
+  mimeType   String
+  
+  createdAt   DateTime @default(now())
+}
+
+// Platform Features to Prevent Disintermediation
+model PlatformFeature {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  
+  // Features that add value to keep users on platform
+  features    String[] // ["video_recording", "automated_scheduling", "invoicing", "contracts", "compliance_tracking"]
+}
+
+// Terms violation tracking
+model TermsViolation {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  type        String   // "contact_sharing", "off_platform_solicitation", etc.
+  description String
+  severity    String   // "warning", "suspension", "ban"
+  
+  actionTaken String?
+  
+  createdAt   DateTime @default(now())
   
   @@index([userId])
-  @@index([key])
-}
-
-model TeamMember {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  teamId    String   // Organization/team ID from Clerk
-  
-  role      String   // admin, member, viewer
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@unique([userId, teamId])
-  @@index([teamId])
-}
-
-model UsageRecord {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  
-  feature   String   // Feature name
-  action    String   // Action performed
-  count     Int      @default(1)
-  metadata  Json?    // Additional context
-  
-  createdAt DateTime @default(now())
-  
-  @@index([userId])
-  @@index([feature])
-  @@index([createdAt])
-}
-
-model UtilityRebate {
-  id           String   @id @default(cuid())
-  utilityName  String
-  programName  String
-  state        String
-  zipCodes     String[] // Array of eligible ZIP codes
-  
-  rebateAmount Float?   // $ per fixture or % of cost
-  rebateType   String   // fixed, percentage, per_watt
-  requirements Json     // DLC requirements, minimum purchase, etc.
-  
-  startDate    DateTime?
-  endDate      DateTime?
-  
-  contactInfo  Json     // { phone, email, website }
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  
-  @@index([state])
-  @@index([utilityName])
 }

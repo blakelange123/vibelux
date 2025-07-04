@@ -122,6 +122,10 @@ export default function FacilitySettings() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'facility-settings.json';
+    link.click();
   };
 
   return (

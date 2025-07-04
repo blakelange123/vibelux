@@ -39,8 +39,8 @@ interface ModelWeights {
 }
 
 export class GrowthPredictionModel {
-  private modelWeights: ModelWeights;
-  private cropModels: Map<string, any>;
+  private modelWeights!: ModelWeights;
+  private cropModels!: Map<string, any>;
   
   constructor() {
     this.initializeModels();
@@ -413,7 +413,7 @@ export class GrowthPredictionModel {
     if (!cropModel) return null;
     
     // Use gradient descent to find optimal parameters
-    let bestInput: GrowthPredictionInput = {
+    const bestInput: GrowthPredictionInput = {
       ppfd: cropModel.optimal_ppfd,
       spectrum_ratio: { red_blue: 3, far_red: 2 },
       duration: 16,
@@ -461,3 +461,26 @@ export class GrowthPredictionModel {
 
 // Export singleton instance
 export const growthModel = new GrowthPredictionModel();
+
+// Export convenience function for growth prediction
+export function calculateGrowthPrediction(input: any): any {
+  return growthModel.predict({
+    ppfd: input.ppfd || 500,
+    spectrum_ratio: input.spectrum_ratio || { red_blue: 3, far_red: 2 },
+    duration: input.duration || 16,
+    dli: input.dli || 20,
+    temperature: input.temperature || 24,
+    humidity: input.humidity || 65,
+    co2_ppm: input.co2 || 800,
+    crop_type: input.crop_type || 'lettuce'
+  });
+}
+
+// Export convenience function for yield forecast
+export function calculateYieldForecast(
+  input: GrowthPredictionInput,
+  days: number = 30
+): number {
+  const prediction = growthModel.predict(input);
+  return prediction.biomass_accumulation * days;
+}

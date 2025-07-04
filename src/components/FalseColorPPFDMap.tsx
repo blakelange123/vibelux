@@ -15,6 +15,7 @@ interface PPFDMapProps {
   showContours?: boolean;
   showLabels?: boolean;
   resolution?: number;
+  opacity?: number;
 }
 
 export function FalseColorPPFDMap({
@@ -28,7 +29,8 @@ export function FalseColorPPFDMap({
   targetPPFD = 600,
   showContours = true,
   showLabels = true,
-  resolution = 50
+  resolution = 50,
+  opacity = 1
 }: PPFDMapProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hoveredValue, setHoveredValue] = useState<number | null>(null);
@@ -314,6 +316,7 @@ export function FalseColorPPFDMap({
           width={800}
           height={600}
           className="w-full"
+          style={{ opacity }}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
         />

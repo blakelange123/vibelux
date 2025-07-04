@@ -19,27 +19,7 @@ import {
   Clock,
   ExternalLink
 } from 'lucide-react'
-
-interface RebateProgram {
-  id: string
-  utilityCompany: string
-  programName: string
-  state: string
-  zipCodes: string[]
-  rebateType: 'prescriptive' | 'custom' | 'both'
-  maxRebate: number
-  rebateRate: number // $ per fixture or $ per kWh saved
-  requirements: string[]
-  deadline?: Date
-  budgetRemaining?: number
-  documentsRequired: string[]
-  processingTime: string
-  tierStructure?: {
-    min: number
-    max: number
-    rate: number
-  }[]
-}
+import { utilityRebateDatabase, type RebateProgram } from '@/lib/utility-rebate-database'
 
 interface FederalIncentive {
   id: string
@@ -58,91 +38,19 @@ export function UtilityRebateCalculator() {
     wattsPerFixture: 600,
     replacingType: 'HPS',
     replacingWatts: 1000,
-    annualHours: 4380
+    annualHours: 4380,
+    facilityType: 'greenhouse' as 'greenhouse' | 'indoor-sole-source-non-stacked' | 'indoor-sole-source-stacked',
+    cropType: 'cannabis-flowering' as 'cannabis-flowering' | 'cannabis-vegetative' | 'non-cannabis-flowering' | 'non-cannabis-vegetative',
+    fixtureType: 'toplight' as 'toplight' | 'ucl',
+    uclFixtures: 0
   })
   
   const [availableRebates, setAvailableRebates] = useState<RebateProgram[]>([])
   const [selectedRebates, setSelectedRebates] = useState<string[]>([])
   const [showResults, setShowResults] = useState(false)
 
-  // Sample rebate database (in production, this would be an API call)
-  const rebateDatabase: RebateProgram[] = [
-    {
-      id: 'pge-ag',
-      utilityCompany: 'Pacific Gas & Electric',
-      programName: 'Agricultural Energy Efficiency',
-      state: 'CA',
-      zipCodes: ['93', '94', '95'],
-      rebateType: 'prescriptive',
-      maxRebate: 500000,
-      rebateRate: 150, // per fixture
-      requirements: [
-        'DLC Premium or QPL listed fixtures',
-        'Minimum 40% energy reduction',
-        'Pre-approval required for projects over $50k',
-        'Licensed contractor installation'
-      ],
-      deadline: new Date('2024-12-31'),
-      budgetRemaining: 2500000,
-      documentsRequired: [
-        'Itemized invoice',
-        'Specification sheets',
-        'Installation verification',
-        'Disposal receipts for old fixtures'
-      ],
-      processingTime: '60-90 days'
-    },
-    {
-      id: 'sce-express',
-      utilityCompany: 'Southern California Edison',
-      programName: 'Express Solutions',
-      state: 'CA',
-      zipCodes: ['90', '91', '92'],
-      rebateType: 'prescriptive',
-      maxRebate: 300000,
-      rebateRate: 0.05, // per kWh saved
-      requirements: [
-        'DLC listed products',
-        'Replace HID fixtures only',
-        'Minimum 10 fixtures'
-      ],
-      deadline: new Date('2024-06-30'),
-      budgetRemaining: 5000000,
-      documentsRequired: [
-        'Application form',
-        'Equipment invoices',
-        'Proof of installation'
-      ],
-      processingTime: '30-45 days',
-      tierStructure: [
-        { min: 0, max: 50000, rate: 0.05 },
-        { min: 50001, max: 200000, rate: 0.07 },
-        { min: 200001, max: 999999, rate: 0.10 }
-      ]
-    },
-    {
-      id: 'coned-cep',
-      utilityCompany: 'ConEd',
-      programName: 'Commercial Efficiency Program',
-      state: 'NY',
-      zipCodes: ['10', '11'],
-      rebateType: 'both',
-      maxRebate: 1000000,
-      rebateRate: 0.16, // per kWh saved first year
-      requirements: [
-        'Energy audit required',
-        'Minimum 25% savings',
-        'DLC or Energy Star certified'
-      ],
-      budgetRemaining: 8000000,
-      documentsRequired: [
-        'Detailed project proposal',
-        'Energy savings calculations',
-        'M&V plan'
-      ],
-      processingTime: '90-120 days'
-    }
-  ]
+  // Use the comprehensive rebate database from the imported file
+  const rebateDatabase = utilityRebateDatabase
 
   const federalIncentives: FederalIncentive[] = [
     {
@@ -213,7 +121,21 @@ export function UtilityRebateCalculator() {
     const savings = calculateSavings()
     let amount = 0
     
-    if (rebate.rebateType === 'prescriptive') {
+    // Check if this is an AgEE program with specific rates
+    if (rebate.ageeRates && rebate.ageeRates.length > 0) {
+      const rate = rebate.ageeRates.find(r => 
+        r.facilityType === projectSize.facilityType && 
+        r.cropType === projectSize.cropType
+      )
+      
+      if (rate) {
+        // Calculate rebate for toplight fixtures
+        const toplightRebate = projectSize.fixtures * rate.toplightRebate
+        // Calculate rebate for under-canopy (UCL) fixtures
+        const uclRebate = projectSize.uclFixtures * rate.uclRebate
+        amount = toplightRebate + uclRebate
+      }
+    } else if (rebate.rebateType === 'prescriptive') {
       if (rebate.rebateRate < 1) {
         // Rate is per kWh
         amount = savings.kWhSaved * rebate.rebateRate
@@ -367,6 +289,53 @@ export function UtilityRebateCalculator() {
           </div>
         </div>
         
+        {/* AgEE Specific Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-700">
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-2">
+              Facility Type
+            </label>
+            <select
+              value={projectSize.facilityType}
+              onChange={(e) => setProjectSize({ ...projectSize, facilityType: e.target.value as any })}
+              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-purple-500 text-gray-100"
+            >
+              <option value="greenhouse">Greenhouse</option>
+              <option value="indoor-sole-source-non-stacked">Indoor (Non-stacked)</option>
+              <option value="indoor-sole-source-stacked">Indoor (Stacked/Vertical)</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-2">
+              Crop Type
+            </label>
+            <select
+              value={projectSize.cropType}
+              onChange={(e) => setProjectSize({ ...projectSize, cropType: e.target.value as any })}
+              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-purple-500 text-gray-100"
+            >
+              <option value="cannabis-flowering">Cannabis - Flowering</option>
+              <option value="cannabis-vegetative">Cannabis - Vegetative</option>
+              <option value="non-cannabis-flowering">Non-Cannabis - Flowering</option>
+              <option value="non-cannabis-vegetative">Non-Cannabis - Vegetative</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-2">
+              Under-Canopy Fixtures (UCL)
+            </label>
+            <input
+              type="number"
+              value={projectSize.uclFixtures}
+              onChange={(e) => setProjectSize({ ...projectSize, uclFixtures: Number(e.target.value) })}
+              placeholder="0"
+              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:border-purple-500 text-gray-100"
+            />
+          </div>
+        </div>
+        
         <button
           onClick={searchRebates}
           disabled={!zipCode}
@@ -468,6 +437,68 @@ export function UtilityRebateCalculator() {
                             {rebate.rebateType === 'prescriptive' ? 'Prescriptive' : 'Custom'} program
                           </span>
                         </div>
+                        
+                        {/* Show AgEE specific rates if applicable */}
+                        {rebate.ageeRates && rebate.ageeRates.length > 0 && (
+                          <div className="bg-gray-700/50 rounded p-2 mt-2">
+                            <p className="text-xs font-medium text-gray-300 mb-1">AgEE Rebate Rates:</p>
+                            {(() => {
+                              const rate = rebate.ageeRates.find(r => 
+                                r.facilityType === projectSize.facilityType && 
+                                r.cropType === projectSize.cropType
+                              )
+                              if (rate) {
+                                return (
+                                  <div className="text-xs text-gray-400 space-y-1">
+                                    <p>• Toplight: ${rate.toplightRebate}/fixture</p>
+                                    <p>• Under-canopy: ${rate.uclRebate}/fixture</p>
+                                    <p className="text-purple-400 font-medium mt-1">
+                                      Your config: {projectSize.fixtures} toplight + {projectSize.uclFixtures} UCL
+                                    </p>
+                                  </div>
+                                )
+                              }
+                              return <p className="text-xs text-gray-500">Select facility/crop type for rates</p>
+                            })()}
+                          </div>
+                        )}
+                        
+                        {/* Show contact info if available */}
+                        {rebate.contactInfo && (
+                          <div className="mt-2 p-2 bg-gray-700/30 rounded text-xs">
+                            {rebate.contactInfo.phone && (
+                              <p className="text-gray-400">Phone: {rebate.contactInfo.phone}</p>
+                            )}
+                            {rebate.contactInfo.email && (
+                              <p className="text-gray-400">Email: {rebate.contactInfo.email}</p>
+                            )}
+                            {rebate.contactInfo.website && (
+                              <a 
+                                href={rebate.contactInfo.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-purple-400 hover:text-purple-300 flex items-center gap-1"
+                              >
+                                View program details <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* Show PDF application link if available */}
+                        {rebate.applicationPDF && (
+                          <div className="mt-2">
+                            <a 
+                              href={rebate.applicationPDF}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 rounded text-xs text-purple-400 transition-colors"
+                            >
+                              <FileText className="w-3 h-3" />
+                              Download Application PDF
+                            </a>
+                          </div>
+                        )}
                         
                         {rebate.deadline && (
                           <div className="flex items-center gap-2">

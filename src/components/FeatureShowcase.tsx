@@ -2,7 +2,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import {
-  Camera,
   Leaf,
   Wifi,
   DollarSign,
@@ -34,23 +33,14 @@ interface FeatureCard {
 export function FeatureShowcase() {
   const features: FeatureCard[] = [
     {
-      id: 'ar',
-      title: 'AR Preview',
-      description: 'Visualize fixtures in your actual grow space using augmented reality',
-      icon: Camera,
-      href: '/ar-preview',
-      stats: { label: 'Accuracy', value: '98%', trend: 5 },
-      color: 'purple',
-      badge: 'New'
-    },
-    {
       id: 'carbon',
       title: 'Carbon Credits',
       description: 'Track sustainability metrics and trade carbon credits on blockchain',
       icon: Leaf,
       href: '/carbon-credits',
       stats: { label: 'Credits Earned', value: '2,450', trend: 12 },
-      color: 'green'
+      color: 'green',
+      badge: 'New'
     },
     {
       id: 'iot',

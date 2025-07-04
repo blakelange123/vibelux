@@ -11,16 +11,17 @@ import {
   Calculator,
   Snowflake,
   Flame,
-  Info
+  Info,
+  Sun
 } from 'lucide-react'
 
 interface HeatLoadCalculatorProps {
-  roomDimensions: {
+  roomDimensions?: {
     width: number // feet
     height: number // feet  
     depth: number // feet (ceiling height)
   }
-  fixtures: {
+  fixtures?: {
     wattage: number
     enabled: boolean
   }[]
@@ -47,10 +48,10 @@ interface HVACRequirements {
 }
 
 export function HeatLoadCalculator({
-  roomDimensions,
-  fixtures,
+  roomDimensions = { width: 20, height: 40, depth: 10 },
+  fixtures = [],
   targetTemperature = 75,
-  outsideTemperature = 95
+  outsideTemperature: initialOutsideTemp = 95
 }: HeatLoadCalculatorProps) {
   const [insulationType, setInsulationType] = useState<'poor' | 'average' | 'good'>('average')
   const [glazingArea, setGlazingArea] = useState(0) // sq ft
@@ -62,6 +63,7 @@ export function HeatLoadCalculator({
   const [airChangesPerHour, setAirChangesPerHour] = useState(1.0)
   const [targetHumidity, setTargetHumidity] = useState(60) // %
   const [outsideHumidity, setOutsideHumidity] = useState(40) // %
+  const [outsideTemperature, setOutsideTemperature] = useState(initialOutsideTemp)
 
   // Calculate room volume
   const roomVolume = roomDimensions.width * roomDimensions.height * roomDimensions.depth

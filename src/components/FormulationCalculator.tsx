@@ -256,7 +256,7 @@ export function FormulationCalculator({
     // Calculate deficits and excess
     Object.entries(recipe.elements).forEach(([element, target]) => {
       const key = element as keyof CustomNutrientRecipe['elements']
-      const achieved = result.achieved[key]
+      const achieved = result.achieved[key] || 0
       const diff = achieved - target
       
       if (diff < -1) {
@@ -651,7 +651,7 @@ export function FormulationCalculator({
               <h4 className="font-medium text-gray-100 mb-3">Element Achievement</h4>
               <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 text-xs">
                 {Object.entries(recipe.elements).map(([element, target]) => {
-                  const achieved = calculationResult.achieved[element as keyof typeof calculationResult.achieved]
+                  const achieved = calculationResult.achieved[element as keyof typeof calculationResult.achieved] || 0
                   const percentage = (achieved / target) * 100
                   const isGood = percentage >= 90 && percentage <= 110
                   const isWarning = percentage >= 80 && percentage < 90 || percentage > 110 && percentage <= 120

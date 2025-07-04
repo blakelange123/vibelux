@@ -20,8 +20,11 @@ import {
   Pause,
   BarChart3,
   Settings,
-  Shield
+  Shield,
+  Menu,
+  X
 } from 'lucide-react'
+import { DeveloperToolsSidebar } from './DeveloperToolsSidebar'
 
 interface LogEntry {
   id: string
@@ -58,6 +61,7 @@ export function DeveloperTools() {
   const [isRecording, setIsRecording] = useState(true)
   const [logFilter, setLogFilter] = useState<'all' | 'info' | 'warning' | 'error' | 'debug'>('all')
   const [copiedId, setCopiedId] = useState('')
+  const [showSidebar, setShowSidebar] = useState(true)
 
   // Simulate real-time logs
   useEffect(() => {
@@ -79,9 +83,9 @@ export function DeveloperTools() {
       const newLog: LogEntry = {
         id: Date.now().toString(),
         timestamp: new Date(),
-        level: types[Math.floor(Math.random() * types.length)],
-        message: messages[Math.floor(Math.random() * messages.length)],
-        details: Math.random() > 0.7 ? { requestId: 'req_' + Date.now(), userId: 'user_123' } : undefined
+        level: types[Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * types.length)],
+        message: messages[Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * messages.length)],
+        details: crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF > 0.7 ? { requestId: 'req_' + Date.now(), userId: 'user_123' } : undefined
       }
 
       setLogs(prev => [newLog, ...prev].slice(0, 100))
@@ -108,11 +112,11 @@ export function DeveloperTools() {
       const newCall: APICall = {
         id: Date.now().toString(),
         timestamp: new Date(),
-        method: methods[Math.floor(Math.random() * methods.length)],
-        endpoint: endpoints[Math.floor(Math.random() * endpoints.length)],
-        status: statuses[Math.floor(Math.random() * statuses.length)],
-        duration: Math.floor(Math.random() * 500) + 50,
-        size: Math.floor(Math.random() * 10000) + 500
+        method: methods[Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * methods.length)],
+        endpoint: endpoints[Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * endpoints.length)],
+        status: statuses[Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * statuses.length)],
+        duration: Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * 500) + 50,
+        size: Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF * 10000) + 500
       }
 
       setApiCalls(prev => [newCall, ...prev].slice(0, 50))
@@ -129,17 +133,17 @@ export function DeveloperTools() {
 
   const getLogIcon = (level: LogEntry['level']) => {
     switch (level) {
-      case 'info': return <CheckCircle className="w-4 h-4 text-blue-600" />
-      case 'warning': return <AlertCircle className="w-4 h-4 text-yellow-600" />
-      case 'error': return <AlertCircle className="w-4 h-4 text-red-600" />
-      case 'debug': return <Bug className="w-4 h-4 text-gray-600" />
+      case 'info': return <CheckCircle className="w-4 h-4 text-blue-400" />
+      case 'warning': return <AlertCircle className="w-4 h-4 text-yellow-400" />
+      case 'error': return <AlertCircle className="w-4 h-4 text-red-400" />
+      case 'debug': return <Bug className="w-4 h-4 text-gray-400" />
     }
   }
 
   const getStatusColor = (status: number) => {
-    if (status >= 200 && status < 300) return 'text-green-600'
-    if (status >= 400 && status < 500) return 'text-yellow-600'
-    return 'text-red-600'
+    if (status >= 200 && status < 300) return 'text-green-400'
+    if (status >= 400 && status < 500) return 'text-yellow-400'
+    return 'text-red-400'
   }
 
   const filteredLogs = logs.filter(log => logFilter === 'all' || log.level === logFilter)
@@ -153,19 +157,31 @@ export function DeveloperTools() {
   ]
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <Code className="w-6 h-6 text-indigo-600" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Developer Tools</h2>
-        </div>
-        <div className="flex items-center gap-4">
+    <div className="flex h-full w-full">
+      {/* Sidebar */}
+      {showSidebar && <DeveloperToolsSidebar />}
+      
+      {/* Main Content */}
+      <div className="flex-1 bg-gray-950 p-6 overflow-auto">
+        <div className="bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowSidebar(!showSidebar)}
+              className="p-2 hover:bg-gray-700 rounded-lg mr-2 text-white"
+            >
+              {showSidebar ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            <Code className="w-6 h-6 text-indigo-400" />
+            <h2 className="text-2xl font-bold text-white">Developer Tools</h2>
+          </div>
+          <div className="flex items-center gap-4">
           <button
             onClick={() => setIsRecording(!isRecording)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
               isRecording
-                ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                : 'bg-green-100 text-green-700 hover:bg-green-200'
+                ? 'bg-red-900 text-red-200 hover:bg-red-800'
+                : 'bg-green-900 text-green-200 hover:bg-green-800'
             }`}
           >
             {isRecording ? (
@@ -180,22 +196,22 @@ export function DeveloperTools() {
               </>
             )}
           </button>
-          <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+          <button className="p-2 hover:bg-gray-700 rounded-lg text-white">
             <Settings className="w-5 h-5" />
           </button>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-4 mb-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex gap-4 mb-6 border-b border-gray-700">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={`pb-2 px-1 ${
               activeTab === tab.id
-                ? 'border-b-2 border-indigo-600 text-indigo-600'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                ? 'border-b-2 border-indigo-400 text-indigo-400'
+                : 'text-gray-400 hover:text-white'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -219,7 +235,7 @@ export function DeveloperTools() {
                   className={`px-3 py-1 rounded-lg capitalize text-sm ${
                     logFilter === filter
                       ? 'bg-indigo-600 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   }`}
                 >
                   {filter}
@@ -228,7 +244,7 @@ export function DeveloperTools() {
             </div>
             <button
               onClick={() => setLogs([])}
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              className="text-sm text-gray-400 hover:text-white"
             >
               Clear
             </button>
@@ -237,28 +253,28 @@ export function DeveloperTools() {
           {/* Logs */}
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {filteredLogs.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-400">
                 No logs to display
               </div>
             ) : (
               filteredLogs.map(log => (
                 <div
                   key={log.id}
-                  className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600"
+                  className="p-3 bg-gray-700 rounded-lg hover:bg-gray-600"
                 >
                   <div className="flex items-start gap-3">
                     {getLogIcon(log.level)}
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <span className="font-mono text-sm">
+                        <span className="font-mono text-sm text-white">
                           {log.message}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-400">
                           {log.timestamp.toLocaleTimeString()}
                         </span>
                       </div>
                       {log.details && (
-                        <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded text-xs overflow-x-auto">
+                        <pre className="mt-2 p-2 bg-gray-800 rounded text-xs overflow-x-auto text-gray-300">
                           {JSON.stringify(log.details, null, 2)}
                         </pre>
                       )}
@@ -276,13 +292,13 @@ export function DeveloperTools() {
         <div>
           {/* API Stats */}
           <div className="grid grid-cols-4 gap-4 mb-6">
-            <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Calls</p>
-              <p className="text-2xl font-bold">{apiCalls.length}</p>
+            <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
+              <p className="text-sm text-gray-400">Total Calls</p>
+              <p className="text-2xl font-bold text-gray-100">{apiCalls.length}</p>
             </div>
-            <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Success Rate</p>
-              <p className="text-2xl font-bold">
+            <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
+              <p className="text-sm text-gray-400">Success Rate</p>
+              <p className="text-2xl font-bold text-gray-100">
                 {apiCalls.length > 0
                   ? Math.round(
                       (apiCalls.filter(c => c.status >= 200 && c.status < 300).length / apiCalls.length) * 100
@@ -290,17 +306,17 @@ export function DeveloperTools() {
                   : 0}%
               </p>
             </div>
-            <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Avg Response</p>
-              <p className="text-2xl font-bold">
+            <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
+              <p className="text-sm text-gray-400">Avg Response</p>
+              <p className="text-2xl font-bold text-gray-100">
                 {apiCalls.length > 0
                   ? Math.round(apiCalls.reduce((acc, c) => acc + c.duration, 0) / apiCalls.length)
                   : 0}ms
               </p>
             </div>
-            <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Data Transfer</p>
-              <p className="text-2xl font-bold">
+            <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
+              <p className="text-sm text-gray-400">Data Transfer</p>
+              <p className="text-2xl font-bold text-gray-100">
                 {(apiCalls.reduce((acc, c) => acc + c.size, 0) / 1024).toFixed(1)}KB
               </p>
             </div>
@@ -310,19 +326,19 @@ export function DeveloperTools() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2">Method</th>
-                  <th className="text-left py-2">Endpoint</th>
-                  <th className="text-left py-2">Status</th>
-                  <th className="text-left py-2">Duration</th>
-                  <th className="text-left py-2">Size</th>
-                  <th className="text-left py-2">Time</th>
+                <tr className="border-b border-gray-700">
+                  <th className="text-left py-2 text-gray-300">Method</th>
+                  <th className="text-left py-2 text-gray-300">Endpoint</th>
+                  <th className="text-left py-2 text-gray-300">Status</th>
+                  <th className="text-left py-2 text-gray-300">Duration</th>
+                  <th className="text-left py-2 text-gray-300">Size</th>
+                  <th className="text-left py-2 text-gray-300">Time</th>
                 </tr>
               </thead>
               <tbody>
                 {apiCalls.map(call => (
-                  <tr key={call.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="py-2">
+                  <tr key={call.id} className="border-b border-gray-700 hover:bg-gray-700">
+                    <td className="py-2 text-white">
                       <span className={`font-mono text-sm font-semibold ${
                         call.method === 'GET' ? 'text-green-600' :
                         call.method === 'POST' ? 'text-blue-600' :
@@ -332,15 +348,15 @@ export function DeveloperTools() {
                         {call.method}
                       </span>
                     </td>
-                    <td className="py-2 font-mono text-sm">{call.endpoint}</td>
+                    <td className="py-2 font-mono text-sm text-white">{call.endpoint}</td>
                     <td className="py-2">
                       <span className={`font-mono text-sm ${getStatusColor(call.status)}`}>
                         {call.status}
                       </span>
                     </td>
-                    <td className="py-2 text-sm">{call.duration}ms</td>
-                    <td className="py-2 text-sm">{(call.size / 1024).toFixed(1)}KB</td>
-                    <td className="py-2 text-sm text-gray-500">
+                    <td className="py-2 text-sm text-white">{call.duration}ms</td>
+                    <td className="py-2 text-sm text-white">{(call.size / 1024).toFixed(1)}KB</td>
+                    <td className="py-2 text-sm text-gray-400">
                       {call.timestamp.toLocaleTimeString()}
                     </td>
                   </tr>
@@ -415,22 +431,22 @@ export function DeveloperTools() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <Database className="w-5 h-5 text-indigo-600 mb-2" />
-              <p className="text-2xl font-bold">1.2GB</p>
+              <p className="text-2xl font-bold text-gray-100">1.2GB</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Total Size</p>
             </div>
             <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <Activity className="w-5 h-5 text-green-600 mb-2" />
-              <p className="text-2xl font-bold">342</p>
+              <p className="text-2xl font-bold text-gray-100">342</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Queries/min</p>
             </div>
             <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <Clock className="w-5 h-5 text-yellow-600 mb-2" />
-              <p className="text-2xl font-bold">12ms</p>
+              <p className="text-2xl font-bold text-gray-100">12ms</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Avg Latency</p>
             </div>
             <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <Shield className="w-5 h-5 text-purple-600 mb-2" />
-              <p className="text-2xl font-bold">99.9%</p>
+              <p className="text-2xl font-bold text-gray-100">99.9%</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Uptime</p>
             </div>
           </div>
@@ -501,22 +517,22 @@ export function DeveloperTools() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Page Load</p>
-              <p className="text-2xl font-bold">1.2s</p>
+              <p className="text-2xl font-bold text-gray-100">1.2s</p>
               <p className="text-xs text-green-600">-15% from last week</p>
             </div>
             <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">API Response</p>
-              <p className="text-2xl font-bold">85ms</p>
+              <p className="text-2xl font-bold text-gray-100">85ms</p>
               <p className="text-xs text-green-600">-5% from last week</p>
             </div>
             <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Error Rate</p>
-              <p className="text-2xl font-bold">0.2%</p>
+              <p className="text-2xl font-bold text-gray-100">0.2%</p>
               <p className="text-xs text-red-600">+0.1% from last week</p>
             </div>
             <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Cache Hit</p>
-              <p className="text-2xl font-bold">87%</p>
+              <p className="text-2xl font-bold text-gray-100">87%</p>
               <p className="text-xs text-green-600">+3% from last week</p>
             </div>
           </div>
@@ -571,6 +587,8 @@ export function DeveloperTools() {
           </div>
         </div>
       )}
+        </div>
+      </div>
     </div>
   )
 }

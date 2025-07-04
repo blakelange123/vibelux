@@ -89,9 +89,9 @@ interface VentilationLoadResult {
 }
 
 export class AdvancedScientificCalculations {
-  private photomorphogenicModels: PhotomorphogenicModels;
-  private mccreeCoefficients: McCreeCoefficients;
-  private regionalFactors: RegionalFactor[];
+  private photomorphogenicModels!: PhotomorphogenicModels;
+  private mccreeCoefficients!: McCreeCoefficients;
+  private regionalFactors!: RegionalFactor[];
   
   constructor() {
     this.initializeModels();

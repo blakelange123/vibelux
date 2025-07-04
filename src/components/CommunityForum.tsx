@@ -19,7 +19,8 @@ import {
   Hash,
   ChevronRight,
   FileDown,
-  FileText
+  FileText,
+  X
 } from 'lucide-react'
 import { exportToCSV, exportToPDF, generateForumReportHTML } from '@/lib/exportUtils'
 
@@ -54,49 +55,7 @@ interface ForumCategory {
 }
 
 export function CommunityForum() {
-  const [posts, setPosts] = useState<ForumPost[]>([
-    {
-      id: '1',
-      title: 'Best PPFD levels for lettuce in vertical farms?',
-      content: 'I\'m running a vertical farm with 5 tiers and wondering what PPFD levels work best for lettuce...',
-      author: { name: 'GreenThumb92', role: 'member' },
-      category: 'Growing Techniques',
-      tags: ['lettuce', 'ppfd', 'vertical-farming'],
-      createdAt: new Date('2024-01-14'),
-      lastActivity: new Date('2024-01-15T10:30:00'),
-      views: 324,
-      replies: 12,
-      likes: 23,
-      hasAcceptedAnswer: true
-    },
-    {
-      id: '2',
-      title: 'Comparing Fluence SPYDR vs Gavita 1700e for cannabis',
-      content: 'Looking for real-world comparisons between these two fixtures for flowering...',
-      author: { name: 'ProGrower', role: 'expert' },
-      category: 'Equipment Reviews',
-      tags: ['fluence', 'gavita', 'cannabis', 'flowering'],
-      createdAt: new Date('2024-01-13'),
-      lastActivity: new Date('2024-01-15T09:15:00'),
-      views: 567,
-      replies: 28,
-      likes: 45,
-      isPinned: true
-    },
-    {
-      id: '3',
-      title: 'How to calculate ROI for LED upgrade?',
-      content: 'Our facility is considering switching from HPS to LED. Need help with ROI calculations...',
-      author: { name: 'FarmManager', role: 'member' },
-      category: 'Business & Finance',
-      tags: ['roi', 'led', 'business', 'upgrade'],
-      createdAt: new Date('2024-01-12'),
-      lastActivity: new Date('2024-01-14T16:45:00'),
-      views: 189,
-      replies: 8,
-      likes: 15
-    }
-  ])
+  const [posts, setPosts] = useState<ForumPost[]>([])
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -131,12 +90,7 @@ export function CommunityForum() {
     return a.replies === 0 ? -1 : 1
   })
 
-  const topContributors = [
-    { name: 'ProGrower', posts: 234, likes: 1567, role: 'expert' },
-    { name: 'LightingGuru', posts: 189, likes: 1234, role: 'expert' },
-    { name: 'GreenThumb92', posts: 156, likes: 892, role: 'member' },
-    { name: 'CommercialGrower', posts: 134, likes: 756, role: 'member' }
-  ]
+  const topContributors: any[] = []
 
   const handleExportPDF = () => {
     const reportHTML = generateForumReportHTML({
@@ -188,28 +142,28 @@ export function CommunityForum() {
             <span className="text-gray-400 text-sm">Total Posts</span>
             <MessageSquare className="w-4 h-4 text-purple-400" />
           </div>
-          <p className="text-2xl font-semibold text-gray-100">1,234</p>
+          <p className="text-2xl font-semibold text-gray-100">{posts.length}</p>
         </div>
         <div className="bg-gray-800 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-400 text-sm">Active Members</span>
             <Users className="w-4 h-4 text-green-400" />
           </div>
-          <p className="text-2xl font-semibold text-gray-100">567</p>
+          <p className="text-2xl font-semibold text-gray-100">0</p>
         </div>
         <div className="bg-gray-800 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-400 text-sm">Expert Contributors</span>
             <Award className="w-4 h-4 text-purple-400" />
           </div>
-          <p className="text-2xl font-semibold text-gray-100">23</p>
+          <p className="text-2xl font-semibold text-gray-100">0</p>
         </div>
         <div className="bg-gray-800 rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-400 text-sm">Solved Questions</span>
             <CheckCircle className="w-4 h-4 text-green-400" />
           </div>
-          <p className="text-2xl font-semibold text-gray-100">89%</p>
+          <p className="text-2xl font-semibold text-gray-100">0%</p>
         </div>
       </div>
 
@@ -321,7 +275,21 @@ export function CommunityForum() {
 
           {/* Posts */}
           <div className="space-y-3">
-            {filteredPosts.map(post => (
+            {filteredPosts.length === 0 ? (
+              <div className="bg-gray-800 border border-gray-700 rounded-lg p-8 text-center">
+                <MessageSquare className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-300 mb-2">No posts yet</h3>
+                <p className="text-gray-400 mb-4">Be the first to start a discussion!</p>
+                <button
+                  onClick={() => setShowNewPost(true)}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors inline-flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Create First Post
+                </button>
+              </div>
+            ) : (
+              filteredPosts.map(post => (
               <div 
                 key={post.id}
                 className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-gray-600 transition-colors cursor-pointer"
@@ -385,10 +353,114 @@ export function CommunityForum() {
                   </div>
                 </div>
               </div>
-            ))}
+            ))
+            )}
           </div>
         </div>
       </div>
+
+      {/* New Post Dialog */}
+      {showNewPost && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 rounded-2xl border border-gray-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-800">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-white">Create New Post</h2>
+                <button
+                  onClick={() => setShowNewPost(false)}
+                  className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={(e) => {
+              e.preventDefault()
+              const formData = new FormData(e.currentTarget)
+              const newPost: ForumPost = {
+                id: Date.now().toString(),
+                title: formData.get('title') as string,
+                content: formData.get('content') as string,
+                author: {
+                  name: 'Current User',
+                  role: 'member'
+                },
+                category: formData.get('category') as string,
+                tags: (formData.get('tags') as string).split(',').map(t => t.trim()).filter(Boolean),
+                createdAt: new Date(),
+                lastActivity: new Date(),
+                views: 0,
+                replies: 0,
+                likes: 0
+              }
+              setPosts([newPost, ...posts])
+              setShowNewPost(false)
+            }} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Title</label>
+                <input
+                  name="title"
+                  type="text"
+                  required
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="Enter your post title..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
+                <select
+                  name="category"
+                  required
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                >
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Content</label>
+                <textarea
+                  name="content"
+                  required
+                  rows={6}
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="Share your thoughts, questions, or experiences..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Tags (comma separated)</label>
+                <input
+                  name="tags"
+                  type="text"
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="e.g. LED, yield, nutrients"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
+                >
+                  Create Post
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowNewPost(false)}
+                  className="px-6 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

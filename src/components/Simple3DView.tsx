@@ -64,6 +64,8 @@ export function Simple3DView({ roomDimensions, fixtures, onClose }: Simple3DView
     const ctx = canvas.getContext('2d')
     if (!ctx) return
     
+    if (!roomDimensions?.width || !roomDimensions?.height || !roomDimensions?.depth) return
+    
     // Clear canvas
     ctx.fillStyle = '#111827'
     ctx.fillRect(0, 0, 800, 600)

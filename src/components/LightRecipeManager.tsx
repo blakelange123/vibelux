@@ -302,12 +302,12 @@ export function LightRecipeManager() {
         </div>
         <button
           onClick={() => {
-            setSelectedRecipe({
+            const newRecipe = {
               id: Date.now().toString(),
               name: 'New Recipe',
               description: '',
               cropType: 'Custom',
-              growthStage: 'vegetative',
+              growthStage: 'vegetative' as const,
               photoperiod: {
                 dayLength: 16,
                 nightLength: 8,
@@ -340,10 +340,15 @@ export function LightRecipeManager() {
                 enabled: false,
                 repeatDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
               }
-            })
+            }
+            setSelectedRecipe(newRecipe)
             setIsEditing(true)
+            // Scroll to editor section
+            setTimeout(() => {
+              document.querySelector('.recipe-editor')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }, 100)
           }}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
         >
           <Plus className="w-4 h-4" />
           Create Recipe
@@ -355,11 +360,44 @@ export function LightRecipeManager() {
         <h2 className="text-lg font-semibold text-gray-100 mb-4">Quick Start Presets</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {cropPresets.map(preset => (
-            <div key={preset.id} className="bg-gray-700 rounded-lg p-4 text-center hover:bg-gray-600 transition-colors cursor-pointer">
+            <button
+              key={preset.id}
+              onClick={() => {
+                // Create a new recipe from preset
+                const firstStage = Object.keys(preset.stages)[0] as keyof typeof preset.stages
+                const stageData = preset.stages[firstStage]
+                const newRecipe: LightRecipe = {
+                  id: Date.now().toString(),
+                  name: `${preset.name} - ${firstStage}`,
+                  description: `Auto-generated from ${preset.name} preset`,
+                  cropType: preset.name,
+                  growthStage: firstStage as 'vegetative' | 'flowering' | 'fruiting' | 'seedling',
+                  photoperiod: stageData.photoperiod || { dayLength: 16, nightLength: 8, dawnDuration: 30, duskDuration: 30 },
+                  spectrum: stageData.spectrum || { blue: 20, green: 10, red: 65, farRed: 5, uv: 0 },
+                  intensity: stageData.intensity || { ppfd: 300, dli: 17.3, rampUp: 15, rampDown: 15 },
+                  specialTreatments: {
+                    eodFarRed: false,
+                    eodDuration: 15,
+                    eodIntensity: 50,
+                    nightInterruption: false,
+                    nightInterruptionTime: '03:00',
+                    nightInterruptionDuration: 15
+                  },
+                  schedule: {
+                    startTime: '06:00',
+                    enabled: false,
+                    repeatDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                  }
+                }
+                setSelectedRecipe(newRecipe)
+                setIsEditing(true)
+              }}
+              className="bg-gray-700 rounded-lg p-4 text-center hover:bg-gray-600 transition-all cursor-pointer transform hover:scale-105 active:scale-95"
+            >
               <div className="text-4xl mb-2">{preset.icon}</div>
               <h3 className="font-medium text-gray-100">{preset.name}</h3>
               <p className="text-xs text-gray-400 mt-1">{Object.keys(preset.stages).length} stages</p>
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -470,7 +508,7 @@ export function LightRecipeManager() {
 
         {/* Recipe Detail/Editor */}
         {selectedRecipe && (
-          <div className="lg:col-span-2 bg-gray-800 rounded-lg p-6">
+          <div className="lg:col-span-2 bg-gray-800 rounded-lg p-6 recipe-editor">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-100">
                 {isEditing ? 'Edit Recipe' : 'Recipe Details'}

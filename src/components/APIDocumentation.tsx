@@ -15,7 +15,11 @@ import {
   Terminal,
   Book,
   Play,
-  ExternalLink
+  ExternalLink,
+  Sun,
+  BarChart3,
+  Activity,
+  DollarSign
 } from 'lucide-react'
 
 interface APIEndpoint {
@@ -345,7 +349,8 @@ export function APIDocumentation() {
 });
 
 const data = await response.json();
-console.log(data);`
+// Process API response data
+};`
 
       case 'python':
         return `import requests

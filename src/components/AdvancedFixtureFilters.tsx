@@ -27,7 +27,7 @@ export function AdvancedFixtureFilters({ onFiltersChange, onClose }: AdvancedFil
     cri: { min: 70, max: 100 },
     
     // Mounting & Physical
-    mountingType: [], // Surface, Suspended, Track, Stand
+    mountingType: [] as string[], // Surface, Suspended, Track, Stand
     dimensions: {
       maxLength: '',
       maxWidth: '',
@@ -37,7 +37,7 @@ export function AdvancedFixtureFilters({ onFiltersChange, onClose }: AdvancedFil
     ipRating: 'All', // IP65, IP66, IP67, etc.
     
     // Control & Dimming
-    dimmingType: [], // 0-10V, PWM, DALI, Wireless
+    dimmingType: [] as string[], // 0-10V, PWM, DALI, Wireless
     hasSmartControl: false,
     hasDaisyChain: false,
     hasScheduling: false,
@@ -84,10 +84,10 @@ export function AdvancedFixtureFilters({ onFiltersChange, onClose }: AdvancedFil
       hasFarRed: false,
       colorTemp: { min: 2700, max: 6500 },
       cri: { min: 70, max: 100 },
-      mountingType: [],
+      mountingType: [] as string[],
       dimensions: { maxLength: '', maxWidth: '', maxHeight: '', maxWeight: '' },
       ipRating: 'All',
-      dimmingType: [],
+      dimmingType: [] as string[],
       hasSmartControl: false,
       hasDaisyChain: false,
       hasScheduling: false,

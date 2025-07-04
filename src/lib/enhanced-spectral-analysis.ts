@@ -82,7 +82,7 @@ export class EnhancedSpectralAnalysis {
     data: SpectralData[], 
     description: string = ""
   ): SpectrumSnapshot {
-    const id = `snap_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const id = `snap_${Date.now()}_${crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF.toString(36).substr(2, 9)}`;
     const checksum = this.calculateChecksum(data);
     
     // Calculate metadata

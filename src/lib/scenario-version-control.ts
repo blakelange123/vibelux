@@ -356,7 +356,7 @@ export class ScenarioVersionControl {
     
     // Check room config
     const roomChanges: Record<string, { old: any; new: any }> = {};
-    Object.keys(oldScenario.roomConfig).forEach(key => {
+    (Object.keys(oldScenario.roomConfig) as Array<keyof typeof oldScenario.roomConfig>).forEach(key => {
       if (oldScenario.roomConfig[key] !== newScenario.roomConfig[key]) {
         roomChanges[key] = {
           old: oldScenario.roomConfig[key],
@@ -462,7 +462,7 @@ export class ScenarioVersionControl {
    * Generate unique version ID
    */
   private generateVersionId(): string {
-    return `v_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `v_${Date.now()}_${crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF.toString(36).substr(2, 9)}`;
   }
   
   /**
