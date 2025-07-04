@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const facilityId = searchParams.get('facilityId');
-    const userId = searchParams.get('userId');
+    const targetUserId = searchParams.get('userId');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     const limit = parseInt(searchParams.get('limit') || '100');
@@ -124,8 +124,8 @@ export async function GET(request: NextRequest) {
     // Only allow viewing own location unless manager/owner
     if (facilityAccess.role === 'OPERATOR' || facilityAccess.role === 'VIEWER') {
       where.userId = userId;
-    } else if (userId) {
-      where.userId = userId;
+    } else if (targetUserId) {
+      where.userId = targetUserId;
     }
 
     if (startDate || endDate) {

@@ -58,17 +58,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Save to database
-    const recordingData = {
-      userId,
-      filename,
-      originalName: recording.name,
-      fileSize: parseInt(size) || recording.size,
-      duration: parseFloat(duration) || 0,
-      mimeType: recording.type,
-      filePath: filePath,
-      uploadedAt: new Date(timestamp) || new Date()
-    };
-    
     await prisma.recording.create({ data: recordingData });
 
     return NextResponse.json({
