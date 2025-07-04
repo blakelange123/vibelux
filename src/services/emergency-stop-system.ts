@@ -22,4 +22,6 @@ export class EmergencyStopSystemService {
   }
 }
 
-export default EmergencyStopSystemService.getInstance();
+// Export both named and default exports
+export const emergencyStopSystem = EmergencyStopSystemService.getInstance();
+export default emergencyStopSystem;

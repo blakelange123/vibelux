@@ -87,3 +87,38 @@ export function checkProductionReadiness(): {
     issues
   };
 }
+
+// Main function to get Claude response
+export async function getClaudeResponse(systemPrompt: string, userPrompt: string, options?: {
+  model?: string;
+  maxTokens?: number;
+  temperature?: number;
+}): Promise<string> {
+  const client = createClaudeClient();
+  
+  try {
+    const response = await client.messages.create({
+      model: options?.model || CLAUDE_CONFIG.models.design,
+      max_tokens: options?.maxTokens || 4096,
+      temperature: options?.temperature || 0.7,
+      system: systemPrompt,
+      messages: [
+        {
+          role: 'user',
+          content: userPrompt
+        }
+      ]
+    });
+    
+    // Extract text from response
+    const content = response.content[0];
+    if (content.type === 'text') {
+      return content.text;
+    }
+    
+    throw new Error('Unexpected response format from Claude');
+  } catch (error) {
+    console.error('Claude API error:', error);
+    throw error;
+  }
+}

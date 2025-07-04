@@ -22,4 +22,6 @@ export class EnergySystemStartupService {
   }
 }
 
-export default EnergySystemStartupService.getInstance();
+// Export both named and default exports
+export const energySystemStartup = EnergySystemStartupService.getInstance();
+export default energySystemStartup;
