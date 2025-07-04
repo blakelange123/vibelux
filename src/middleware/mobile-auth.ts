@@ -58,3 +58,11 @@ export function requirePermission(permission: string) {
     return NextResponse.next();
   };
 }
+
+// Middleware for routes that require authentication
+export const requireAuth = mobileAuthMiddleware;
+
+// Helper function to require admin role
+export function requireAdmin(req: NextRequest) {
+  return requirePermission('admin')(req);
+}

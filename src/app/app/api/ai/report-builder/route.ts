@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs'
+import { auth } from '@clerk/nextjs/server'
 import { getClaudeResponse } from '@/lib/claude-config'
 
 export async function POST(request: NextRequest) {
