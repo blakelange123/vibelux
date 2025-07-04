@@ -1,0 +1,271 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionTier {
+  FREE
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+model User {
+  id               String           @id @default(cuid())
+  clerkId          String           @unique
+  email            String           @unique
+  name             String?
+  role             UserRole         @default(USER)
+  subscriptionTier SubscriptionTier @default(FREE)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  
+  projects         Project[]
+  savedFixtures    SavedFixture[]
+  lightRecipes     LightRecipe[]
+  reports          Report[]
+  apiKeys          ApiKey[]
+  teamMembers      TeamMember[]
+  usageRecords     UsageRecord[]
+}
+
+model Project {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  
+  // Project configuration
+  location        Json?    // { lat, lng, address }
+  roomDimensions  Json?    // { length, width, height }
+  fixtureLayout   Json?    // Complete layout data
+  weatherData     Json?    // Weather integration data
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  fixtures        ProjectFixture[]
+  calculations    Calculation[]
+  reports         Report[]
+  
+  @@index([userId])
+}
+
+model Fixture {
+  id              String   @id @default(cuid())
+  dlcListingId    String?  @unique
+  manufacturer    String
+  model           String
+  
+  // Technical specifications
+  ppf             Float    // μmol/s
+  wattage         Float    // W
+  efficacy        Float    // μmol/J
+  spectrum        Json     // Spectral distribution data
+  dimensions      Json     // { length, width, height }
+  weight          Float?   // kg
+  
+  // Optical properties
+  beamAngle       Float?   // degrees
+  distribution    String?  // batwing, lambertian, etc.
+  
+  // Electrical properties
+  voltage         String   // 120V, 208V, 240V, 277V, 347V, 480V, 600V
+  powerFactor     Float?
+  thd             Float?   // Total Harmonic Distortion
+  
+  // Certifications
+  dlcQualified    Boolean  @default(false)
+  dlcPremium      Boolean  @default(false)
+  
+  // Metadata
+  dataSheet       String?  // URL to PDF
+  iesFile         String?  // URL to IES file
+  images          String[] // Array of image URLs
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  projectFixtures ProjectFixture[]
+  savedBy         SavedFixture[]
+  
+  @@index([manufacturer, model])
+  @@index([dlcQualified])
+  @@index([efficacy])
+}
+
+model ProjectFixture {
+  id         String   @id @default(cuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  fixtureId  String
+  fixture    Fixture  @relation(fields: [fixtureId], references: [id])
+  
+  // Placement
+  position   Json     // { x, y, z }
+  rotation   Float    @default(0)
+  quantity   Int      @default(1)
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  @@unique([projectId, fixtureId, position])
+  @@index([projectId])
+}
+
+model SavedFixture {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  fixtureId String
+  fixture   Fixture  @relation(fields: [fixtureId], references: [id])
+  
+  notes     String?
+  tags      String[]
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, fixtureId])
+  @@index([userId])
+}
+
+model LightRecipe {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  crop        String
+  stages      Json     // Array of growth stages with parameters
+  validated   Boolean  @default(false)
+  public      Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([crop])
+  @@index([public])
+}
+
+model Calculation {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  type      String   // ppfd, dli, uniformity, roi, etc.
+  input     Json     // Input parameters
+  result    Json     // Calculation results
+  
+  createdAt DateTime @default(now())
+  
+  @@index([projectId])
+  @@index([type])
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id])
+  
+  type      String   // executive, technical, financial, compliance
+  title     String
+  content   Json     // Report data and configuration
+  format    String   // pdf, excel, word
+  url       String?  // Generated report URL
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([projectId])
+  @@index([type])
+}
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  name        String
+  key         String   @unique
+  permissions Json     // Array of allowed endpoints/actions
+  lastUsed    DateTime?
+  expiresAt   DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([key])
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  teamId    String   // Organization/team ID from Clerk
+  
+  role      String   // admin, member, viewer
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, teamId])
+  @@index([teamId])
+}
+
+model UsageRecord {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  feature   String   // Feature name
+  action    String   // Action performed
+  count     Int      @default(1)
+  metadata  Json?    // Additional context
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([feature])
+  @@index([createdAt])
+}
+
+model UtilityRebate {
+  id           String   @id @default(cuid())
+  utilityName  String
+  programName  String
+  state        String
+  zipCodes     String[] // Array of eligible ZIP codes
+  
+  rebateAmount Float?   // $ per fixture or % of cost
+  rebateType   String   // fixed, percentage, per_watt
+  requirements Json     // DLC requirements, minimum purchase, etc.
+  
+  startDate    DateTime?
+  endDate      DateTime?
+  
+  contactInfo  Json     // { phone, email, website }
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@index([state])
+  @@index([utilityName])
+}

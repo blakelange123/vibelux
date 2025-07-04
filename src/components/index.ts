@@ -60,3 +60,42 @@ export { VisualOperationsHub } from './tracking/VisualOperationsHub';
 // Alert components
 export { AlertDashboard } from './alerts/AlertDashboard';
 export { AlertWithCamera } from './alerts/AlertWithCamera';
+
+// Cultivation components
+export { RecipeControlSystem } from './cultivation/RecipeControlSystem';
+export { MultiLevelRackControl } from './cultivation/MultiLevelRackControl';
+export { IrrigationControlPanel } from './cultivation/IrrigationControlPanel';
+export { HVACSystemDashboard } from './cultivation/HVACSystemDashboard';
+export { CircadianRhythmManager } from './cultivation/CircadianRhythmManager';
+export { FunctionalFoodProduction } from './cultivation/FunctionalFoodProduction';
+export { VerticalFarmingIntegration } from './cultivation/VerticalFarmingIntegration';
+export { CropSteeringDashboard } from './cultivation/CropSteeringDashboard';
+export { RecipeManager } from './cultivation/RecipeManager';
+export { RecipeMonitor } from './cultivation/RecipeMonitor';
+export { RecipeCreationWizard } from './cultivation/RecipeCreationWizard';
+export { RecipeExecutionWizard } from './cultivation/RecipeExecutionWizard';
+export { TaskManagement } from './cultivation/TaskManagement';
+export { AdvancedQualityPrediction } from './cultivation/AdvancedQualityPrediction';
+export { WorkerSafetyModule } from './cultivation/WorkerSafetyModule';
+export { EnergyMarketIntegration } from './cultivation/EnergyMarketIntegration';
+export { MultiSiteSynchronization } from './cultivation/MultiSiteSynchronization';
+export { RegulatoryComplianceAutomation } from './cultivation/RegulatoryComplianceAutomation';
+export { CultivationFinancialPlanning } from './cultivation/CultivationFinancialPlanning';
+export { IPMLightManagement } from './cultivation/IPMLightManagement';
+export { LightBurnPreventionSystem } from './cultivation/LightBurnPreventionSystem';
+export { FacilityDesignValidation } from './cultivation/FacilityDesignValidation';
+export { StrainLightRecipeLibrary } from './cultivation/StrainLightRecipeLibrary';
+export { AirflowLightingIntegration } from './cultivation/AirflowLightingIntegration';
+export { CostTrackingDashboard } from './cultivation/CostTrackingDashboard';
+export { DualUnitCostDisplay } from './cultivation/DualUnitCostDisplay';
+export { EnvironmentalMonitoringGrid } from './cultivation/EnvironmentalMonitoringGrid';
+
+// Facility components
+export { FacilityTypeSelector } from './facility/FacilityTypeSelector';
+
+// Harvest components
+export { HarvestTracker } from './farm/HarvestTracker';
+export { HarvestLogistics } from './harvest/HarvestLogistics';
+
+// Supply chain components
+export { InventoryTracking } from './supply-chain/InventoryTracking';
