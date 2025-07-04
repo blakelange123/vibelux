@@ -1,69 +1,184 @@
-export default function Dashboard() {
-  const metrics = [
-    { label: 'Active Facilities', value: '12', change: '+2' },
-    { label: 'Energy Efficiency', value: '94%', change: '+3%' },
-    { label: 'Monthly Savings', value: '$8,432', change: '+12%' },
-    { label: 'System Uptime', value: '99.7%', change: '+0.2%' },
-  ]
+'use client';
+
+import React from 'react';
+import { DashboardBuilder } from '@/components/dashboard/DashboardBuilder';
+
+export default function DashboardDemoPage() {
+  // Demo dashboard with pre-configured widgets
+  const demoDashboard = {
+    name: 'Environmental Control Demo',
+    widgets: [
+      {
+        id: 'temp-gauge',
+        type: 'gauge',
+        title: 'Zone Temperature',
+        dataBindings: [{
+          source: 'sensor',
+          path: 'zone1/temperature',
+          refreshRate: 2000
+        }],
+        config: {
+          min: 60,
+          max: 85,
+          unit: '°F',
+          thresholds: [
+            { value: 70, color: '#10b981' },
+            { value: 75, color: '#f59e0b' },
+            { value: 80, color: '#ef4444' }
+          ]
+        }
+      },
+      {
+        id: 'humidity-gauge',
+        type: 'gauge',
+        title: 'Zone Humidity',
+        dataBindings: [{
+          source: 'sensor',
+          path: 'zone1/humidity',
+          refreshRate: 2000
+        }],
+        config: {
+          min: 30,
+          max: 80,
+          unit: '%',
+          thresholds: [
+            { value: 60, color: '#10b981' },
+            { value: 70, color: '#f59e0b' },
+            { value: 75, color: '#ef4444' }
+          ]
+        }
+      },
+      {
+        id: 'ppfd-heatmap',
+        type: 'heatmap',
+        title: 'PPFD Distribution',
+        dataBindings: [{
+          source: 'calculation',
+          path: 'ppfd.grid',
+          refreshRate: 5000
+        }],
+        config: {
+          rows: 8,
+          cols: 12,
+          colorScale: 'viridis',
+          min: 0,
+          max: 1000,
+          showValues: false,
+          unit: 'μmol/m²/s'
+        }
+      },
+      {
+        id: 'light-toggle',
+        type: 'toggle',
+        title: 'Light Control',
+        dataBindings: [{
+          source: 'modbus',
+          path: 'coil:1:0',
+          refreshRate: 500
+        }],
+        config: {
+          onLabel: 'Lights ON',
+          offLabel: 'Lights OFF',
+          onColor: '#10b981',
+          offColor: '#6b7280'
+        }
+      },
+      {
+        id: 'dimmer-slider',
+        type: 'slider',
+        title: 'Light Intensity',
+        dataBindings: [{
+          source: 'modbus',
+          path: 'holding:1:100',
+          refreshRate: 500
+        }],
+        config: {
+          min: 0,
+          max: 100,
+          step: 5,
+          unit: '%',
+          showValue: true,
+          color: '#8b5cf6'
+        }
+      },
+      {
+        id: 'system-status',
+        type: 'status',
+        title: 'System Status',
+        dataBindings: [{
+          source: 'modbus',
+          path: 'coil:1:0',
+          refreshRate: 1000
+        }],
+        config: {
+          states: [
+            { value: 0, label: 'Offline', color: '#ef4444', icon: 'x' },
+            { value: 1, label: 'Running', color: '#10b981', icon: 'check' },
+            { value: 2, label: 'Warning', color: '#f59e0b', icon: 'alert' }
+          ],
+          showLabel: true,
+          animate: true
+        }
+      },
+      {
+        id: 'alarm-list',
+        type: 'alarm',
+        title: 'Active Alarms',
+        dataBindings: [{
+          source: 'websocket',
+          path: 'alarms/active',
+          refreshRate: 1000
+        }],
+        config: {
+          maxAlarms: 5,
+          showAcknowledged: false,
+          severityFilter: ['critical', 'warning'],
+          sortOrder: 'newest'
+        }
+      },
+      {
+        id: 'temp-trend',
+        type: 'trend',
+        title: 'Temperature History',
+        dataBindings: [{
+          source: 'database',
+          path: 'sensors.history.temperature',
+          refreshRate: 5000
+        }],
+        config: {
+          timeRange: '24h',
+          showGrid: true,
+          lines: [{
+            dataKey: 'value',
+            color: '#8b5cf6',
+            name: 'Temperature'
+          }]
+        }
+      }
+    ],
+    layouts: {
+      lg: [
+        { i: 'temp-gauge', x: 0, y: 0, w: 3, h: 4 },
+        { i: 'humidity-gauge', x: 3, y: 0, w: 3, h: 4 },
+        { i: 'ppfd-heatmap', x: 6, y: 0, w: 6, h: 8 },
+        { i: 'light-toggle', x: 0, y: 4, w: 3, h: 4 },
+        { i: 'dimmer-slider', x: 3, y: 4, w: 3, h: 4 },
+        { i: 'system-status', x: 0, y: 8, w: 3, h: 4 },
+        { i: 'alarm-list', x: 3, y: 8, w: 5, h: 4 },
+        { i: 'temp-trend', x: 8, y: 8, w: 4, h: 4 }
+      ]
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Operations Dashboard</h1>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {metrics.map((metric, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">{metric.label}</p>
-                    <p className="text-2xl font-bold text-gray-900">{metric.value}</p>
-                  </div>
-                  <div className="text-sm text-green-600 font-medium">
-                    {metric.change}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between py-2 border-b">
-                  <span className="text-gray-700">Energy optimization completed</span>
-                  <span className="text-sm text-gray-500">2 hours ago</span>
-                </div>
-                <div className="flex items-center justify-between py-2 border-b">
-                  <span className="text-gray-700">New facility onboarded</span>
-                  <span className="text-sm text-gray-500">1 day ago</span>
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <span className="text-gray-700">System maintenance completed</span>
-                  <span className="text-sm text-gray-500">3 days ago</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-              <div className="space-y-3">
-                <button className="w-full text-left bg-blue-50 hover:bg-blue-100 p-3 rounded border">
-                  Generate Energy Report
-                </button>
-                <button className="w-full text-left bg-green-50 hover:bg-green-100 p-3 rounded border">
-                  Schedule Maintenance
-                </button>
-                <button className="w-full text-left bg-purple-50 hover:bg-purple-100 p-3 rounded border">
-                  View Analytics
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="h-screen bg-gray-950">
+      <DashboardBuilder 
+        initialDashboard={demoDashboard}
+        readOnly={false}
+        onSave={(dashboard) => {
+          // In a real app, save to database
+        }}
+      />
     </div>
-  )
+  );
 }
