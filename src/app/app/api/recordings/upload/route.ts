@@ -43,20 +43,6 @@ export async function POST(request: NextRequest) {
     // 4. Generate thumbnails
     // 5. Set up access controls
 
-    // For now, we'll just save locally and return success
-    const recordingData = {
-      id: uuidv4(),
-      userId,
-      filename,
-      originalName: recording.name,
-      size: parseInt(size),
-      duration: parseInt(duration),
-      mimeType: recording.type,
-      timestamp: new Date(timestamp),
-      url: `/api/recordings/${filename}`,
-      status: 'completed'
-    }
-
     // Save to database
     const recordingData = {
       userId,
@@ -65,7 +51,7 @@ export async function POST(request: NextRequest) {
       fileSize: parseInt(size) || recording.size,
       duration: parseFloat(duration) || 0,
       mimeType: recording.type,
-      filePath: filePath,
+      filePath: filepath,
       uploadedAt: new Date(timestamp) || new Date()
     };
     
@@ -73,7 +59,18 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      recording: recordingData
+      recording: {
+        id: uuidv4(),
+        userId,
+        filename,
+        originalName: recording.name,
+        size: parseInt(size),
+        duration: parseFloat(duration),
+        mimeType: recording.type,
+        timestamp: new Date(timestamp),
+        url: `/api/recordings/${filename}`,
+        status: 'completed'
+      }
     })
 
   } catch (error) {

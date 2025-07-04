@@ -1,15 +1,15 @@
 // recipe-sharing-service service
 
-export class recipe-sharing-serviceService {
-  private static instance: recipe-sharing-serviceService;
+export class RecipeSharingService {
+  private static instance: RecipeSharingService;
 
   private constructor() {}
 
-  static getInstance(): recipe-sharing-serviceService {
-    if (!recipe-sharing-serviceService.instance) {
-      recipe-sharing-serviceService.instance = new recipe-sharing-serviceService();
+  static getInstance(): RecipeSharingService {
+    if (!RecipeSharingService.instance) {
+      RecipeSharingService.instance = new RecipeSharingService();
     }
-    return recipe-sharing-serviceService.instance;
+    return RecipeSharingService.instance;
   }
 
   async initialize(): Promise<void> {
@@ -22,4 +22,4 @@ export class recipe-sharing-serviceService {
   }
 }
 
-export default recipe-sharing-serviceService.getInstance();
+export default RecipeSharingService.getInstance();

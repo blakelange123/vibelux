@@ -1,15 +1,15 @@
 // fluorescence-data service
 
-export class fluorescence-dataService {
-  private static instance: fluorescence-dataService;
+export class FluorescenceDataService {
+  private static instance: FluorescenceDataService;
 
   private constructor() {}
 
-  static getInstance(): fluorescence-dataService {
-    if (!fluorescence-dataService.instance) {
-      fluorescence-dataService.instance = new fluorescence-dataService();
+  static getInstance(): FluorescenceDataService {
+    if (!FluorescenceDataService.instance) {
+      FluorescenceDataService.instance = new FluorescenceDataService();
     }
-    return fluorescence-dataService.instance;
+    return FluorescenceDataService.instance;
   }
 
   async initialize(): Promise<void> {
@@ -22,4 +22,4 @@ export class fluorescence-dataService {
   }
 }
 
-export default fluorescence-dataService.getInstance();
+export default FluorescenceDataService.getInstance();

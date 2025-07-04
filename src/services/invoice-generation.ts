@@ -1,15 +1,15 @@
 // invoice-generation service
 
-export class invoice-generationService {
-  private static instance: invoice-generationService;
+export class InvoiceGenerationService {
+  private static instance: InvoiceGenerationService;
 
   private constructor() {}
 
-  static getInstance(): invoice-generationService {
-    if (!invoice-generationService.instance) {
-      invoice-generationService.instance = new invoice-generationService();
+  static getInstance(): InvoiceGenerationService {
+    if (!InvoiceGenerationService.instance) {
+      InvoiceGenerationService.instance = new InvoiceGenerationService();
     }
-    return invoice-generationService.instance;
+    return InvoiceGenerationService.instance;
   }
 
   async initialize(): Promise<void> {
@@ -22,4 +22,4 @@ export class invoice-generationService {
   }
 }
 
-export default invoice-generationService.getInstance();
+export default InvoiceGenerationService.getInstance();

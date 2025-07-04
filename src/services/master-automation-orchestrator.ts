@@ -1,15 +1,15 @@
 // master-automation-orchestrator service
 
-export class master-automation-orchestratorService {
-  private static instance: master-automation-orchestratorService;
+export class MasterAutomationOrchestratorService {
+  private static instance: MasterAutomationOrchestratorService;
 
   private constructor() {}
 
-  static getInstance(): master-automation-orchestratorService {
-    if (!master-automation-orchestratorService.instance) {
-      master-automation-orchestratorService.instance = new master-automation-orchestratorService();
+  static getInstance(): MasterAutomationOrchestratorService {
+    if (!MasterAutomationOrchestratorService.instance) {
+      MasterAutomationOrchestratorService.instance = new MasterAutomationOrchestratorService();
     }
-    return master-automation-orchestratorService.instance;
+    return MasterAutomationOrchestratorService.instance;
   }
 
   async initialize(): Promise<void> {
@@ -22,4 +22,4 @@ export class master-automation-orchestratorService {
   }
 }
 
-export default master-automation-orchestratorService.getInstance();
+export default MasterAutomationOrchestratorService.getInstance();

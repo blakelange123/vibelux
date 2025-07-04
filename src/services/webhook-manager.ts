@@ -1,15 +1,15 @@
 // webhook-manager service
 
-export class webhook-managerService {
-  private static instance: webhook-managerService;
+export class WebhookManagerService {
+  private static instance: WebhookManagerService;
 
   private constructor() {}
 
-  static getInstance(): webhook-managerService {
-    if (!webhook-managerService.instance) {
-      webhook-managerService.instance = new webhook-managerService();
+  static getInstance(): WebhookManagerService {
+    if (!WebhookManagerService.instance) {
+      WebhookManagerService.instance = new WebhookManagerService();
     }
-    return webhook-managerService.instance;
+    return WebhookManagerService.instance;
   }
 
   async initialize(): Promise<void> {
@@ -22,4 +22,4 @@ export class webhook-managerService {
   }
 }
 
-export default webhook-managerService.getInstance();
+export default WebhookManagerService.getInstance();

@@ -1,15 +1,15 @@
 // dispute-resolution service
 
-export class dispute-resolutionService {
-  private static instance: dispute-resolutionService;
+export class DisputeResolutionService {
+  private static instance: DisputeResolutionService;
 
   private constructor() {}
 
-  static getInstance(): dispute-resolutionService {
-    if (!dispute-resolutionService.instance) {
-      dispute-resolutionService.instance = new dispute-resolutionService();
+  static getInstance(): DisputeResolutionService {
+    if (!DisputeResolutionService.instance) {
+      DisputeResolutionService.instance = new DisputeResolutionService();
     }
-    return dispute-resolutionService.instance;
+    return DisputeResolutionService.instance;
   }
 
   async initialize(): Promise<void> {
@@ -22,4 +22,4 @@ export class dispute-resolutionService {
   }
 }
 
-export default dispute-resolutionService.getInstance();
+export default DisputeResolutionService.getInstance();

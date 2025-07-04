@@ -1,13 +1,13 @@
 // ipm-photo-scouting library module
 
-export interface ipm-photo-scoutingConfig {
+export interface IpmPhotoScoutingConfig {
   // Add configuration options
 }
 
-export class ipm-photo-scouting {
-  private config: ipm-photo-scoutingConfig;
+export class IpmPhotoScouting {
+  private config: IpmPhotoScoutingConfig;
 
-  constructor(config: ipm-photo-scoutingConfig = {}) {
+  constructor(config: IpmPhotoScoutingConfig = {}) {
     this.config = config;
   }
 
@@ -19,4 +19,4 @@ export class ipm-photo-scouting {
 }
 
 // Export singleton instance
-export default new ipm-photo-scouting();
+export default new IpmPhotoScouting();

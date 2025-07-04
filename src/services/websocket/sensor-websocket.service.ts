@@ -1,15 +1,15 @@
 // sensor-websocket service
 
-export class sensor-websocketService {
-  private static instance: sensor-websocketService;
+export class SensorWebsocketService {
+  private static instance: SensorWebsocketService;
 
   private constructor() {}
 
-  static getInstance(): sensor-websocketService {
-    if (!sensor-websocketService.instance) {
-      sensor-websocketService.instance = new sensor-websocketService();
+  static getInstance(): SensorWebsocketService {
+    if (!SensorWebsocketService.instance) {
+      SensorWebsocketService.instance = new SensorWebsocketService();
     }
-    return sensor-websocketService.instance;
+    return SensorWebsocketService.instance;
   }
 
   async initialize(): Promise<void> {
@@ -22,4 +22,4 @@ export class sensor-websocketService {
   }
 }
 
-export default sensor-websocketService.getInstance();
+export default SensorWebsocketService.getInstance();

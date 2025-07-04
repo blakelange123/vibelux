@@ -1,15 +1,15 @@
 // model-registry-service service
 
-export class model-registry-serviceService {
-  private static instance: model-registry-serviceService;
+export class ModelRegistryService {
+  private static instance: ModelRegistryService;
 
   private constructor() {}
 
-  static getInstance(): model-registry-serviceService {
-    if (!model-registry-serviceService.instance) {
-      model-registry-serviceService.instance = new model-registry-serviceService();
+  static getInstance(): ModelRegistryService {
+    if (!ModelRegistryService.instance) {
+      ModelRegistryService.instance = new ModelRegistryService();
     }
-    return model-registry-serviceService.instance;
+    return ModelRegistryService.instance;
   }
 
   async initialize(): Promise<void> {
@@ -22,4 +22,4 @@ export class model-registry-serviceService {
   }
 }
 
-export default model-registry-serviceService.getInstance();
+export default ModelRegistryService.getInstance();

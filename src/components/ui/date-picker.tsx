@@ -1,11 +1,11 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-export interface date-pickerProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface DatePickerProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'secondary'
 }
 
-const date-picker = React.forwardRef<HTMLDivElement, date-pickerProps>(
+const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(
   ({ className, variant = 'default', ...props }, ref) => {
     return (
       <div
@@ -21,6 +21,6 @@ const date-picker = React.forwardRef<HTMLDivElement, date-pickerProps>(
     )
   }
 )
-date-picker.displayName = "date-picker"
+DatePicker.displayName = "DatePicker"
 
-export { date-picker }
+export { DatePicker }

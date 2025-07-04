@@ -1,15 +1,15 @@
 // energy-system-startup service
 
-export class energy-system-startupService {
-  private static instance: energy-system-startupService;
+export class EnergySystemStartupService {
+  private static instance: EnergySystemStartupService;
 
   private constructor() {}
 
-  static getInstance(): energy-system-startupService {
-    if (!energy-system-startupService.instance) {
-      energy-system-startupService.instance = new energy-system-startupService();
+  static getInstance(): EnergySystemStartupService {
+    if (!EnergySystemStartupService.instance) {
+      EnergySystemStartupService.instance = new EnergySystemStartupService();
     }
-    return energy-system-startupService.instance;
+    return EnergySystemStartupService.instance;
   }
 
   async initialize(): Promise<void> {
@@ -22,4 +22,4 @@ export class energy-system-startupService {
   }
 }
 
-export default energy-system-startupService.getInstance();
+export default EnergySystemStartupService.getInstance();

@@ -1,15 +1,15 @@
 // cron-runner service
 
-export class cron-runnerService {
-  private static instance: cron-runnerService;
+export class CronRunnerService {
+  private static instance: CronRunnerService;
 
   private constructor() {}
 
-  static getInstance(): cron-runnerService {
-    if (!cron-runnerService.instance) {
-      cron-runnerService.instance = new cron-runnerService();
+  static getInstance(): CronRunnerService {
+    if (!CronRunnerService.instance) {
+      CronRunnerService.instance = new CronRunnerService();
     }
-    return cron-runnerService.instance;
+    return CronRunnerService.instance;
   }
 
   async initialize(): Promise<void> {
@@ -22,4 +22,4 @@ export class cron-runnerService {
   }
 }
 
-export default cron-runnerService.getInstance();
+export default CronRunnerService.getInstance();

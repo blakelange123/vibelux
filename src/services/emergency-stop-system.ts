@@ -1,15 +1,15 @@
 // emergency-stop-system service
 
-export class emergency-stop-systemService {
-  private static instance: emergency-stop-systemService;
+export class EmergencyStopSystemService {
+  private static instance: EmergencyStopSystemService;
 
   private constructor() {}
 
-  static getInstance(): emergency-stop-systemService {
-    if (!emergency-stop-systemService.instance) {
-      emergency-stop-systemService.instance = new emergency-stop-systemService();
+  static getInstance(): EmergencyStopSystemService {
+    if (!EmergencyStopSystemService.instance) {
+      EmergencyStopSystemService.instance = new EmergencyStopSystemService();
     }
-    return emergency-stop-systemService.instance;
+    return EmergencyStopSystemService.instance;
   }
 
   async initialize(): Promise<void> {
@@ -22,4 +22,4 @@ export class emergency-stop-systemService {
   }
 }
 
-export default emergency-stop-systemService.getInstance();
+export default EmergencyStopSystemService.getInstance();

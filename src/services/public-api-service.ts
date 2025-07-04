@@ -1,15 +1,15 @@
 // public-api-service service
 
-export class public-api-serviceService {
-  private static instance: public-api-serviceService;
+export class PublicApiService {
+  private static instance: PublicApiService;
 
   private constructor() {}
 
-  static getInstance(): public-api-serviceService {
-    if (!public-api-serviceService.instance) {
-      public-api-serviceService.instance = new public-api-serviceService();
+  static getInstance(): PublicApiService {
+    if (!PublicApiService.instance) {
+      PublicApiService.instance = new PublicApiService();
     }
-    return public-api-serviceService.instance;
+    return PublicApiService.instance;
   }
 
   async initialize(): Promise<void> {
@@ -22,4 +22,4 @@ export class public-api-serviceService {
   }
 }
 
-export default public-api-serviceService.getInstance();
+export default PublicApiService.getInstance();

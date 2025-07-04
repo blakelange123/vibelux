@@ -1,13 +1,13 @@
 // photorealistic-renderer library module
 
-export interface photorealistic-rendererConfig {
+export interface PhotorealisticRendererConfig {
   // Add configuration options
 }
 
-export class photorealistic-renderer {
-  private config: photorealistic-rendererConfig;
+export class PhotorealisticRenderer {
+  private config: PhotorealisticRendererConfig;
 
-  constructor(config: photorealistic-rendererConfig = {}) {
+  constructor(config: PhotorealisticRendererConfig = {}) {
     this.config = config;
   }
 
@@ -19,4 +19,4 @@ export class photorealistic-renderer {
 }
 
 // Export singleton instance
-export default new photorealistic-renderer();
+export default new PhotorealisticRenderer();

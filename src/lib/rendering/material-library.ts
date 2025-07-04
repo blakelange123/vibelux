@@ -1,13 +1,13 @@
 // material-library library module
 
-export interface material-libraryConfig {
+export interface MaterialLibraryConfig {
   // Add configuration options
 }
 
-export class material-library {
-  private config: material-libraryConfig;
+export class MaterialLibrary {
+  private config: MaterialLibraryConfig;
 
-  constructor(config: material-libraryConfig = {}) {
+  constructor(config: MaterialLibraryConfig = {}) {
     this.config = config;
   }
 
@@ -19,4 +19,4 @@ export class material-library {
 }
 
 // Export singleton instance
-export default new material-library();
+export default new MaterialLibrary();
