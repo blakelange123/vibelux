@@ -14,7 +14,7 @@ export async function securityMiddleware(req: NextRequest) {
   );
   
   // Add rate limiting headers
-  const ip = req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+  const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
   response.headers.set('X-RateLimit-Limit', '100');
   response.headers.set('X-RateLimit-Remaining', '99');
   response.headers.set('X-RateLimit-Reset', new Date(Date.now() + 60000).toISOString());

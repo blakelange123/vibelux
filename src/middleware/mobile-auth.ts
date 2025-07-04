@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 
 export async function mobileAuthMiddleware(req: NextRequest) {
   const authHeader = req.headers.get('authorization');
