@@ -1,11 +1,33 @@
+export enum InvestmentType {
+  GAAS = 'GAAS',
+  YEP = 'YEP',
+  HYBRID = 'HYBRID'
+}
+
 export interface Investment {
   id: string;
   userId: string;
+  facilityId: string;
+  investmentType: InvestmentType;
   amount: number;
   currency: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  contractStartDate: Date;
+  monthlyServiceFee: number;
+  targetYieldImprovement: number;
+  yieldSharePercentage: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface PaymentRecord {
+  id: string;
+  investmentId: string;
+  amount: number;
+  currency: string;
+  date: Date;
+  status: 'pending' | 'paid' | 'overdue';
+  paymentType: 'service_fee' | 'yield_share';
 }
 
 export interface InvestmentRound {
