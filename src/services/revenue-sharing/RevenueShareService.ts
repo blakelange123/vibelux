@@ -1,15 +1,15 @@
 // RevenueShareService service
 
-export class RevenueShareServiceService {
-  private static instance: RevenueShareServiceService;
+export class RevenueShareService {
+  private static instance: RevenueShareService;
 
   private constructor() {}
 
-  static getInstance(): RevenueShareServiceService {
-    if (!RevenueShareServiceService.instance) {
-      RevenueShareServiceService.instance = new RevenueShareServiceService();
+  static getInstance(): RevenueShareService {
+    if (!RevenueShareService.instance) {
+      RevenueShareService.instance = new RevenueShareService();
     }
-    return RevenueShareServiceService.instance;
+    return RevenueShareService.instance;
   }
 
   async initialize(): Promise<void> {
@@ -20,6 +20,16 @@ export class RevenueShareServiceService {
     // Execute service logic
     return { success: true, data: params };
   }
+
+  async calculateRevenue(data: any): Promise<any> {
+    // Calculate revenue share
+    return { success: true, data };
+  }
+
+  async distributeRevenue(data: any): Promise<any> {
+    // Distribute revenue
+    return { success: true, data };
+  }
 }
 
-export default RevenueShareServiceService.getInstance();
+export default RevenueShareService.getInstance();

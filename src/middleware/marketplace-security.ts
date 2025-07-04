@@ -36,3 +36,21 @@ async function checkMarketplaceAccess(userId: string): Promise<boolean> {
   // For now, allow all authenticated users
   return true;
 }
+
+// Export as class for compatibility
+export class MarketplaceSecurityMiddleware {
+  static async handle(req: NextRequest) {
+    return marketplaceSecurityMiddleware(req);
+  }
+}
+
+// Export as higher-order function
+export function withMarketplaceSecurity(handler: (req: NextRequest) => Promise<NextResponse>) {
+  return async (req: NextRequest) => {
+    const securityResponse = await marketplaceSecurityMiddleware(req);
+    if (securityResponse.status !== 200) {
+      return securityResponse;
+    }
+    return handler(req);
+  };
+}
