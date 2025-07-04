@@ -29,6 +29,12 @@ export default function Navigation() {
             <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
               Dashboard
             </Link>
+            <Link href="/analytics" className="text-gray-600 hover:text-gray-900">
+              Analytics
+            </Link>
+            <Link href="/admin" className="text-gray-600 hover:text-gray-900">
+              Admin
+            </Link>
             <Link href="/pricing" className="text-gray-600 hover:text-gray-900">
               Pricing
             </Link>
@@ -60,6 +66,12 @@ export default function Navigation() {
               </Link>
               <Link href="/dashboard" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
                 Dashboard
+              </Link>
+              <Link href="/analytics" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
+                Analytics
+              </Link>
+              <Link href="/admin" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
+                Admin
               </Link>
               <Link href="/pricing" className="block px-3 py-2 text-gray-600 hover:text-gray-900">
                 Pricing
