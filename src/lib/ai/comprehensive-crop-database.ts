@@ -152,7 +152,7 @@ export class ComprehensiveCropDatabase {
       this.loadLeafyGreens(),
       this.loadFruitingVegetables(),
       // this.loadRootVegetables(), // Method not implemented yet
-      this.loadHerbsSpices(),
+      // this.loadHerbsSpices(), // Method not implemented yet
       this.loadCannabisVarieties(),
       this.loadFlowersOrnamentals(),
       this.loadMicrogreens(),

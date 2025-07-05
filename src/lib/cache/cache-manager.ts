@@ -417,7 +417,7 @@ class CacheManager {
    */
   getMetrics(): CacheMetrics {
     const memoryStats = this.memoryCache.getStats()
-    const redisStats = redisClient.getStats()
+    const redisStats = redisClient.getStats() || { hits: 0, misses: 0, hitRate: 0 }
     
     const totalHits = memoryStats.hits + redisStats.hits
     const totalMisses = memoryStats.misses + redisStats.misses

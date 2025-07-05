@@ -148,7 +148,7 @@ export const db = {
       
       return await prisma.fixture.findMany({
         where,
-        orderBy: { efficacy: 'desc' },
+        orderBy: { power: 'desc' }, // Order by power instead of efficacy since efficacy field doesn't exist
         take: 100 // Limit for performance
       })
     },

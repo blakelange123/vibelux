@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { validateAPIKey, generateAPIResponse, generateErrorResponse } from '@/middleware/api-auth'
 import PublicAPIService from '@/services/public-api-service'
-import ModelRegistryService from '@/services/model-registry-service'
+import { ModelRegistryService } from '@/services/model-registry-service'
 import { z } from 'zod'
 
 const apiService = new PublicAPIService()
-const modelService = new ModelRegistryService()
+const modelService = ModelRegistryService.getInstance()
 
 export async function POST(req: NextRequest) {
   try {

@@ -7,16 +7,6 @@
 
 import { EquipmentDefinition, EquipmentType } from '@/lib/hmi/equipment-registry';
 
-// Conditional import for Node.js only
-let ModbusRTU: any;
-if (typeof window === 'undefined') {
-  try {
-    ModbusRTU = require('modbus-serial').ModbusRTU;
-  } catch (error) {
-    console.warn('modbus-serial not available in browser environment');
-  }
-}
-
 export interface ArgusConfig {
   systemType: 'titan' | 'atlas' | 'solus' | 'controls4';
   connectionType: 'modbus' | 'bacnet' | 'ethernet' | 'web_api';
@@ -261,11 +251,17 @@ export class ArgusAdapter {
    */
   private async connectModbus(): Promise<boolean> {
     try {
-      if (!ModbusRTU) {
+      if (typeof window !== 'undefined') {
         throw new Error('Modbus client not available in browser environment');
       }
       
-      this.modbusClient = new ModbusRTU();
+      // Dynamic import for server-side only
+      const modbusSerial = await import('modbus-serial').catch(() => null);
+      if (!modbusSerial) {
+        throw new Error('modbus-serial module not available');
+      }
+      
+      this.modbusClient = new modbusSerial.default();
       await this.modbusClient.connectTCP(this.config.host, { port: this.config.port || 502 });
       this.modbusClient.setID(this.config.modbusUnitId || 1);
       
@@ -694,8 +690,15 @@ export function createArgusAdapter(config: ArgusConfig): ArgusAdapter {
 export async function discoverArgusSystems(networkRange: string = '192.168.1'): Promise<ArgusConfig[]> {
   const discovered: ArgusConfig[] = [];
   
-  if (!ModbusRTU) {
+  if (typeof window !== 'undefined') {
     console.warn('Modbus discovery not available in browser environment');
+    return discovered;
+  }
+  
+  // Dynamic import for server-side only
+  const modbusSerial = await import('modbus-serial').catch(() => null);
+  if (!modbusSerial) {
+    console.warn('modbus-serial module not available');
     return discovered;
   }
   
@@ -709,7 +712,7 @@ export async function discoverArgusSystems(networkRange: string = '192.168.1'): 
       try {
         if (port === 502) {
           // Test Modbus connection
-          const client = new ModbusRTU();
+          const client = new modbusSerial.default();
           await client.connectTCP(host, { port });
           const result = await client.readHoldingRegisters(1000, 1);
           

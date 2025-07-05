@@ -7,14 +7,13 @@
 
 import { EquipmentDefinition, EquipmentType } from '@/lib/hmi/equipment-registry';
 
-// Conditional import for Node.js only
-let ModbusRTU: any;
-if (typeof window === 'undefined') {
-  try {
-    ModbusRTU = require('modbus-serial').ModbusRTU;
-  } catch (error) {
-    console.warn('modbus-serial not available in browser environment');
-  }
+// ModbusRTU type interface
+interface ModbusRTU {
+  connectTCP(host: string, options: { port: number }): Promise<void>;
+  setID(id: number): void;
+  readHoldingRegisters(address: number, quantity: number): Promise<{ data: number[] }>;
+  writeRegister(address: number, value: number): Promise<void>;
+  close(): Promise<void>;
 }
 
 export interface PrivaConfig {
@@ -44,7 +43,7 @@ export interface PrivaDataPoint {
 
 export class PrivaAdapter {
   private config: PrivaConfig;
-  private modbusClient?: ModbusRTU;
+  private modbusClient?: any;
   private isConnected = false;
 
   constructor(config: PrivaConfig) {
@@ -234,11 +233,17 @@ export class PrivaAdapter {
    */
   private async connectToOnPremise(): Promise<boolean> {
     try {
-      if (!ModbusRTU) {
+      if (typeof window !== 'undefined') {
         throw new Error('Modbus client not available in browser environment');
       }
       
-      this.modbusClient = new ModbusRTU();
+      // Dynamic import for server-side only
+      const modbusSerial = await import('modbus-serial').catch(() => null);
+      if (!modbusSerial) {
+        throw new Error('modbus-serial module not available');
+      }
+      
+      this.modbusClient = new modbusSerial.default();
       await this.modbusClient.connectTCP(this.config.host, { port: this.config.port || 502 });
       this.modbusClient.setID(this.config.modbusUnitId || 1);
       
@@ -490,8 +495,15 @@ export function createPrivaAdapter(config: PrivaConfig): PrivaAdapter {
 export async function discoverPrivaSystems(networkRange: string = '192.168.1'): Promise<PrivaConfig[]> {
   const discovered: PrivaConfig[] = [];
   
-  if (!ModbusRTU) {
+  if (typeof window !== 'undefined') {
     console.warn('Modbus discovery not available in browser environment');
+    return discovered;
+  }
+  
+  // Dynamic import for server-side only
+  const modbusSerial = await import('modbus-serial').catch(() => null);
+  if (!modbusSerial) {
+    console.warn('modbus-serial module not available');
     return discovered;
   }
   
@@ -507,7 +519,7 @@ export async function discoverPrivaSystems(networkRange: string = '192.168.1'): 
   for (const host of hosts) {
     for (const port of commonPorts) {
       try {
-        const client = new ModbusRTU();
+        const client = new modbusSerial.default();
         await client.connectTCP(host, { port });
         
         // Try to read a known Priva register
