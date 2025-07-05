@@ -4,10 +4,22 @@ import OpenAI from 'openai';
 import { trackAIUsage, checkAIUsageLimit } from '@/lib/ai-usage-tracker';
 import { FactBasedDesignAdvisor } from '@/lib/ai/fact-based-design-advisor';
 
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI lazily
+let openai: OpenAI | null = null;
+
+function getOpenAI(): OpenAI | null {
+  if (!openai && process.env.OPENAI_API_KEY) {
+    try {
+      openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+    } catch (error) {
+      console.error('Failed to initialize OpenAI:', error);
+      return null;
+    }
+  }
+  return openai;
+}
 
 // Designer action types
 export type DesignerAction = 
@@ -267,7 +279,11 @@ Brand names like "siify", "signify", "philips" should be ignored for fixture sel
 Return a JSON object with an "actions" array containing the parsed actions.`;
 
   try {
-    const response = await openai.chat.completions.create({
+    const openaiClient = getOpenAI();
+    if (!openaiClient) {
+      throw new Error('OpenAI client not available');
+    }
+    const response = await openaiClient.chat.completions.create({
       model: 'gpt-4-turbo-preview',
       messages: [
         { role: 'system', content: systemPrompt },

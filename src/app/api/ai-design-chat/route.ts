@@ -5,12 +5,19 @@ import { createClaudeClient, getTokenLimit, CLAUDE_CONFIG } from '@/lib/claude-c
 import { generateFallbackDesign, isRateLimitError } from '@/lib/ai-fallback-designer';
 import Anthropic from '@anthropic-ai/sdk';
 
-// Initialize Claude client with production config  
-let claude: any;
-try {
-  claude = createClaudeClient();
-} catch (error) {
-  console.error('Failed to initialize Claude client:', error);
+// Initialize Claude client lazily
+let claude: any = null;
+
+function getClaude() {
+  if (!claude) {
+    try {
+      claude = createClaudeClient();
+    } catch (error) {
+      console.error('Failed to initialize Claude client:', error);
+      return null;
+    }
+  }
+  return claude;
 }
 
 const systemPrompt = `You are an expert horticultural lighting design assistant for Vibelux, with deep knowledge of photobiology, lighting science, and facility design. You can understand complex, natural language requests and provide intelligent design solutions.
@@ -408,7 +415,11 @@ IMPORTANT INSTRUCTIONS:
         // Prepend instruction to ensure JSON response
         const jsonInstruction = "Respond with ONLY valid JSON. No text before or after the JSON object.";
         
-        completion = await claude.messages.create({
+        const claudeClient = getClaude();
+        if (!claudeClient) {
+          throw new Error('Claude client not available');
+        }
+        completion = await claudeClient.messages.create({
           model,
           messages: [
             ...claudeMessages.slice(0, -1),
