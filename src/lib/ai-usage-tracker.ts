@@ -204,3 +204,21 @@ export class AIUsageTracker {
     return (tokensUsed / 1000) * 0.009
   }
 }
+
+// Export convenience functions
+export async function checkAIUsageLimit(
+  userId: string,
+  userTier: string,
+  feature: keyof AIUsageLimit['features']
+): Promise<{ allowed: boolean; reason?: string; remainingTokens?: number }> {
+  return AIUsageTracker.canMakeRequest(userId, userTier, feature);
+}
+
+export async function trackAIUsage(
+  userId: string,
+  feature: keyof AIUsageLimit['features'],
+  tokensUsed: number,
+  endpoint: string
+): Promise<void> {
+  return AIUsageTracker.trackUsage(userId, feature, tokensUsed, endpoint);
+}
