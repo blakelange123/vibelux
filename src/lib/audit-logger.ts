@@ -409,4 +409,6 @@ export async function generateComplianceReport(
   };
 }
 
+// Export both named and default
+export const auditLogger = auditLog;
 export default auditLog;

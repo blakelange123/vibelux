@@ -76,7 +76,7 @@ interface EnrollmentFormData {
   dataHistory?: number
 }
 
-export default function PilotProgramDashboard({ onWebSocketConnect }: PilotProgramDashboardProps) {
+function PilotProgramDashboard({ onWebSocketConnect }: PilotProgramDashboardProps) {
   const [facilities, setFacilities] = useState<PilotFacility[]>([])
   const [report, setReport] = useState<PilotProgramReport | null>(null)
   const [selectedFacility, setSelectedFacility] = useState<PilotFacility | null>(null)
@@ -988,3 +988,6 @@ export default function PilotProgramDashboard({ onWebSocketConnect }: PilotProgr
     </div>
   )
 }
+
+export { PilotProgramDashboard }
+export default PilotProgramDashboard

@@ -2,14 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { auth } from '@clerk/nextjs/server';
 import { PrismaClient } from '@prisma/client';
-import pdf from 'pdf-parse';
 
 const prisma = new PrismaClient();
 
-// Initialize Claude API
-const anthropic = new Anthropic({
-  apiKey: process.env.CLAUDE_API_KEY || '',
-});
+// Initialize Claude API lazily
+let anthropic: Anthropic | null = null;
+
+function getAnthropic(): Anthropic {
+  if (!anthropic && process.env.CLAUDE_API_KEY) {
+    anthropic = new Anthropic({
+      apiKey: process.env.CLAUDE_API_KEY,
+    });
+  }
+  if (!anthropic) {
+    throw new Error('Claude API key not configured');
+  }
+  return anthropic;
+}
 
 // PDF processing prompt template
 const PDF_ANALYSIS_PROMPT = `You are an expert at analyzing utility bills. Extract the following information from this utility bill text:
@@ -75,6 +84,8 @@ export async function POST(req: NextRequest) {
     // Extract text from PDF
     let extractedText = '';
     try {
+      // Dynamically import pdf-parse to avoid build issues
+      const pdf = (await import('pdf-parse')).default;
       const pdfData = await pdf(buffer);
       extractedText = pdfData.text;
     } catch (pdfError) {
@@ -86,7 +97,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Send to Claude for analysis
-    const claudeResponse = await anthropic.messages.create({
+    const claudeResponse = await getAnthropic().messages.create({
       model: 'claude-3-opus-20240229',
       max_tokens: 2000,
       temperature: 0,

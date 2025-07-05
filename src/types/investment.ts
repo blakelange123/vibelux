@@ -49,3 +49,32 @@ export interface Investor {
   investments: Investment[];
   tier: 'seed' | 'angel' | 'series-a' | 'series-b';
 }
+
+// Additional types for investment data generator
+export enum InvestorType {
+  ANGEL = 'ANGEL',
+  VENTURE_CAPITAL = 'VENTURE_CAPITAL',
+  FAMILY_OFFICE = 'FAMILY_OFFICE',
+  STRATEGIC = 'STRATEGIC',
+  RETAIL = 'RETAIL'
+}
+
+export enum RiskTolerance {
+  LOW = 'LOW',
+  MODERATE = 'MODERATE',
+  HIGH = 'HIGH'
+}
+
+export enum DealStatus {
+  PROSPECTING = 'PROSPECTING',
+  DUE_DILIGENCE = 'DUE_DILIGENCE',
+  NEGOTIATION = 'NEGOTIATION',
+  CLOSED = 'CLOSED',
+  REJECTED = 'REJECTED'
+}
+
+export enum PaymentFrequency {
+  MONTHLY = 'MONTHLY',
+  QUARTERLY = 'QUARTERLY',
+  ANNUALLY = 'ANNUALLY'
+}

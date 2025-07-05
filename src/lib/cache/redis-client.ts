@@ -35,12 +35,15 @@ class RedisClient {
   }
 
   constructor() {
-    this.initialize()
+    // Don't initialize at construction to avoid build-time errors
   }
 
   private async initialize() {
+    if (this.client) return
+    
     try {
-      const redisUrl = env.get('REDIS_URL') || 'redis://localhost:6379'
+      // Don't validate env during build
+      const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379'
       
       this.client = new Redis(redisUrl, {
         retryDelayOnFailover: 100,
