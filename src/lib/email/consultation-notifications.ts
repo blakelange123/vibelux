@@ -1,7 +1,23 @@
 import { Resend } from 'resend';
 import { prisma } from '@/lib/db';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend lazily to avoid build-time errors
+let resend: Resend | null = null;
+
+function getResend(): Resend {
+  if (!resend && process.env.RESEND_API_KEY) {
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  if (!resend) {
+    // Return a mock instance for build time
+    return {
+      emails: {
+        send: async () => ({ data: null, error: 'Resend API key not configured' })
+      }
+    } as any;
+  }
+  return resend;
+}
 
 interface ConsultationData {
   id: string;
@@ -114,7 +130,7 @@ export class ConsultationEmailService {
         </html>
       `;
 
-      await resend.emails.send({
+      await getResend().emails.send({
         from: 'VibeLux Platform <noreply@vibelux.com>',
         to: expert.email,
         subject: `🔔 New Consultation Request from ${client.name} - $${consultation.totalAmount.toFixed(2)}`,
@@ -237,7 +253,7 @@ export class ConsultationEmailService {
         </html>
       `;
 
-      await resend.emails.send({
+      await getResend().emails.send({
         from: 'VibeLux Platform <noreply@vibelux.com>',
         to: client.email,
         subject: `✅ Consultation Confirmed with ${expert.displayName} - ${formattedDate}`,
@@ -342,7 +358,7 @@ export class ConsultationEmailService {
           </html>
         `;
 
-        await resend.emails.send({
+        await getResend().emails.send({
           from: 'VibeLux Platform <noreply@vibelux.com>',
           to: recipient.email,
           subject: `⏰ Consultation Reminder - Tomorrow at ${formattedTime}`,
@@ -401,7 +417,7 @@ export class ConsultationEmailService {
         </html>
       `;
 
-      await resend.emails.send({
+      await getResend().emails.send({
         from: 'VibeLux Platform <noreply@vibelux.com>',
         to: client.email,
         subject: `🎉 Your consultation with ${expert.displayName} has been approved!`,

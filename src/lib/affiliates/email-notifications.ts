@@ -494,11 +494,11 @@ export class AffiliateEmailNotifications {
 
 // Factory function to create email service based on environment
 export function createEmailService(): EmailService {
-  if (process.env.SENDGRID_API_KEY) {
+  if (process.env.SENDGRID_API_KEY && process.env.SENDGRID_API_KEY.startsWith('SG.')) {
     return new SendGridEmailService(process.env.SENDGRID_API_KEY);
   }
   
-  // Use mock service in development
+  // Use mock service in development or when SendGrid is not configured
   return new MockEmailService();
 }
 

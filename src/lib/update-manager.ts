@@ -2,7 +2,7 @@
 // Handles feature rollouts, subscription changes, and user notifications
 
 import { prisma } from '@/lib/db';
-import { sendEmail } from '@/lib/email';
+import { emailService } from '@/lib/email/email-service';
 
 export interface Update {
   id: string;
@@ -252,7 +252,7 @@ export class UpdateManager {
 
       // Send email for major updates
       if (update.severity === 'major' || update.severity === 'critical') {
-        await sendEmail({
+        await emailService.sendEmail({
           to: user.email,
           subject: `Important Update: ${update.title}`,
           template: 'system-update',
