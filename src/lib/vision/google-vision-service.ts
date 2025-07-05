@@ -22,3 +22,4 @@ export class GoogleVisionService {
 }
 
 export const visionService = new GoogleVisionService();
+export const googleVisionService = visionService; // Alias for compatibility

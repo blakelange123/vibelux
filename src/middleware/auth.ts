@@ -37,3 +37,20 @@ export function requireAuth(handler: (req: NextRequest) => Promise<NextResponse>
     return handler(req);
   };
 }
+
+// Middleware to check facility role permissions
+export async function requireFacilityRole(
+  req: NextRequest,
+  facilityId: string,
+  requiredRole: 'owner' | 'admin' | 'member'
+) {
+  const { userId } = await auth();
+  
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  
+  // TODO: Check user's role in the facility from database
+  // For now, just check if authenticated
+  return NextResponse.next();
+}

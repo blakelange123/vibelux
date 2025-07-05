@@ -45,3 +45,22 @@ export async function requireAuth() {
 export function isAuthorized(userId: string, resourceOwnerId: string): boolean {
   return userId === resourceOwnerId;
 }
+
+// NextAuth compatibility layer for routes expecting authOptions
+// This is a placeholder since we're using Clerk instead of NextAuth
+export const authOptions = {
+  providers: [],
+  callbacks: {
+    async session({ session, token }: any) {
+      return session;
+    },
+    async jwt({ token, user }: any) {
+      return token;
+    }
+  },
+  pages: {
+    signIn: '/sign-in',
+    signOut: '/sign-out',
+    error: '/auth/error',
+  }
+};

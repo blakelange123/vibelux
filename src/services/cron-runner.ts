@@ -22,4 +22,7 @@ export class CronRunnerService {
   }
 }
 
-export default CronRunnerService.getInstance();
+// Export both named and default exports
+export const cronRunner = CronRunnerService.getInstance();
+export const getCronRunner = () => cronRunner;
+export default cronRunner;
