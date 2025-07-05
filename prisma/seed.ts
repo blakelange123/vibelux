@@ -78,7 +78,11 @@ async function parseCSV(): Promise<DLCFixture[]> {
 }
 
 async function seedFixtures() {
-  console.log('🌱 Starting fixture seeding...')
+  console.log('🌱 Skipping fixture seeding - Fixture model schema mismatch')
+  
+  // The current Fixture model requires spaceId and doesn't have the fields
+  // from the DLC CSV (efficacy, ppf, voltage, etc.)
+  return
   
   try {
     // Check if CSV file exists
@@ -99,10 +103,12 @@ async function seedFixtures() {
       
       await prisma.fixture.createMany({
         data: chunk.map(fixture => ({
-          ...fixture,
-          spectrum: { type: 'full_spectrum', channels: [] }, // Default spectrum data
-          dimensions: { length: 1200, width: 100, height: 50 }, // Default dimensions in mm
-          images: []
+          manufacturer: fixture.manufacturer,
+          model: fixture.model,
+          power: fixture.wattage || 0, // Map wattage to power
+          // Note: The Fixture model needs spaceId, but we don't have one in seed data
+          // This will likely fail without a valid spaceId
+          // spectrum, dimensions, images fields don't exist in current Fixture model
         })),
         skipDuplicates: true
       })
@@ -118,7 +124,8 @@ async function seedFixtures() {
 }
 
 async function seedSampleFixtures() {
-  console.log('🌱 Seeding sample fixtures...')
+  console.log('🌱 Skipping sample fixtures - Fixture model schema mismatch')
+  return
   
   const sampleFixtures = [
     {

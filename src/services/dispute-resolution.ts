@@ -23,3 +23,9 @@ export class DisputeResolutionService {
 }
 
 export default DisputeResolutionService.getInstance();
+
+// Export the function that's being imported
+export async function processDisputesAutomatically(): Promise<void> {
+  const service = DisputeResolutionService.getInstance();
+  await service.execute({ automatic: true });
+}

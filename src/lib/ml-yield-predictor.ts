@@ -24,3 +24,9 @@ export class MLYieldPredictor {
     };
   }
 }
+
+// Export the predictYield function that components are expecting
+export async function predictYield(inputs: any): Promise<any> {
+  const predictor = new MLYieldPredictor();
+  return predictor.predict(inputs);
+}

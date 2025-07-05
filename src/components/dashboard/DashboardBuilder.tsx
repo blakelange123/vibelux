@@ -11,24 +11,11 @@ import { WidgetLibrary } from './WidgetLibrary';
 import { WidgetRenderer } from './WidgetRenderer';
 import { DataBindingPanel } from './DataBindingPanel';
 import { DashboardTemplate } from './DashboardTemplates';
+import { DashboardWidget, Dashboard } from './types';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
-
-export interface DashboardWidget {
-  id: string;
-  type: string;
-  title: string;
-  dataBindings: {
-    source: 'modbus' | 'sensor' | 'database' | 'calculation' | 'websocket';
-    path: string;
-    refreshRate?: number;
-    transform?: string; // JavaScript expression
-  }[];
-  config: any;
-  locked?: boolean;
-}
 
 interface DashboardBuilderProps {
   initialDashboard?: {

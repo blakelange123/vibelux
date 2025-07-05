@@ -173,22 +173,27 @@ export class AuditLogger {
         });
       }
 
-      // Also can write to file system for backup
-      if (process.env.NODE_ENV === 'production') {
-        const fs = await import('fs/promises');
-        const path = await import('path');
-        
-        const logDir = path.join(process.cwd(), 'logs', 'audit');
-        const logFile = path.join(
-          logDir, 
-          `audit-${new Date().toISOString().split('T')[0]}.jsonl`
-        );
-        
-        await fs.mkdir(logDir, { recursive: true });
-        await fs.appendFile(
-          logFile,
-          logsToFlush.map(log => JSON.stringify(log)).join('\n') + '\n'
-        );
+      // Also can write to file system for backup (only in Node.js environment)
+      if (process.env.NODE_ENV === 'production' && typeof window === 'undefined') {
+        try {
+          const fs = await import('fs/promises');
+          const path = await import('path');
+          
+          const logDir = path.join(process.cwd(), 'logs', 'audit');
+          const logFile = path.join(
+            logDir, 
+            `audit-${new Date().toISOString().split('T')[0]}.jsonl`
+          );
+          
+          await fs.mkdir(logDir, { recursive: true });
+          await fs.appendFile(
+            logFile,
+            logsToFlush.map(log => JSON.stringify(log)).join('\n') + '\n'
+          );
+        } catch (fsError) {
+          // Silently fail if fs is not available
+          console.debug('File system logging not available');
+        }
       }
     } catch (error) {
       console.error('Failed to flush audit logs:', error);

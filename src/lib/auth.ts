@@ -5,6 +5,9 @@ import { NextRequest } from 'next/server';
 // Re-export auth from Clerk for convenience
 export { auth } from '@clerk/nextjs/server';
 
+// Export getAuth function for compatibility
+export const getAuth = auth;
+
 export async function authenticateRequest(req: NextRequest) {
   try {
     const { userId } = await auth();

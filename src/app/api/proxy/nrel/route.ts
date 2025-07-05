@@ -4,11 +4,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { env } from '@/lib/env-validator'
 import { securityMiddleware } from '@/middleware/security'
 
 async function handler(request: NextRequest) {
-  const apiKey = env.get('NREL_API_KEY')
+  const apiKey = process.env.NREL_API_KEY
   
   if (!apiKey) {
     return NextResponse.json(

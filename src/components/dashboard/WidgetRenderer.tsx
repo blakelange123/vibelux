@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, Settings, AlertCircle } from 'lucide-react';
-import { DashboardWidget } from './DashboardBuilder';
+import { DashboardWidget } from './types';
 import { GaugeWidget } from './widgets/GaugeWidget';
 import { NumericWidget } from './widgets/NumericWidget';
 import { TrendWidget } from './widgets/TrendWidget';

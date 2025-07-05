@@ -298,3 +298,17 @@ async function sendEmailNotificationIfEnabled(
     // TODO: Queue email notification
   }
 }
+
+/**
+ * Send notification - alias for createNotification for backward compatibility
+ */
+export async function sendNotification(params: {
+  userId: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  data?: any;
+  expiresAt?: Date;
+}): Promise<Notification> {
+  return createNotification(params);
+}

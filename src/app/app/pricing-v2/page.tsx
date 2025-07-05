@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { 
-  Check, X, Sparkles, Home, Plant, Briefcase, Zap, Microscope, 
+  Check, X, Sparkles, Home, Leaf, Briefcase, Zap, Microscope, 
   Building, Rocket, Globe, Crown, Users, GraduationCap, Beaker, 
   Shield, Wrench, ChevronDown, ChevronUp, ArrowRight, Info,
   Star, TrendingUp, Award, Percent
@@ -11,9 +11,9 @@ import {
 import { SUBSCRIPTION_TIERS_15, FEATURE_CATEGORIES_15, getRecommendedTier15 } from '@/lib/subscription-tiers-15';
 
 const iconMap: { [key: string]: any } = {
-  Sparkles, Home, Plant, Briefcase, Zap, Microscope,
+  Sparkles, Home, Leaf, Briefcase, Zap, Microscope,
   Building, Rocket, Globe, Crown, Users, GraduationCap,
-  Beaker, Shield, Wrench
+  Beaker, Shield, Wrench, Plant: Leaf
 };
 
 export default function PricingV2Page() {

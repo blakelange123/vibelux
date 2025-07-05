@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Database, Wifi, Server, Calculator, Cable } from 'lucide-react';
-import { DashboardWidget } from './DashboardBuilder';
+import { DashboardWidget } from './types';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface DataBindingPanelProps {

@@ -1,4 +1,372 @@
+
+> vibelux-app@0.1.1 build
+> next build
+
    ▲ Next.js 15.3.3
    - Environments: .env.local, .env.production, .env
 
    Creating an optimized production build ...
+ ⚠ Compiled with warnings in 3.6min
+
+./src/app/app/pricing-v2/page.tsx
+Attempted import error: 'Plant' is not exported from '__barrel_optimize__?names=ArrowRight,Beaker,Briefcase,Building,Check,ChevronDown,ChevronUp,Crown,Globe,GraduationCap,Home,Microscope,Plant,Rocket,Shield,Sparkles,Star,TrendingUp,Users,Wrench,X,Zap!=!lucide-react' (imported as 'Plant').
+
+Import trace for requested module:
+./src/app/app/pricing-v2/page.tsx
+
+./src/components/designer/PlantBiologyIntegration.tsx
+Attempted import error: 'predictYield' is not exported from '@/lib/ml-yield-predictor' (imported as 'predictYield').
+
+Import trace for requested module:
+./src/components/designer/PlantBiologyIntegration.tsx
+./src/components/designer/AdvancedDesigner.tsx
+./src/app/designer/page.tsx
+
+./src/components/designer/PlantBiologyIntegrationEnhanced.tsx
+Attempted import error: 'predictYield' is not exported from '@/lib/ml-yield-predictor' (imported as 'predictYield').
+
+Import trace for requested module:
+./src/components/designer/PlantBiologyIntegrationEnhanced.tsx
+./src/components/designer/PlantBiologyWrapper.tsx
+./src/app/hyperspectral-integration/page.tsx
+
+./src/components/designer/utils/exportHandlers.ts
+Attempted import error: 'IESExporter' is not exported from '@/lib/photometric/ies-exporter' (imported as 'IESExporter').
+
+Import trace for requested module:
+./src/components/designer/utils/exportHandlers.ts
+./src/components/designer/panels/TopToolbar.tsx
+./src/components/designer/AdvancedDesigner.tsx
+./src/app/designer/page.tsx
+
+./src/components/designer/utils/exportHandlers.ts
+Attempted import error: 'LDTExporter' is not exported from '@/lib/photometric/ies-exporter' (imported as 'LDTExporter').
+
+Import trace for requested module:
+./src/components/designer/utils/exportHandlers.ts
+./src/components/designer/panels/TopToolbar.tsx
+./src/components/designer/AdvancedDesigner.tsx
+./src/app/designer/page.tsx
+
+./src/components/designer/utils/exportHandlers.ts
+Attempted import error: 'IESExporter' is not exported from '@/lib/photometric/ies-exporter' (imported as 'IESExporter').
+
+Import trace for requested module:
+./src/components/designer/utils/exportHandlers.ts
+./src/components/designer/panels/TopToolbar.tsx
+./src/components/designer/AdvancedDesigner.tsx
+./src/app/designer/page.tsx
+
+./src/components/designer/utils/exportHandlers.ts
+Attempted import error: 'LDTExporter' is not exported from '@/lib/photometric/ies-exporter' (imported as 'LDTExporter').
+
+Import trace for requested module:
+./src/components/designer/utils/exportHandlers.ts
+./src/components/designer/panels/TopToolbar.tsx
+./src/components/designer/AdvancedDesigner.tsx
+./src/app/designer/page.tsx
+
+./src/lib/audit-logger.ts
+Module not found: Can't resolve 'fs/promises' in '/Users/blakelange/vibelux-app/src/lib'
+
+Import trace for requested module:
+./src/lib/audit-logger.ts
+./src/app/admin/audit-logs/page.tsx
+
+./src/app/app/pricing-v2/page.tsx
+Attempted import error: 'Plant' is not exported from '__barrel_optimize__?names=ArrowRight,Beaker,Briefcase,Building,Check,ChevronDown,ChevronUp,Crown,Globe,GraduationCap,Home,Microscope,Plant,Rocket,Shield,Sparkles,Star,TrendingUp,Users,Wrench,X,Zap!=!lucide-react' (imported as 'Plant').
+
+Import trace for requested module:
+./src/app/app/pricing-v2/page.tsx
+
+./src/components/designer/PlantBiologyIntegration.tsx
+Attempted import error: 'predictYield' is not exported from '@/lib/ml-yield-predictor' (imported as 'predictYield').
+
+Import trace for requested module:
+./src/components/designer/PlantBiologyIntegration.tsx
+./src/components/designer/PlantBiologyWrapper.tsx
+./src/app/hyperspectral-integration/page.tsx
+
+./src/components/designer/PlantBiologyIntegrationEnhanced.tsx
+Attempted import error: 'predictYield' is not exported from '@/lib/ml-yield-predictor' (imported as 'predictYield').
+
+Import trace for requested module:
+./src/components/designer/PlantBiologyIntegrationEnhanced.tsx
+./src/components/designer/PlantBiologyWrapper.tsx
+./src/app/hyperspectral-integration/page.tsx
+
+./src/components/designer/utils/exportHandlers.ts
+Attempted import error: 'IESExporter' is not exported from '@/lib/photometric/ies-exporter' (imported as 'IESExporter').
+
+Import trace for requested module:
+./src/components/designer/utils/exportHandlers.ts
+./src/components/designer/panels/TopToolbar.tsx
+./src/components/designer/AdvancedDesigner.tsx
+./src/app/app/designer/page.tsx
+
+./src/components/designer/utils/exportHandlers.ts
+Attempted import error: 'LDTExporter' is not exported from '@/lib/photometric/ies-exporter' (imported as 'LDTExporter').
+
+Import trace for requested module:
+./src/components/designer/utils/exportHandlers.ts
+./src/components/designer/panels/TopToolbar.tsx
+./src/components/designer/AdvancedDesigner.tsx
+./src/app/app/designer/page.tsx
+
+./src/components/designer/utils/exportHandlers.ts
+Attempted import error: 'IESExporter' is not exported from '@/lib/photometric/ies-exporter' (imported as 'IESExporter').
+
+Import trace for requested module:
+./src/components/designer/utils/exportHandlers.ts
+./src/components/designer/panels/TopToolbar.tsx
+./src/components/designer/AdvancedDesigner.tsx
+./src/app/app/designer/page.tsx
+
+./src/components/designer/utils/exportHandlers.ts
+Attempted import error: 'LDTExporter' is not exported from '@/lib/photometric/ies-exporter' (imported as 'LDTExporter').
+
+Import trace for requested module:
+./src/components/designer/utils/exportHandlers.ts
+./src/components/designer/panels/TopToolbar.tsx
+./src/components/designer/AdvancedDesigner.tsx
+./src/app/app/designer/page.tsx
+
+./src/lib/integrations/climate-computers/argus-adapter.ts
+Module not found: Can't resolve 'modbus-serial' in '/Users/blakelange/vibelux-app/src/lib/integrations/climate-computers'
+
+Import trace for requested module:
+./src/lib/integrations/climate-computers/argus-adapter.ts
+./src/lib/integrations/climate-computers/integration-manager.ts
+./src/components/ClimateComputerAutoDiscovery.tsx
+./src/app/climate-computers/page.tsx
+
+./src/lib/integrations/climate-computers/hortimax-adapter.ts
+Module not found: Can't resolve 'modbus-serial' in '/Users/blakelange/vibelux-app/src/lib/integrations/climate-computers'
+
+Import trace for requested module:
+./src/lib/integrations/climate-computers/hortimax-adapter.ts
+./src/lib/integrations/climate-computers/integration-manager.ts
+./src/components/ClimateComputerAutoDiscovery.tsx
+./src/app/climate-computers/page.tsx
+
+./src/lib/integrations/climate-computers/priva-adapter.ts
+Module not found: Can't resolve 'modbus-serial' in '/Users/blakelange/vibelux-app/src/lib/integrations/climate-computers'
+
+Import trace for requested module:
+./src/lib/integrations/climate-computers/priva-adapter.ts
+./src/lib/integrations/climate-computers/integration-manager.ts
+./src/components/ClimateComputerAutoDiscovery.tsx
+./src/app/climate-computers/page.tsx
+
+./node_modules/handlebars/lib/index.js
+require.extensions is not supported by webpack. Use a loader instead.
+
+Import trace for requested module:
+./node_modules/handlebars/lib/index.js
+./src/lib/email/email-service.ts
+./src/lib/update-manager.ts
+./src/app/api/admin/updates/route.ts
+
+./node_modules/handlebars/lib/index.js
+require.extensions is not supported by webpack. Use a loader instead.
+
+Import trace for requested module:
+./node_modules/handlebars/lib/index.js
+./src/lib/email/email-service.ts
+./src/lib/update-manager.ts
+./src/app/api/admin/updates/route.ts
+
+./node_modules/handlebars/lib/index.js
+require.extensions is not supported by webpack. Use a loader instead.
+
+Import trace for requested module:
+./node_modules/handlebars/lib/index.js
+./src/lib/email/email-service.ts
+./src/lib/update-manager.ts
+./src/app/api/admin/updates/route.ts
+
+./src/app/api/cron/automated-billing/route.ts
+Attempted import error: 'processDisputesAutomatically' is not exported from '@/services/dispute-resolution' (imported as 'processDisputesAutomatically').
+
+Import trace for requested module:
+./src/app/api/cron/automated-billing/route.ts
+
+./src/app/api/health/redis/route.ts
+Attempted import error: 'getRedisClient' is not exported from '@/lib/cache/redis-client' (imported as 'getRedisClient').
+
+Import trace for requested module:
+./src/app/api/health/redis/route.ts
+
+./src/app/api/psi/calculate/route.ts
+Attempted import error: 'sendNotification' is not exported from '@/lib/notifications' (imported as 'sendNotification').
+
+Import trace for requested module:
+./src/app/api/psi/calculate/route.ts
+
+./src/app/api/system/health/route.ts
+Attempted import error: 'checkDatabaseHealth' is not exported from '@/lib/prisma' (imported as 'checkDatabaseHealth').
+
+Import trace for requested module:
+./src/app/api/system/health/route.ts
+
+./src/app/api/system/health/route.ts
+Attempted import error: 'connectionManager' is not exported from '@/lib/prisma' (imported as 'connectionManager').
+
+Import trace for requested module:
+./src/app/api/system/health/route.ts
+
+./src/app/api/system/health/route.ts
+Attempted import error: 'connectionManager' is not exported from '@/lib/prisma' (imported as 'connectionManager').
+
+Import trace for requested module:
+./src/app/api/system/health/route.ts
+
+./src/app/api/system/health/route.ts
+Attempted import error: 'connectionManager' is not exported from '@/lib/prisma' (imported as 'connectionManager').
+
+Import trace for requested module:
+./src/app/api/system/health/route.ts
+
+./src/app/api/tracking/alerts/route.ts
+Attempted import error: 'getAuth' is not exported from '@/lib/auth' (imported as 'getAuth').
+
+Import trace for requested module:
+./src/app/api/tracking/alerts/route.ts
+
+./src/app/api/tracking/alerts/route.ts
+Attempted import error: 'getAuth' is not exported from '@/lib/auth' (imported as 'getAuth').
+
+Import trace for requested module:
+./src/app/api/tracking/alerts/route.ts
+
+./src/app/api/tracking/alerts/route.ts
+Attempted import error: 'getAuth' is not exported from '@/lib/auth' (imported as 'getAuth').
+
+Import trace for requested module:
+./src/app/api/tracking/alerts/route.ts
+
+./src/app/api/tracking/privacy/route.ts
+Attempted import error: 'validateInput' is not exported from '@/middleware/security' (imported as 'validateInput').
+
+Import trace for requested module:
+./src/app/api/tracking/privacy/route.ts
+
+./src/app/api/validation/request/route.ts
+Attempted import error: 'authOptions' is not exported from '@/app/api/auth/[...nextauth]/route' (imported as 'authOptions').
+
+Import trace for requested module:
+./src/app/api/validation/request/route.ts
+
+./src/app/api/v1/biology/predictions/route.ts
+Attempted import error: 'predictYield' is not exported from '@/lib/ml-yield-predictor' (imported as 'predictYield').
+
+Import trace for requested module:
+./src/app/api/v1/biology/predictions/route.ts
+
+./src/app/app/api/cron/automated-billing/route.ts
+Attempted import error: 'processDisputesAutomatically' is not exported from '@/services/dispute-resolution' (imported as 'processDisputesAutomatically').
+
+Import trace for requested module:
+./src/app/app/api/cron/automated-billing/route.ts
+
+./src/app/app/api/health/redis/route.ts
+Attempted import error: 'getRedisClient' is not exported from '@/lib/cache/redis-client' (imported as 'getRedisClient').
+
+Import trace for requested module:
+./src/app/app/api/health/redis/route.ts
+
+./src/app/app/api/psi/calculate/route.ts
+Attempted import error: 'sendNotification' is not exported from '@/lib/notifications' (imported as 'sendNotification').
+
+Import trace for requested module:
+./src/app/app/api/psi/calculate/route.ts
+
+./src/app/app/api/system/health/route.ts
+Attempted import error: 'checkDatabaseHealth' is not exported from '@/lib/prisma' (imported as 'checkDatabaseHealth').
+
+Import trace for requested module:
+./src/app/app/api/system/health/route.ts
+
+./src/app/app/api/system/health/route.ts
+Attempted import error: 'connectionManager' is not exported from '@/lib/prisma' (imported as 'connectionManager').
+
+Import trace for requested module:
+./src/app/app/api/system/health/route.ts
+
+./src/app/app/api/system/health/route.ts
+Attempted import error: 'connectionManager' is not exported from '@/lib/prisma' (imported as 'connectionManager').
+
+Import trace for requested module:
+./src/app/app/api/system/health/route.ts
+
+./src/app/app/api/system/health/route.ts
+Attempted import error: 'connectionManager' is not exported from '@/lib/prisma' (imported as 'connectionManager').
+
+Import trace for requested module:
+./src/app/app/api/system/health/route.ts
+
+./src/app/app/api/tracking/alerts/route.ts
+Attempted import error: 'getAuth' is not exported from '@/lib/auth' (imported as 'getAuth').
+
+Import trace for requested module:
+./src/app/app/api/tracking/alerts/route.ts
+
+./src/app/app/api/tracking/alerts/route.ts
+Attempted import error: 'getAuth' is not exported from '@/lib/auth' (imported as 'getAuth').
+
+Import trace for requested module:
+./src/app/app/api/tracking/alerts/route.ts
+
+./src/app/app/api/tracking/alerts/route.ts
+Attempted import error: 'getAuth' is not exported from '@/lib/auth' (imported as 'getAuth').
+
+Import trace for requested module:
+./src/app/app/api/tracking/alerts/route.ts
+
+./src/app/app/api/tracking/privacy/route.ts
+Attempted import error: 'validateInput' is not exported from '@/middleware/security' (imported as 'validateInput').
+
+Import trace for requested module:
+./src/app/app/api/tracking/privacy/route.ts
+
+./src/app/app/api/v1/biology/predictions/route.ts
+Attempted import error: 'predictYield' is not exported from '@/lib/ml-yield-predictor' (imported as 'predictYield').
+
+Import trace for requested module:
+./src/app/app/api/v1/biology/predictions/route.ts
+
+./src/lib/backup/backup-manager.ts
+Attempted import error: 'Prisma' is not exported from '@/lib/prisma' (imported as 'Prisma').
+
+Import trace for requested module:
+./src/lib/backup/backup-manager.ts
+./src/app/api/admin/backup/[id]/route.ts
+
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+Error: @prisma/client did not initialize yet. Please run "prisma generate" and try to import it again.
+    at 931183 (.next/server/chunks/63162.js:5:3570)
+    at t (.next/server/webpack-runtime.js:1:143)
+    at 200924 (.next/server/chunks/63162.js:1:229)
+    at t (.next/server/webpack-runtime.js:1:143)
+    at 329099 (.next/server/app/api/admin/backup/[id]/route.js:1:442)
+    at t (.next/server/webpack-runtime.js:1:143)
+    at s (.next/server/app/api/admin/backup/[id]/route.js:1:3642)
+    at <unknown> (.next/server/app/api/admin/backup/[id]/route.js:1:3701)
+    at t.X (.next/server/webpack-runtime.js:1:2214)
+Error: @prisma/client did not initialize yet. Please run "prisma generate" and try to import it again.
+    at 931183 (.next/server/chunks/63162.js:5:3570)
+    at t (.next/server/webpack-runtime.js:1:143)
+    at 200924 (.next/server/chunks/63162.js:1:229)
+    at t (.next/server/webpack-runtime.js:1:143)
+    at 898878 (.next/server/app/api/admin/backup/[id]/restore/route.js:1:1101)
+    at t (.next/server/webpack-runtime.js:1:143)
+    at s (.next/server/app/api/admin/backup/[id]/restore/route.js:1:3023)
+    at <unknown> (.next/server/app/api/admin/backup/[id]/restore/route.js:1:3082)
+    at t.X (.next/server/webpack-runtime.js:1:2214)
+
+> Build error occurred
+[Error: Failed to collect page data for /api/admin/backup/[id]] {
+  type: 'Error'
+}

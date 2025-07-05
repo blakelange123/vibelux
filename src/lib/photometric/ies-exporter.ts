@@ -77,3 +77,27 @@ export function generateSampleIESData(fixtureName: string): IESData {
     }
   };
 }
+
+// Export classes that are expected by exportHandlers.ts
+export class IESExporter {
+  export(data: IESData): string {
+    return exportToIES(data);
+  }
+}
+
+export class LDTExporter {
+  export(data: IESData): string {
+    // LDT format is similar to IES but with some differences
+    // For now, return a basic LDT format
+    const header = [
+      'VibeLux LDT Export',
+      data.fixture.manufacturer,
+      data.fixture.name,
+      data.fixture.wattage + 'W',
+      data.fixture.lumens + 'lm',
+      ''
+    ].join('\n');
+    
+    return header + exportToIES(data);
+  }
+}

@@ -4,11 +4,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { env } from '@/lib/env-validator'
 import { securityMiddleware } from '@/middleware/security'
 
 async function handler(request: NextRequest) {
-  const apiKey = env.get('OPENWEATHER_API_KEY')
+  const apiKey = process.env.OPENWEATHER_API_KEY
   
   if (!apiKey) {
     return NextResponse.json(

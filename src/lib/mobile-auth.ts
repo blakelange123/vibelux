@@ -4,7 +4,7 @@
 import { NextRequest } from 'next/server';
 import { verifyToken } from '@clerk/backend';
 import { db } from '@/lib/db';
-import { env } from '@/lib/env-validator';
+// Removed env-validator import to avoid build-time validation
 
 export interface MobileUser {
   userId: string;
@@ -28,7 +28,7 @@ export async function verifyMobileToken(request: NextRequest): Promise<MobileUse
     const token = authHeader.substring(7);
     
     // Verify Clerk JWT token
-    const secretKey = env.get('CLERK_SECRET_KEY');
+    const secretKey = process.env.CLERK_SECRET_KEY;
     if (!secretKey) {
       throw new Error('Clerk secret key not configured');
     }
@@ -182,7 +182,7 @@ export async function validateMobileApiKey(apiKey: string): Promise<boolean> {
     }
 
     // Fallback to environment variable for development
-    const devApiKey = env.get('MOBILE_API_KEY');
+    const devApiKey = process.env.MOBILE_API_KEY;
     return devApiKey ? apiKey === devApiKey : false;
     
   } catch (error) {

@@ -4,7 +4,6 @@
  */
 
 import Redis from 'ioredis'
-import { env } from '@/lib/env-validator'
 
 export interface CacheOptions {
   ttl?: number // Time to live in seconds
@@ -52,7 +51,7 @@ class RedisClient {
         keepAlive: 30000,
         connectTimeout: 10000,
         commandTimeout: 5000,
-        db: env.get('NODE_ENV') === 'test' ? 1 : 0, // Use different DB for tests
+        db: process.env.NODE_ENV === 'test' ? 1 : 0, // Use different DB for tests
       })
 
       this.client.on('connect', () => {
@@ -82,6 +81,8 @@ class RedisClient {
    * Get value from cache
    */
   async get<T = any>(key: string, options: CacheOptions = {}): Promise<T | null> {
+    await this.initialize()
+    
     if (!this.client || !this.isConnected) {
       this.stats.misses++
       return null
@@ -126,6 +127,8 @@ class RedisClient {
     value: any, 
     options: CacheOptions = {}
   ): Promise<boolean> {
+    await this.initialize()
+    
     if (!this.client || !this.isConnected) {
       return false
     }
@@ -162,6 +165,8 @@ class RedisClient {
    * Delete from cache
    */
   async del(key: string | string[], options: CacheOptions = {}): Promise<number> {
+    await this.initialize()
+    
     if (!this.client || !this.isConnected) {
       return 0
     }
@@ -186,6 +191,8 @@ class RedisClient {
    * Check if key exists
    */
   async exists(key: string, options: CacheOptions = {}): Promise<boolean> {
+    await this.initialize()
+    
     if (!this.client || !this.isConnected) {
       return false
     }
@@ -206,6 +213,8 @@ class RedisClient {
    * Set expiration for key
    */
   async expire(key: string, ttl: number, options: CacheOptions = {}): Promise<boolean> {
+    await this.initialize()
+    
     if (!this.client || !this.isConnected) {
       return false
     }
@@ -226,6 +235,8 @@ class RedisClient {
    * Get multiple values at once
    */
   async mget<T = any>(keys: string[], options: CacheOptions = {}): Promise<(T | null)[]> {
+    await this.initialize()
+    
     if (!this.client || !this.isConnected) {
       return new Array(keys.length).fill(null)
     }
@@ -267,6 +278,8 @@ class RedisClient {
    * Set multiple values at once
    */
   async mset(keyValuePairs: Record<string, any>, options: CacheOptions = {}): Promise<boolean> {
+    await this.initialize()
+    
     if (!this.client || !this.isConnected) {
       return false
     }
@@ -307,6 +320,8 @@ class RedisClient {
    * Clear all keys with pattern
    */
   async clear(pattern: string = '*', options: CacheOptions = {}): Promise<number> {
+    await this.initialize()
+    
     if (!this.client || !this.isConnected) {
       return 0
     }
@@ -335,6 +350,8 @@ class RedisClient {
    * Increment counter
    */
   async incr(key: string, options: CacheOptions = {}): Promise<number> {
+    await this.initialize()
+    
     if (!this.client || !this.isConnected) {
       return 0
     }
@@ -360,6 +377,8 @@ class RedisClient {
    * Decrement counter
    */
   async decr(key: string, options: CacheOptions = {}): Promise<number> {
+    await this.initialize()
+    
     if (!this.client || !this.isConnected) {
       return 0
     }
@@ -406,6 +425,8 @@ class RedisClient {
    * Get connection status
    */
   isReady(): boolean {
+    // Note: This is a sync method, so we can't initialize here
+    // The client should be initialized by other methods before checking ready state
     return this.isConnected && this.client !== null
   }
 
@@ -424,6 +445,8 @@ class RedisClient {
    * Flush all data (use with caution)
    */
   async flushAll(): Promise<boolean> {
+    await this.initialize()
+    
     if (!this.client || !this.isConnected) {
       return false
     }
@@ -454,6 +477,11 @@ class RedisClient {
 
 // Export singleton instance
 export const redisClient = new RedisClient()
+
+// Export getRedisClient function for compatibility
+export function getRedisClient(): RedisClient {
+  return redisClient
+}
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {

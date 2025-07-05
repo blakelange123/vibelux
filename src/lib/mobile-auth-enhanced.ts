@@ -4,7 +4,7 @@
 import { NextRequest } from 'next/server';
 import { verifyToken } from '@clerk/backend';
 import { db, prisma } from '@/lib/db';
-import { env } from '@/lib/env-validator';
+// Removed env-validator import to avoid build-time validation
 import crypto from 'crypto';
 
 export interface DeviceInfo {
@@ -233,7 +233,7 @@ export async function verifyMobileTokenWithSession(
     const token = authHeader.substring(7);
     
     // Verify Clerk JWT token
-    const secretKey = env.get('CLERK_SECRET_KEY');
+    const secretKey = process.env.CLERK_SECRET_KEY;
     if (!secretKey) {
       throw new Error('Clerk secret key not configured');
     }

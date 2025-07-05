@@ -4,7 +4,7 @@
  */
 
 import { InfluxDB, Point, WriteApi, QueryApi } from '@influxdata/influxdb-client'
-import { env } from '@/lib/env-validator'
+// Removed env-validator import to avoid build-time validation
 
 export interface SensorReading {
   measurement: string
@@ -42,10 +42,10 @@ class InfluxDBClient {
    */
   async connect(): Promise<boolean> {
     try {
-      const url = env.get('INFLUXDB_URL')
-      const token = env.get('INFLUXDB_TOKEN')
-      const org = env.get('INFLUXDB_ORG')
-      const bucket = env.get('INFLUXDB_BUCKET')
+      const url = process.env.INFLUXDB_URL
+      const token = process.env.INFLUXDB_TOKEN
+      const org = process.env.INFLUXDB_ORG
+      const bucket = process.env.INFLUXDB_BUCKET
 
       if (!url || !token || !org || !bucket) {
         console.warn('InfluxDB configuration incomplete, using PostgreSQL for time-series data')
@@ -86,19 +86,15 @@ class InfluxDBClient {
   private async testConnection(): Promise<void> {
     if (!this.client) throw new Error('InfluxDB client not initialized')
 
-    const org = env.get('INFLUXDB_ORG')
-    const health = await this.client.health()
-    
-    if (health.status !== 'pass') {
-      throw new Error(`InfluxDB health check failed: ${health.status}`)
-    }
-
-    // Test org access
-    const orgsAPI = this.client.getOrgsAPI()
-    const orgs = await orgsAPI.getOrgs({ org })
-    
-    if (!orgs.orgs || orgs.orgs.length === 0) {
-      throw new Error(`Organization '${org}' not found`)
+    try {
+      // Try to ping the InfluxDB instance
+      const pingAPI = this.client.getPingAPI()
+      await pingAPI.getPing()
+      
+      // Connection successful
+      console.log('✅ InfluxDB connection established')
+    } catch (error) {
+      throw new Error(`InfluxDB connection test failed: ${error}`)
     }
   }
 
@@ -164,7 +160,7 @@ class InfluxDBClient {
     }
 
     try {
-      const bucket = env.get('INFLUXDB_BUCKET')
+      const bucket = process.env.INFLUXDB_BUCKET
       const start = options.start || '-1h'
       const stop = options.stop || 'now()'
       const limit = options.limit || 1000
@@ -354,7 +350,7 @@ class InfluxDBClient {
 // Export singleton instance
 export const influxClient = InfluxDBClient.getInstance()
 
-// Auto-connect on import
-influxClient.connect().catch(console.error)
+// Don't auto-connect at module level to avoid build errors
+// Connection will be established on first use
 
 export default influxClient

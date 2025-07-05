@@ -9,7 +9,7 @@ import { parse } from 'url'
 import { verifyToken } from '@clerk/backend'
 import { influxClient } from './influxdb-client'
 import { db } from './db'
-import { env } from './env-validator'
+// Removed env-validator import to avoid build-time validation
 
 export interface WebSocketClient {
   id: string
@@ -122,7 +122,7 @@ class VibeLuxWebSocketServer {
     // Authenticate if token provided
     if (token) {
       try {
-        const secretKey = env.get('CLERK_SECRET_KEY')
+        const secretKey = process.env.CLERK_SECRET_KEY
         if (secretKey) {
           const payload = await verifyToken(token, { secretKey })
           if (payload?.sub) {
